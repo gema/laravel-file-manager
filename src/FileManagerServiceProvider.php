@@ -1,6 +1,6 @@
 <?php
 
-namespace Gemadigital\FileManager;
+namespace GemaDigital\FileManager;
 
 use Illuminate\Support\ServiceProvider;
 

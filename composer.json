@@ -35,10 +35,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Gemadigital\\FileManager\\FileManagerServiceProvider"
+                "GemaDigital\\FileManager\\FileManagerServiceProvider"
             ],
             "aliases": {
-                "FileManager": "Gemadigital\\FileManager\\Facades\\FileManager"
+                "FileManager": "GemaDigital\\FileManager\\Facades\\FileManager"
             }
         }
     }
