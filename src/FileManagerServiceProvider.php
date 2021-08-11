@@ -11,10 +11,10 @@ class FileManagerServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'gemadigital');
-        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'gemadigital');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        // $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadTranslationsFrom(__DIR__.'/resources/lang', 'file-manager');
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'file-manager');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadRoutesFrom(__DIR__.'/routes/routes.php');
 
         // Publishing is only necessary when using the CLI.
         if ($this->app->runningInConsole()) {
