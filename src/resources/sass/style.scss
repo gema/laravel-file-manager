@@ -1,0 +1,151 @@
+// .modal:nth-of-type(even) {
+//     z-index: 1052 !important;
+//   }
+//   .modal-backdrop.show:nth-of-type(even) {
+//     z-index: 1051 !important;
+//   }
+  
+  #upload-modal{
+    .confirm-crop{
+      position: absolute;
+      z-index: 1;
+      margin: .25rem;
+    }
+  
+    .medias-list{
+      height: 100%;
+      overflow: auto;
+      &::-webkit-scrollbar {
+        width: 3px;
+      }
+      &::-webkit-scrollbar-track {
+        background: #f1f1f159;
+      }
+  
+      &::-webkit-scrollbar-thumb {
+        background: white;
+      }
+    }
+  }
+  
+  #upload-modal, #tagModal{
+    .invalid-feedback{
+      display:block;
+    }
+  
+    .file-row .card-header{
+      background-color:#efefef;
+    }
+  }
+  
+  .selected-medias-list{
+    margin-bottom:.3rem;
+    a{
+      margin-bottom: 1rem;
+    }
+    img{
+      max-width: 4rem;
+      max-height: 4rem;
+    }
+  }
+  
+  .custom-file-manager{
+  
+    .card-header{
+      padding: .3rem;
+  
+      ul{
+        margin:0;
+        
+        li{
+          margin: 0;
+          padding: .5rem 1rem;
+          border-right: 1px solid #d9e2ef;
+          cursor:pointer;
+          a:hover{
+            text-decoration: underline;
+          }
+          .selected{
+            color: #eee;
+            background-color: #7c69ef;
+          }
+        }
+      }
+    }
+  
+    .card-body{
+      padding:0;
+      margin:0;
+  
+      .tags-container{
+        border-right: 1px solid #d9e2ef;
+        max-height: 17rem;
+        overflow: auto;
+  
+        ul li{
+          margin: .25rem 0;
+          text-align: center;
+          padding: .25rem .75rem
+        }
+  
+        ul li.selected{
+          background-color: #d9e2ef;
+        }
+  
+        ul > li:first-child{
+          margin-top: .75rem;
+        }
+      }
+  
+      nav{
+        margin: 1rem;
+        .page-item{
+          margin-right: .25rem;
+        }
+      }
+  
+      .selection {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+  
+      .selection-area {
+        max-height: 17rem;
+        padding-bottom: 10px!important;
+        overflow: auto;
+      }
+  
+      .selectable.selected {
+        background: rgba(111, 112, 112, 0.329);
+      }
+  
+      .selectable >*{
+        user-select:none;
+      }
+  
+      .row{
+        display:flex;
+        justify-content: center;
+        padding:0;
+        margin:0;
+        .col-sm-3.selectable{
+          display:flex;
+          justify-content: center;
+          margin-bottom:1rem;
+            >*{
+              user-select:none;
+            }
+  
+            > img{
+              margin: 1.3rem .25rem;
+              max-width: 3rem;
+            }
+  
+            > small {
+              position: absolute;
+              bottom:0;
+            }
+          
+        }
+      }
+    }
+  }

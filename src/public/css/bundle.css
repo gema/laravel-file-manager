@@ -1,0 +1,118 @@
+#upload-modal .confirm-crop {
+  position: absolute;
+  z-index: 1;
+  margin: 0.25rem;
+}
+#upload-modal .medias-list {
+  height: 100%;
+  overflow: auto;
+}
+#upload-modal .medias-list::-webkit-scrollbar {
+  width: 3px;
+}
+#upload-modal .medias-list::-webkit-scrollbar-track {
+  background: #f1f1f159;
+}
+#upload-modal .medias-list::-webkit-scrollbar-thumb {
+  background: white;
+}
+
+#upload-modal .invalid-feedback, #tagModal .invalid-feedback {
+  display: block;
+}
+#upload-modal .file-row .card-header, #tagModal .file-row .card-header {
+  background-color: #efefef;
+}
+
+.selected-medias-list {
+  margin-bottom: 0.3rem;
+}
+.selected-medias-list a {
+  margin-bottom: 1rem;
+}
+.selected-medias-list img {
+  max-width: 4rem;
+  max-height: 4rem;
+}
+
+.custom-file-manager .card-header {
+  padding: 0.3rem;
+}
+.custom-file-manager .card-header ul {
+  margin: 0;
+}
+.custom-file-manager .card-header ul li {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border-right: 1px solid #d9e2ef;
+  cursor: pointer;
+}
+.custom-file-manager .card-header ul li a:hover {
+  text-decoration: underline;
+}
+.custom-file-manager .card-header ul li .selected {
+  color: #eee;
+  background-color: #7c69ef;
+}
+.custom-file-manager .card-body {
+  padding: 0;
+  margin: 0;
+}
+.custom-file-manager .card-body .tags-container {
+  border-right: 1px solid #d9e2ef;
+  max-height: 17rem;
+  overflow: auto;
+}
+.custom-file-manager .card-body .tags-container ul li {
+  margin: 0.25rem 0;
+  text-align: center;
+  padding: 0.25rem 0.75rem;
+}
+.custom-file-manager .card-body .tags-container ul li.selected {
+  background-color: #d9e2ef;
+}
+.custom-file-manager .card-body .tags-container ul > li:first-child {
+  margin-top: 0.75rem;
+}
+.custom-file-manager .card-body nav {
+  margin: 1rem;
+}
+.custom-file-manager .card-body nav .page-item {
+  margin-right: 0.25rem;
+}
+.custom-file-manager .card-body .selection {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.custom-file-manager .card-body .selection-area {
+  max-height: 17rem;
+  padding-bottom: 10px !important;
+  overflow: auto;
+}
+.custom-file-manager .card-body .selectable.selected {
+  background: rgba(111, 112, 112, 0.329);
+}
+.custom-file-manager .card-body .selectable > * {
+  user-select: none;
+}
+.custom-file-manager .card-body .row {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+.custom-file-manager .card-body .row .col-sm-3.selectable {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.custom-file-manager .card-body .row .col-sm-3.selectable > * {
+  user-select: none;
+}
+.custom-file-manager .card-body .row .col-sm-3.selectable > img {
+  margin: 1.3rem 0.25rem;
+  max-width: 3rem;
+}
+.custom-file-manager .card-body .row .col-sm-3.selectable > small {
+  position: absolute;
+  bottom: 0;
+}
