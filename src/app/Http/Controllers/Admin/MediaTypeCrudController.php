@@ -64,7 +64,7 @@ class MediaTypeCrudController extends CrudController
         $this->setupCreateOperation();
     }
 
-    public function fetchMediaVersion()
+    public function fetchMediaVersions()
     {
         return $this->fetch(\GemaDigital\FileManager\app\Models\MediaVersion::class);
     }

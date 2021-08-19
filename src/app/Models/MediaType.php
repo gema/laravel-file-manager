@@ -11,7 +11,7 @@ class MediaType extends Model
     use HasFactory;
 
     protected $table ='media_types';
-    protected $fillable = ['media_id', 'type_id'];
+    protected $fillable = ['key', 'name'];
 
     /*
     |--------------------------------------------------------------------------

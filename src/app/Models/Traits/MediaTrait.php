@@ -11,29 +11,31 @@ trait MediaTrait
         \DB::beginTransaction();
         try{
             foreach(self::$mediable as $column){
-                
-                if( $entry[$column] !== null && isset($entry[$column]['medias'])){
-                    $mediaIds = $entry[$column]['medias'];
-                    $mediaField = MediaField::create([
-                        'entity_type' => self::class,
-                        'entity_id' => $entry->id
-                    ]);
+                if( $entry[$column] !== null){
+                    $decoded = json_decode($entry[$column]);
+                    if(isset($decoded->medias)){
+                        $mediaIds = $decoded->medias;
+                        $mediaField = MediaField::create([
+                            'entity_type' => self::class,
+                            'entity_id' => $entry->id
+                        ]);
 
-                    $entry[$column] = $mediaField->id;
+                        $entry[$column] = $mediaField->id;
 
-                    $data = [];
+                        $data = [];
 
-                    foreach($mediaIds as $mediaId){
-                        array_push($data, [
-                                'media_id' => $mediaId,
-                                'media_field_id' => $mediaField->id
-                            ]);
+                        foreach($mediaIds as $mediaId){
+                            array_push($data, [
+                                    'media_id' => $mediaId,
+                                    'media_field_id' => $mediaField->id
+                                ]);
+                        }
+
+                        \DB::table('media_field_has_media')->insert($data);
+                        $entry::withoutEvents(function() use($entry) {
+                            return $entry->save();
+                        });
                     }
-
-                    \DB::table('media_field_has_media')->insert($data);
-                    $entry::withoutEvents(function() use($entry) {
-                        return $entry->save();
-                    });
                 }
             }
 

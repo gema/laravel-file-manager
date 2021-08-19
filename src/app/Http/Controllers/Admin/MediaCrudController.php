@@ -34,6 +34,7 @@ class MediaCrudController extends CrudController
     protected function fetchMedia(){
         return $this->fetch([
             'model' => 'GemaDigital\FileManager\app\Models\Media',
+            'paginate' => 15,
             'query' => function($model) {
                 $model = $model->with('mediaContent');
 
@@ -59,7 +60,7 @@ class MediaCrudController extends CrudController
                     $model = $model->where('type_id', $type);
                 }
 
-                $model = call_user_func_array(config("file-manager.user_parents"), [$model]);
+                $model = call_user_func_array(config("file-manager.filter"), [$model]);
     
                 return $model;
             },

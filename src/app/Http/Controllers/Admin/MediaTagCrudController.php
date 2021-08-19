@@ -68,14 +68,16 @@ class MediaTagCrudController extends CrudController
         $this->crud->setValidation(MediaTagRequest::class);
 
         $this->crud->field('name');
-
-        $this->crud->addField([
-            'type' => 'relationship',
-            'name' => 'parent_id',
-            'entity' => 'parent',
-            'model' => 'App\Models\Visit',
-            'label' => ucfirst(__('parent'))
-        ]);
+        
+        foreach(config('file-manager.parents') as $parent){
+            $this->crud->addField([
+                'type' => 'relationship',
+                'name' => 'parent_id',
+                'entity' => 'parent',
+                'model' => $parent,
+                'label' => ucfirst(__('parent'))
+            ]);
+        }
     }
 
     /**

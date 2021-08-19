@@ -29,14 +29,24 @@ class MediaAPIController
         $medias = explode(',', $request->medias);
         $tags = explode(',', $request->tags);
 
+        $mediaTags = \DB::table('media_has_tags')->whereIn('media_id', $medias)->get()->pluck('tag_id', 'media_id');
+
         $data = [];
 
         foreach($medias as $mediaId){
             foreach($tags as $tagId){
-                array_push($data, [
-                    'media_id' => $mediaId,
-                    'tag_id' => $tagId,
-                ]);
+                $tagExists = false;
+                foreach($mediaTags as $media_id => $tag_id){
+                    if($media_id == $mediaId && $tag_id == $tagId){
+                        $tagExists = true;
+                    }
+                }
+                if(!$tagExists){
+                    array_push($data, [
+                        'media_id' => $mediaId,
+                        'tag_id' => $tagId,
+                    ]);
+                }
             } 
         }
 
@@ -128,7 +138,7 @@ class MediaAPIController
 
     public function editMedia(Request $request){
         $validation = Validator::make($request->all(), [
-            'parent' => 'required',
+            'parent' => 'nullable',
             'title' => 'required',
             'description' => 'required'
         ]);
@@ -141,7 +151,10 @@ class MediaAPIController
         $media = Media::find($mediaContent->media_id);
         if(!$media || !$mediaContent) return json_response(['updated' => false]);
         
-        $media->parent_id = $request->parent;
+        if($request->parent) {
+            $media->parent_id = $request->parent;
+        }
+        
         $mediaContent->title = $request->title;
         $mediaContent->description = $request->description;
 
@@ -173,5 +186,18 @@ class MediaAPIController
             'uuid' => Str::uuid(), 
             'preview' => 'https://mcleansmartialarts.com/wp-content/uploads/2017/04/default-image-620x600.jpg'
         ];
+    }
+
+    public function getParents(){
+        $data = [];
+        foreach(config("file-manager.parents") as $class){
+            $object = new $class();
+            
+            $result = $object->paginate(10);
+
+            $data[$class] = $result;
+        }
+
+        return json_response($data);
     }
 }

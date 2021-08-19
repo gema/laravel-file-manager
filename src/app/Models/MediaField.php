@@ -3,13 +3,12 @@
 namespace GemaDigital\FileManager\app\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-
+use GemaDigital\FileManager\app\Models\MediaContent;
 use Illuminate\Database\Eloquent\Model;
 
-class MediaTag extends Model
+class MediaField extends Model
 {
     use CrudTrait;
-    use Traits\FilterByParentTrait;
 
     /*
     |--------------------------------------------------------------------------
@@ -17,11 +16,11 @@ class MediaTag extends Model
     |--------------------------------------------------------------------------
     */
 
-    protected $table = 'media_tags';
+    protected $table = 'media_fields';
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     // protected $guarded = ['id'];
-    protected $fillable = ['name', 'parent_id'];
+    protected $fillable = ['entity_type', 'entity_id'];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -36,15 +35,11 @@ class MediaTag extends Model
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-
     public function medias()
     {
-        return $this->belongsToMany('App\Models\Media', 'media_has_tags', 'tag_id', 'media_id');
+        return $this->belongsToMany('GemaDigital\FileManager\app\Models\Media', 'media_field_has_media', 'media_field_id', 'media_id');
     }
 
-    public function parent(){
-        return $this->morphTo();
-    }
 
     /*
     |--------------------------------------------------------------------------
