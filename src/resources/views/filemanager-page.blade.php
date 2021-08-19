@@ -12,6 +12,3 @@
 </div>
 
 @endsection
-
-@include('file-manager::filemanager-modals')
-@include("file-manager::translations")

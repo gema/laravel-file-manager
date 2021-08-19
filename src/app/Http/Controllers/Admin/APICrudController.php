@@ -8,8 +8,6 @@ use GemaDigital\FileManager\app\Models\MediaContent;
 use GemaDigital\FileManager\app\Models\MediaTag;
 use GemaDigital\FileManager\app\Models\MediaType;
 
-use App\Models\Visit; // Needs review! (config file?)
-
 class APICrudController extends \GemaDigital\Framework\app\Http\Controllers\Admin\APICrudController
 {
     public function mediaTagSearch()
@@ -17,7 +15,7 @@ class APICrudController extends \GemaDigital\Framework\app\Http\Controllers\Admi
         return $this->entitySearch(MediaTag::class, ['name']);
     }
 
-    public function MediaTypeSearch(){
+    public function mediaTypeSearch(){
         return $this->entitySearch(MediaType::class, ['type']);
     }
 }

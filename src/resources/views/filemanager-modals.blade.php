@@ -60,7 +60,7 @@
 
 <!-- Asign Tag to Media Modal -->
 <div class="modal fade" id="asign-tag-modal" data-backdrop="static" tabindex="-1" aria-labelledby="asignTagModalLabel" aria-hidden="true">
-  <div class="modal-dialog" style="max-width:400px;z-index:1052">
+  <div class="modal-dialog" style="max-width:400px">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="asignTagModalLabel">{{__("file-manager::messages.asign_tag")}}</h5>

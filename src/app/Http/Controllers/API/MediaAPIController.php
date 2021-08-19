@@ -187,4 +187,17 @@ class MediaAPIController
             'preview' => 'https://mcleansmartialarts.com/wp-content/uploads/2017/04/default-image-620x600.jpg'
         ];
     }
+
+    public function getParents(){
+        $data = [];
+        foreach(config("file-manager.parents") as $class){
+            $object = new $class();
+            
+            $result = $object->paginate(10);
+
+            $data[$class] = $result;
+        }
+
+        return json_response($data);
+    }
 }

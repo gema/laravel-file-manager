@@ -179,7 +179,7 @@ const initSelectedMediasEdition = (prefix, medias, type) => {
             const [media] = medias.filter(m => String(m.id) === mediaId);
 
             const modal = document.querySelector('#edit-media-modal')
-            modal.querySelector('.modal-body').innerHTML = metadataFormTemplate(media, globalMediaTypes, media.id )
+            modal.querySelector('.modal-body').innerHTML = metadataFormTemplate(globalMediaTypes, media.id )
             
             modal.querySelector('.modal-save').innerHTML = 'Save';
 
@@ -377,13 +377,11 @@ const renderMediasTable = (medias, prefix, type) => {
 
 const getMedias = (page = 1, tags=null, type = false, callback = false) => {
     apiRequest(`/admin/media/fetch/media?page=${page}`, mediasResponse => {
-        console.log({mediasResponse})
         callback(mediasResponse)
     }, 'POST', {  _token : document.querySelector('meta[name=csrf-token]').content, tags, type });
 }
 
 const  loadGlobals = (callback = false) => {
-    console.log('loading globals')
     toggleLoader('', true);
 
     apiRequest('/admin/file-manager/api/mediaTag/ajax/search', tagsResponse => {
@@ -391,7 +389,6 @@ const  loadGlobals = (callback = false) => {
         apiRequest('/admin/file-manager/api/mediaType/ajax/search', typesResponse => {
             globalMediaTypes = typesResponse.data;
             apiRequest('/admin/media/fetch/parent', parentsResponse => {
-                console.log(parentsResponse);
                 Object.entries(parentsResponse.data).forEach(([entity, response]) => {
                     const parentList = {};
                     Object.values(response.data).forEach(parent => {
@@ -400,7 +397,6 @@ const  loadGlobals = (callback = false) => {
                     globalParents[entity] = parentList
                 })
 
-                console.log({globalParents})
                 if(callback) callback();
             }, 'POST', { 
                 _token : document.querySelector('meta[name=csrf-token]').content, 
@@ -447,43 +443,15 @@ const typesListTemplate = types => {
         </select></div>`;
 }
 
-const metadataFormTemplate = (media, types, i) => {
-    // let parentsList = '';
+const metadataFormTemplate = (types, i) => {
 
-    // Object.entries(globalParents).forEach(([parentId, name]) => {
-    //     parentsList += `<option value="${parentId}">${name}</option>`;
-    // })
-
-    let parentsHtml = ``;
-
-    Object.entries(globalParents).forEach(([namespace, parent]) => {
-        const entity = namespace.split('\\').pop();
-        let options = '';
-
-        console.log({parent})
-        Object.entries(parent).forEach(([parentId, name]) => {
-            options += `<option value="${parentId}">${name}</option>`;
-        })
-
-        parentsHtml += `
-            <optgroup data-model="${namespace}" label="${entity}">
-                ${options}
-            </optgroup>
-        `;
-    })
-
-    let select = ``;
-
-    if(Object.keys(globalParents).length > 0){
-        select += `
-            <div class="form-group mt-3">
-                <label>${__('parent')}</label>
-                <select name="parentId" class="form-control custom-select">
-                    ${parentsHtml}
-                </select>
-            </div>
-        `;
-    }
+    let select = `
+        <div class="form-group">
+            <label>${__('parent')}</label>
+            <select id="parent-select-${i}" name="parentId" style="width:100%">
+            </select>
+        </div>
+    `;
 
     return `
     <form id="metadata-form-${i}">
@@ -565,10 +533,67 @@ const renderUploadMediaList = (medias, types) => {
                             <div class="mt-1" id="crop_image_${i}">
                                 ${cropImageTemplate(media, i)}
                             </div>
-                            ${metadataFormTemplate(media, types, i)}
+                            ${metadataFormTemplate(types, i)}
                         </div>
                     </div>
                 </div>`;
+
+        const finished = [];
+        
+        $(`#parent-select-${i}`).select2({
+            ajax: {
+                url: '/api/media/parent',
+                dataType: 'json',
+                processResults: function ({ data }) {
+                    const parentsNumber = Object.keys(data).length;
+                    const results = [];
+                    let more;
+
+                    if (parentsNumber > 1) {
+                        Object.entries(data).forEach(([namespace, response]) => {
+                            if (response.current_page === response.last_page)
+                                finished.push(namespace);
+                            if (response.data.length) {
+                                results.push({
+                                    text: namespace.split('\\').pop(),
+                                    children: Object.values(response.data).map(entry => {
+                                        return {
+                                            id: entry.id,
+                                            text: entry.name
+                                        }
+                                    })
+                                })
+                            } 
+                        });
+                        more = finished.length < parentsNumber;
+                    } else {
+                        Object.entries(data).forEach(([namespace, response]) => {
+                            Object.values(response.data).forEach(entry => {
+                                results.push({
+                                    id: entry.id,
+                                    text: entry.name
+                                })
+                            })
+                            more = response.current_page < response.last_page;
+                        })
+                    }
+
+                    return {
+                        results,
+                        pagination: {more}
+                    }
+                    
+                },
+                data: (params) => {
+                    const query = {
+                      search: params.term,
+                      page: params.page || 1
+                    }
+
+                    return query;
+                  }
+            }
+        });
         i += 1;
     });
 }

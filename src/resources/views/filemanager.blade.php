@@ -30,6 +30,7 @@
         @include("file-manager::translations")  
     @endif
 @else
+    @include("file-manager::translations")  
     @push('after_styles')
         <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet"/>
         <style>{!! $cssBundle !!}</style>
@@ -40,7 +41,6 @@
     @endpush
 
     @include('file-manager::filemanager-modals')
-    @include("file-manager::translations")  
 @endif
 
 <div class="custom-file-manager card">
