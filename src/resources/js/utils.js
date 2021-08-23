@@ -36,8 +36,6 @@ const apiRequest = (endpoint, callback, method = 'GET', data = false, headers = 
         }
     }
 
-    if(data)console.log({formData : formData.get('media')})
-
     fetch(document.location.origin + endpoint, {
         method,
         headers : head,

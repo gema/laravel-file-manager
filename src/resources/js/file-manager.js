@@ -448,7 +448,7 @@ const metadataFormTemplate = (types, i) => {
     let select = `
         <div class="form-group">
             <label>${__('parent')}</label>
-            <select id="parent-select-${i}" name="parentId" style="width:100%">
+            <select id="parent-select-${i}" class="select2-parent" name="parentId" style="width:100%">
             </select>
         </div>
     `;
@@ -501,6 +501,7 @@ const renderUploadMediaList = (medias, types) => {
 
         let mediaTemplate = '';
         let hasVideo = false;
+        let hasAudio = false;
 
         const typesWithoutPreview = [
             'video/avi'
@@ -510,25 +511,39 @@ const renderUploadMediaList = (medias, types) => {
             mediaTemplate = `<small>${__('noPreview', [media.type])}</small>`
         }
         else if (/^image/.test(media.type)) {
-            const cropBtn = `
-                <button id="crop-btn-${i}" class="form-control btn btn-default btn-sm crop-btn" data-id="${i}">
-                    ${__('crop')}
-                </button>`;
+            if (media.type !== 'image/gif') {
+                const cropBtn = `
+                    <button id="crop-btn-${i}" class="form-control btn btn-default btn-sm crop-btn" data-id="${i}">
+                        ${__('crop')}
+                    </button>`;
         
-            mediaTemplate = `
-                <img id="image-preview-${i}" class="w-100 my-3" src="${URL.createObjectURL(media)}">
-                ${cropBtn}
-                <div class="mt-1" id="crop_image_${i}">
-                    ${cropImageTemplate(media, i)}
-                </div>
-            `;
+                mediaTemplate = `
+                    <img id="image-preview-${i}" class="w-100 my-3" src="${URL.createObjectURL(media)}">
+                    ${cropBtn}
+                    <div class="mt-1" id="crop_image_${i}">
+                        ${cropImageTemplate(media, i)}
+                    </div>
+                `;
+            } else {
+                mediaTemplate = `
+                    <img id="image-preview-${i}" class="w-100 my-3" src="${URL.createObjectURL(media)}">
+                `;
+            }
+            
         } else if (/^video/.test(media.type)) {
             hasVideo = true;
             mediaTemplate = `
-                <video controls id="video-preview-video-${i}" class="w-100">
+                <video controls id="video-preview-video-${i}" class="w-100 my-3">
                     <source id="video-preview-source-${i}" src="splashVideo">
                     Your browser does not support the video tag.
                 </video>`; 
+        }
+        else if (/^audio/.test(media.type)) {
+            hasAudio = true;
+            mediaTemplate = `
+            <audio class="w-100 my-3" id="audio-preview-audio-${i}" controls>
+                <source src="" id="audio-preview-source-${i}" />
+            </audio>`; 
         }
 
         mediasList.innerHTML += `
@@ -571,8 +586,13 @@ const renderUploadMediaList = (medias, types) => {
             reader.readAsDataURL(media)
         }
 
+        if (hasAudio) {
+            document.querySelector(`#audio-preview-source-${i}`).src = URL.createObjectURL(media);
+            document.querySelector(`#audio-preview-audio-${i}`).load();
+        }
+
         const finished = [];
-        
+        const x = i;
         $(`#parent-select-${i}`).select2({
             ajax: {
                 url: '/api/media/parent',
@@ -592,7 +612,9 @@ const renderUploadMediaList = (medias, types) => {
                                     children: Object.values(response.data).map(entry => {
                                         return {
                                             id: entry.id,
-                                            text: entry.name
+                                            text: entry.name,
+                                            namespace,
+                                            i:x
                                         }
                                     })
                                 })
@@ -604,7 +626,9 @@ const renderUploadMediaList = (medias, types) => {
                             Object.values(response.data).forEach(entry => {
                                 results.push({
                                     id: entry.id,
-                                    text: entry.name
+                                    text: entry.name,
+                                    namespace,
+                                    i:x
                                 })
                             })
                             more = response.current_page < response.last_page;
@@ -626,7 +650,11 @@ const renderUploadMediaList = (medias, types) => {
                     return query;
                   }
             }
+        }).on('select2:select', e => {
+            const data = e.params.data;
+            $(`#parent-select-${data.i}`).children()[0].dataset.namespace = data.namespace;
         });
+
         i += 1;
     });
 }
@@ -700,8 +728,12 @@ const initUploadModal = (medias, types) => {
             metadataFields.forEach(field => metadata[field.name] = field.value);
 
             const parentSelect = document.querySelector(`#metadata-form-${i} select[name="parentId"]`);
-            if(parentSelect !== null){
-                metadata.parent_model = parentSelect.options[parentSelect.selectedIndex].parentElement.dataset.model;
+            if (parentSelect !== null) {
+                let dataAttrs = $(parentSelect).find(':selected').data();
+                if (dataAttrs !== undefined) {
+                    metadata.parent_model = dataAttrs.namespace
+                }
+                
             }
 
             promises.push(mediaUploadPromise(media, metadata))
