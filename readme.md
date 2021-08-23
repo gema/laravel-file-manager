@@ -17,6 +17,91 @@ $ composer require gemadigital/file-manager
 
 ## Usage
 
+### Running migrations
+
+``` bash
+$ php artisan migrate
+```
+
+### Publishing the config
+
+``` bash
+$ php artisan vendor:publish --provider="gemadigital/file-manager/FileManagerServiceProvider"
+```
+
+### Sample config file
+
+``` php
+<?php
+
+use App\Models\Visit;
+
+return [
+    'parents' => [
+        Visit::class, // Parent classes namespaces (multiple parents supported)
+    ],
+    'filter' => (function($query){
+        /**
+        * Function used in medias fetch operation.
+        * Use to apply filters, ordering, etc to the file-manager medias listing
+        */
+        if(!admin()){
+            return $query
+                ->whereIn('parent_id', backpack_user()->visitsIds())
+                ->where('parent_type', Visit::class);
+        }
+
+        return $query;
+    })
+];
+```
+
+### Adding File-Manager to the sidebar menu
+**`sidebar_content.blade.php`**
+``` blade
+@include('file-manager::sidebar_content')
+```
+
+### Using File-Manager as a field (associated to an entity)
+**`MyEntity.php`**
+``` php
+<?php
+
+use GemaDigital\FileManager\app\Models\Traits\MediaTrait;
+use GemaDigital\Framework\app\Models\Model; // Or an extension of this class
+
+class MyEntity extends Model {
+  use MediaTrait; // Use the trait
+  protected static $mediable = ['images', 'videos'] // Define which columns will have medias
+}
+```
+
+**`MyEntityCrudController.php`**
+``` php
+<?php
+
+class MyEntityCrudController extends CrudController {
+  public function setupCreateOperation(){
+  
+    // Setting up the fields
+    
+    $this->crud->addField([
+            'name' => 'images',
+            'type' => 'file-manager',
+            'view_namespace' => 'file-manager::field',
+            'media_type' => 1 // Get this from `media_types.id`
+        ]);
+
+    $this->crud->addField([
+        'name' => 'videos',
+        'type' => 'file-manager',
+        'view_namespace' => 'file-manager::field',
+        'media_type' => 2 // Get this from `media_types.id`
+    ]);
+  }
+}
+```
+
 ## Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.
