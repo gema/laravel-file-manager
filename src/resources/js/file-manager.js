@@ -332,7 +332,7 @@ const initScroll = (container, lastPage, prefix = '', type) => {
     
     $(container).unbind('scroll');
     $(container).on('scroll', e => {
-        if(container.offsetHeight + container.scrollTop >= container.scrollHeight){
+        if(container.offsetHeight + container.scrollTop >= container.scrollHeight - 1){
             if(!isLoading && (page+1 <= lastPage)){
                 page +=  1;
                 isLoading = true;
@@ -491,18 +491,44 @@ const cropImageTemplate = (media, i) => {
 }
 
 const renderUploadMediaList = (medias, types) => {
+
     const mediasList = document.querySelector('#upload-modal .medias-list');
     mediasList.innerHTML = '';
     let i = 0;
 
     medias.forEach(media => {
         media = media.media;
-        let cropBtn = '';
-        if (media.type == 'image/png' || media.type == 'image/jpg' || media.type == 'image/jpeg') {
-            cropBtn = `
+
+        let mediaTemplate = '';
+        let hasVideo = false;
+
+        const typesWithoutPreview = [
+            'video/avi'
+        ]
+
+        if (typesWithoutPreview.includes(media.type)) {
+            mediaTemplate = `<small>${__('noPreview', [media.type])}</small>`
+        }
+        else if (/^image/.test(media.type)) {
+            const cropBtn = `
                 <button id="crop-btn-${i}" class="form-control btn btn-default btn-sm crop-btn" data-id="${i}">
                     ${__('crop')}
                 </button>`;
+        
+            mediaTemplate = `
+                <img id="image-preview-${i}" class="w-100 my-3" src="${URL.createObjectURL(media)}">
+                ${cropBtn}
+                <div class="mt-1" id="crop_image_${i}">
+                    ${cropImageTemplate(media, i)}
+                </div>
+            `;
+        } else if (/^video/.test(media.type)) {
+            hasVideo = true;
+            mediaTemplate = `
+                <video controls id="video-preview-video-${i}" class="w-100">
+                    <source id="video-preview-source-${i}" src="splashVideo">
+                    Your browser does not support the video tag.
+                </video>`; 
         }
 
         mediasList.innerHTML += `
@@ -528,15 +554,22 @@ const renderUploadMediaList = (medias, types) => {
                         aria-labelledby="heading_${i}"
                         data-parent="#accordion">   
                         <div class="card-body">
-                            <img id="image-preview-${i}" class="w-100 my-3" src="${URL.createObjectURL(media)}">
-                            ${cropBtn}
-                            <div class="mt-1" id="crop_image_${i}">
-                                ${cropImageTemplate(media, i)}
-                            </div>
+                            ${mediaTemplate}
                             ${metadataFormTemplate(types, i)}
                         </div>
                     </div>
                 </div>`;
+        
+        if (hasVideo) {
+            const reader = new FileReader();
+            const x = i;
+            reader.onloadend = () => {
+                const video = document.querySelector(`#video-preview-video-${x}`);
+                video.src = reader.result;
+            }
+
+            reader.readAsDataURL(media)
+        }
 
         const finished = [];
         
@@ -609,19 +642,21 @@ const initCropper = (i) => {
     buttonConfirm.addEventListener('click', function (e) {
 
         let canvas = ImgCrop.getCroppedCanvas();
-        canvas.toBlob(function (blob) {
-            blob.lastModifiedDate = new Date();
-            blob.lastModified = new Date();
-
-            const croppedImage = new File([blob], mediaList[i].media.name, {
-                type: blob.type,
-            });
-
-            mediaList[i].media = croppedImage;
-            document.querySelector(`#image-preview-${i}`).src = URL.createObjectURL(croppedImage);
-            $(`#crop-btn-${i}`).click();
-            toast(__('imageCropped'))
-        });
+        if (canvas !== null) {
+            canvas.toBlob(function (blob) {
+                blob.lastModifiedDate = new Date();
+                blob.lastModified = new Date();
+    
+                const croppedImage = new File([blob], mediaList[i].media.name, {
+                    type: blob.type,
+                });
+    
+                mediaList[i].media = croppedImage;
+                document.querySelector(`#image-preview-${i}`).src = URL.createObjectURL(croppedImage);
+                $(`#crop-btn-${i}`).click();
+                toast(__('imageCropped'))
+            });   
+        }
     });
 }
 

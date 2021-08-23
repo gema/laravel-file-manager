@@ -39,5 +39,6 @@ return [
 	'media_type' => 'Media Type',
 	'crop' => 'crop',
 	'image_cropped' => 'image cropped with success',
-	'invalid_metadata' => 'Provided metadata is invalid'
+	'invalid_metadata' => 'Provided metadata is invalid',
+	'no_preview' => '$ preview is not supported'
 ];

@@ -11,12 +11,10 @@ const apiRequest = (endpoint, callback, method = 'GET', data = false, headers = 
     if(data){
         formData = new FormData();
         for (const [key, value] of Object.entries(data)) {
-            console.log({key, value})
             if (key && value) {
                 if (typeof value === 'object') {
                     // Array
                     if (Array.isArray(value)) {
-                        console.log('is arr');
                         for (const [, subValue] of Object.entries(value)) {
                         formData.append(`${key}[]`, subValue);
                         }
@@ -32,9 +30,7 @@ const apiRequest = (endpoint, callback, method = 'GET', data = false, headers = 
                 }
                 // Default
                 else {
-                    console.log('is default');
-
-                formData.append(key, value);
+                    formData.append(key, value);
                 }
             }
         }

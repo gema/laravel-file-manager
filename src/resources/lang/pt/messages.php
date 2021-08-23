@@ -39,7 +39,8 @@ return [
 	'media_type' => 'Tipo de mídia',
 	'crop' => 'cortar',
 	'image_cropped' => 'imagem cortada com sucesso',
-	'invalid_metadata' => 'Os metadados fornecidos são inválidos'
+	'invalid_metadata' => 'Os metadados fornecidos são inválidos',
+	'no_preview' => 'A pré-visualização de $ não é suportada'
 ];
 
 
