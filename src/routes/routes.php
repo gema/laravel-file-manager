@@ -25,25 +25,28 @@ Route::group(
 
                 // API
                 Route::any('/file-manager/api/{entity}/ajax/{action}/{arg1?}/{arg2?}/{arg3?}', '\GemaDigital\FileManager\app\Http\Controllers\Admin\APICrudController@ajax');
-            });
-    });
+            }
+        );
+    }
+);
 
-    Route::group([
-        'namespace' => 'API', 
-        'middleware' => ['api'], 
-        'prefix' => 'api'
-    ], 
-        function () {
-            Route::group(['prefix' => 'media'], function () {
-                Route::get('/', [MediaAPIController::class, 'getMedias']);
-                Route::get('/parent', [MediaAPIController::class, 'getParents']);
-                Route::post('/tag', [MediaAPIController::class, 'addTags']);
-                Route::post('/tag/unsign', [MediaAPIController::class, 'removeTags']);
-                Route::post('/upload', [MediaAPIController::class, 'uploadMedia']);
-                Route::post('/{id}/edit', [MediaAPIController::class, 'editMedia']);
-                Route::post('/cloud', [MediaAPIController::class, 'mediaCloud'])->name('mediaCloud');
-            });
+Route::group(
+    [
+        'namespace' => 'API',
+        'middleware' => ['api'],
+        'prefix' => 'api',
+    ],
+    function () {
+        Route::group(['prefix' => 'media'], function () {
+            Route::get('/', [MediaAPIController::class, 'getMedias']);
+            Route::get('/parent', [MediaAPIController::class, 'getParents']);
+            Route::post('/tag', [MediaAPIController::class, 'addTags']);
+            Route::post('/tag/unsign', [MediaAPIController::class, 'removeTags']);
+            Route::post('/upload', [MediaAPIController::class, 'uploadMedia']);
+            Route::post('/{id}/edit', [MediaAPIController::class, 'editMedia']);
+            Route::post('/cloud', [MediaAPIController::class, 'mediaCloud'])->name('mediaCloud');
         });
+    });
 
 // Webhooks
 Route::group(
@@ -52,4 +55,5 @@ Route::group(
     ],
     function () {
         // TODO
-    });
+    }
+);
