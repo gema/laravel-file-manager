@@ -3,7 +3,6 @@
 namespace GemaDigital\FileManager\app\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-
 use Illuminate\Database\Eloquent\Model;
 
 class MediaTag extends Model

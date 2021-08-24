@@ -14,15 +14,16 @@ class MediaCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
 
-    protected function fetchParent(){
+    protected function fetchParent()
+    {
         $data = [];
-        foreach(config("file-manager.parents") as $class){
+        foreach (config('file-manager.parents') as $class) {
             $response = $this->fetch([
                 'model' => $class,
-                'query' => function($model) {
+                'query' => function ($model) {
                     return $model;
                 },
-                'searchable_attributes' => []
+                'searchable_attributes' => [],
             ]);
 
             $data[$class] = $response;
@@ -31,15 +32,16 @@ class MediaCrudController extends CrudController
         return json_response($data);
     }
 
-    protected function fetchMedia(){
+    protected function fetchMedia()
+    {
         return $this->fetch([
             'model' => 'GemaDigital\FileManager\app\Models\Media',
             'paginate' => 15,
-            'query' => function($model) {
+            'query' => function ($model) {
                 $model = $model->with('mediaContent');
 
                 $tags = request()->tags;
-                if($tags !== null){
+                if ($tags !== null) {
                     $mediaTags = \DB::table('media_has_tags')
                         ->select(\DB::raw('count(media_id) as total, media_id'))
                         ->whereIn('tag_id', $tags)
@@ -56,15 +58,15 @@ class MediaCrudController extends CrudController
 
                 $type = request()->type;
 
-                if($type !== null && $type !== "0"){
+                if ($type !== null && $type !== '0') {
                     $model = $model->where('type_id', $type);
                 }
 
-                $model = call_user_func_array(config("file-manager.filter"), [$model]);
-    
+                $model = call_user_func_array(config('file-manager.filter'), [$model]);
+
                 return $model;
             },
-            'searchable_attributes' => []
+            'searchable_attributes' => [],
         ]);
     }
 }
