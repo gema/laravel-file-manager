@@ -3,7 +3,6 @@
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Build Status][ico-travis]][link-travis]
-[![StyleCI][ico-styleci]][link-styleci]
 
 This is where your description should go. Take a look at [contributing.md](contributing.md) to see a to do list.
 
@@ -12,7 +11,7 @@ This is where your description should go. Take a look at [contributing.md](contr
 Via Composer
 
 ``` bash
-$ composer require gemadigital/file-manager
+composer require gemadigital/file-manager
 ```
 
 ## Usage
@@ -20,13 +19,13 @@ $ composer require gemadigital/file-manager
 ### Running migrations
 
 ``` bash
-$ php artisan migrate
+php artisan migrate
 ```
 
 ### Publishing the config
 
 ``` bash
-$ php artisan vendor:publish --provider="GemaDigital/FileManager/FileManagerServiceProvider"
+php artisan vendor:publish --provider="GemaDigital\FileManager\FileManagerServiceProvider"
 ```
 
 ### Sample config file
@@ -34,11 +33,11 @@ $ php artisan vendor:publish --provider="GemaDigital/FileManager/FileManagerServ
 ``` php
 <?php
 
-use App\Models\Visit;
+use App\Models\Project;
 
 return [
     'parents' => [
-        Visit::class, // Parent classes namespaces (multiple parents supported)
+        Project::class, // Parent classes namespaces (multiple parents supported)
     ],
     'filter' => (function($query){
         /**
@@ -47,8 +46,8 @@ return [
         */
         if(!admin()){
             return $query
-                ->whereIn('parent_id', backpack_user()->visitsIds())
-                ->where('parent_type', Visit::class);
+                ->whereIn('parent_id', backpack_user()->projects())
+                ->where('parent_type', Project::class);
         }
 
         return $query;
@@ -109,7 +108,7 @@ Please see the [changelog](changelog.md) for more information on what has change
 ## Testing
 
 ``` bash
-$ composer test
+composer test
 ```
 
 ## Contributing
@@ -120,11 +119,6 @@ Please see [contributing.md](contributing.md) for details and a todolist.
 
 If you discover any security related issues, please email author@email.com instead of using the issue tracker.
 
-## Credits
-
-- [Author Name][link-author]
-- [All Contributors][link-contributors]
-
 ## License
 
 MIT. Please see the [license file](license.md) for more information.
@@ -132,11 +126,7 @@ MIT. Please see the [license file](license.md) for more information.
 [ico-version]: https://img.shields.io/packagist/v/gemadigital/file-manager.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/gemadigital/file-manager.svg?style=flat-square
 [ico-travis]: https://img.shields.io/travis/gemadigital/file-manager/master.svg?style=flat-square
-[ico-styleci]: https://styleci.io/repos/12345678/shield
 
 [link-packagist]: https://packagist.org/packages/gemadigital/file-manager
 [link-downloads]: https://packagist.org/packages/gemadigital/file-manager
 [link-travis]: https://travis-ci.org/gemadigital/file-manager
-[link-styleci]: https://styleci.io/repos/12345678
-[link-author]: https://github.com/gemadigital
-[link-contributors]: ../../contributors
