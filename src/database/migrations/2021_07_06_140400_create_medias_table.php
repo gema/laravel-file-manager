@@ -7,8 +7,6 @@ use GemaDigital\Framework\app\Helpers\EnumHelper;
 
 class CreateMediasTable extends Migration
 {
-    private $parent = 'visits';
-
     public function up()
     {
         Schema::create('media_types', function (Blueprint $table) {

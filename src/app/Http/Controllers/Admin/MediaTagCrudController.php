@@ -43,8 +43,11 @@ class MediaTagCrudController extends CrudController
 
         if(admin()){
             $this->crud->addColumn([
-                'type' => 'relationship',
-                'name' => 'parent',
+                'name' => 'parent_id',
+                'label' => ucfirst(__('parent'))
+            ]);
+            $this->crud->addColumn([
+                'name' => 'parent_type',
                 'label' => ucfirst(__('parent'))
             ]);
         }
@@ -68,16 +71,22 @@ class MediaTagCrudController extends CrudController
         $this->crud->setValidation(MediaTagRequest::class);
 
         $this->crud->field('name');
-        
-        foreach(config('file-manager.parents') as $parent){
-            $this->crud->addField([
-                'type' => 'relationship',
-                'name' => 'parent_id',
-                'entity' => 'parent',
-                'model' => $parent,
-                'label' => ucfirst(__('parent'))
-            ]);
-        }
+
+        $this->crud->addField([
+            'name' => 'parent_id',
+            'label' => ucFirst(__('parent')),
+            'type' => 'select2-morph',
+            'view_namespace' => 'file-manager::field',
+            'url' => '/api/media/parent'
+        ]);
+
+        $this->crud->addField([
+            'name' => 'parent_type',
+            'type' => 'text',
+            'wrapperAttributes' => [
+                'class' => 'parent-type-field d-none'
+            ]
+        ]);
     }
 
     /**
