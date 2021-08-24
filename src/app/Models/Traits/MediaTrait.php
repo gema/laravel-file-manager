@@ -27,9 +27,9 @@ trait MediaTrait
 
                         foreach ($mediaIds as $mediaId) {
                             array_push($data, [
-                                    'media_id' => $mediaId,
-                                    'media_field_id' => $mediaField->id,
-                                ]);
+                                'media_id' => $mediaId,
+                                'media_field_id' => $mediaField->id,
+                            ]);
                         }
 
                         DB::table('media_field_has_media')->insert($data);
@@ -41,7 +41,7 @@ trait MediaTrait
             }
 
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (\Exception$e) {
             DB::rollback();
         }
     }
@@ -65,7 +65,7 @@ trait MediaTrait
             DB::commit();
 
             self::afterCreate($entry);
-        } catch (\Exception $e) {
+        } catch (\Exception$e) {
             DB::rollback();
         }
     }

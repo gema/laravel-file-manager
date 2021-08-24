@@ -17,18 +17,8 @@ class MediaTag extends Model
     */
 
     protected $table = 'media_tags';
-    // protected $primaryKey = 'id';
-    // public $timestamps = false;
-    // protected $guarded = ['id'];
+    protected $guarded = ['id'];
     protected $fillable = ['name', 'parent_id', 'parent_type'];
-    // protected $hidden = [];
-    // protected $dates = [];
-
-    /*
-    |--------------------------------------------------------------------------
-    | FUNCTIONS
-    |--------------------------------------------------------------------------
-    */
 
     /*
     |--------------------------------------------------------------------------
@@ -38,24 +28,6 @@ class MediaTag extends Model
 
     public function medias()
     {
-        return $this->belongsToMany('App\Models\Media', 'media_has_tags', 'tag_id', 'media_id');
+        return $this->belongsToMany(Media::class, 'media_has_tags', 'tag_id', 'media_id');
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SCOPES
-    |--------------------------------------------------------------------------
-    */
-
-    /*
-    |--------------------------------------------------------------------------
-    | ACCESORS
-    |--------------------------------------------------------------------------
-    */
-
-    /*
-    |--------------------------------------------------------------------------
-    | MUTATORS
-    |--------------------------------------------------------------------------
-    */
 }

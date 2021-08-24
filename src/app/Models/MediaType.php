@@ -2,13 +2,12 @@
 
 namespace GemaDigital\FileManager\app\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class MediaType extends Model
 {
-    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
-    use HasFactory;
+    use CrudTrait;
 
     /*
     |--------------------------------------------------------------------------
@@ -17,6 +16,7 @@ class MediaType extends Model
     */
 
     protected $table = 'media_types';
+    protected $guarded = ['id'];
     protected $fillable = ['key', 'name'];
 
     /*
@@ -27,6 +27,6 @@ class MediaType extends Model
 
     public function mediaVersions()
     {
-        return $this->belongsToMany('GemaDigital\FileManager\app\Models\MediaVersion', 'media_type_has_versions', 'media_type_id', 'media_version_id');
+        return $this->belongsToMany(MediaVersion::class, 'media_type_has_versions', 'media_type_id', 'media_version_id');
     }
 }

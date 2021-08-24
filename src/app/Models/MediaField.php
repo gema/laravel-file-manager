@@ -16,18 +16,8 @@ class MediaField extends Model
     */
 
     protected $table = 'media_fields';
-    // protected $primaryKey = 'id';
-    // public $timestamps = false;
-    // protected $guarded = ['id'];
+    protected $guarded = ['id'];
     protected $fillable = ['entity_type', 'entity_id'];
-    // protected $hidden = [];
-    // protected $dates = [];
-
-    /*
-    |--------------------------------------------------------------------------
-    | FUNCTIONS
-    |--------------------------------------------------------------------------
-    */
 
     /*
     |--------------------------------------------------------------------------
@@ -36,24 +26,6 @@ class MediaField extends Model
     */
     public function medias()
     {
-        return $this->belongsToMany('GemaDigital\FileManager\app\Models\Media', 'media_field_has_media', 'media_field_id', 'media_id');
+        return $this->belongsToMany(Media::class, 'media_field_has_media', 'media_field_id', 'media_id');
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SCOPES
-    |--------------------------------------------------------------------------
-    */
-
-    /*
-    |--------------------------------------------------------------------------
-    | ACCESORS
-    |--------------------------------------------------------------------------
-    */
-
-    /*
-    |--------------------------------------------------------------------------
-    | MUTATORS
-    |--------------------------------------------------------------------------
-    */
 }

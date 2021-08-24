@@ -16,18 +16,8 @@ class MediaVersion extends Model
     */
 
     protected $table = 'media_versions';
-    // protected $primaryKey = 'id';
-    // public $timestamps = false;
     protected $guarded = ['id'];
     protected $fillable = ['label'];
-    // protected $hidden = [];
-    // protected $dates = [];
-
-    /*
-    |--------------------------------------------------------------------------
-    | FUNCTIONS
-    |--------------------------------------------------------------------------
-    */
 
     /*
     |--------------------------------------------------------------------------
@@ -37,24 +27,6 @@ class MediaVersion extends Model
 
     public function mediaTypes()
     {
-        return $this->belongsToMany('GemaDigital\FileManager\app\Models\MediaType', 'media_type_has_versions', 'media_version_id', 'media_type_id');
+        return $this->belongsToMany(MediaType::class, 'media_type_has_versions', 'media_version_id', 'media_type_id');
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SCOPES
-    |--------------------------------------------------------------------------
-    */
-
-    /*
-    |--------------------------------------------------------------------------
-    | ACCESSORS
-    |--------------------------------------------------------------------------
-    */
-
-    /*
-    |--------------------------------------------------------------------------
-    | MUTATORS
-    |--------------------------------------------------------------------------
-    */
 }
