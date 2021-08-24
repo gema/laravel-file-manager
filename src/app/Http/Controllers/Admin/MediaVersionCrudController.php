@@ -28,7 +28,7 @@ class MediaVersionCrudController extends CrudController
     public function setup()
     {
         $this->crud->setModel(\GemaDigital\FileManager\app\Models\MediaVersion::class);
-        $this->crud->setRoute(config('backpack.base.route_prefix').'/media-version');
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/media-version');
         $this->crud->setEntityNameStrings(ucfirst(__('file-manager::messages.media_version')), ucfirst(__('file-manager::messages.media_versions')), );
     }
 

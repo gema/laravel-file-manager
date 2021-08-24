@@ -79,6 +79,14 @@ class CreateMediasTable extends Migration
 
             $table->nullableTimestamps();
         });
+
+        // Default types
+        DB::table('media_types')->insert([
+            ['key' => 'image', 'name' => 'Image'],
+            ['key' => 'video', 'name' => 'Video'],
+            ['key' => 'audio', 'name' => 'Audio'],
+            ['key' => 'document', 'name' => 'Document'],
+        ]);
     }
 
     public function down()

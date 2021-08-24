@@ -120,7 +120,7 @@ class MediaAPIController
                 'success' => true,
                 'msg' => 'Media uploaded successfully.',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Exception$e) {
             $response = [
                 'filename' => $filename,
                 'success' => false,
@@ -195,7 +195,6 @@ class MediaAPIController
         $data = [];
         foreach (config('file-manager.parents') as $class) {
             $object = new $class();
-
             $result = $object->paginate(10);
 
             $data[$class] = $result;

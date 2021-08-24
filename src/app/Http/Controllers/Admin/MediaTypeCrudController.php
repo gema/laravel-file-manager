@@ -16,7 +16,6 @@ class MediaTypeCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
 
     /**
@@ -27,7 +26,7 @@ class MediaTypeCrudController extends CrudController
     public function setup()
     {
         $this->crud->setModel(\GemaDigital\FileManager\app\Models\MediaType::class);
-        $this->crud->setRoute(config('backpack.base.route_prefix').'/media-type');
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/media-type');
         $this->crud->setEntityNameStrings(ucfirst(__('file-manager::messages.media_type')), ucfirst(__('file-manager::messages.media_types')));
     }
 
