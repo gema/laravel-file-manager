@@ -38,7 +38,6 @@ class MediaTypeRequest extends FormRequest
     public function attributes()
     {
         return [
-            //
         ];
     }
 
@@ -50,7 +49,6 @@ class MediaTypeRequest extends FormRequest
     public function messages()
     {
         return [
-            //
         ];
     }
 }

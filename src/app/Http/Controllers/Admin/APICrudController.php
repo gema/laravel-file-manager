@@ -2,9 +2,6 @@
 
 namespace GemaDigital\FileManager\app\Http\Controllers\Admin;
 
-
-use GemaDigital\FileManager\app\Models\Media;
-use GemaDigital\FileManager\app\Models\MediaContent;
 use GemaDigital\FileManager\app\Models\MediaTag;
 use GemaDigital\FileManager\app\Models\MediaType;
 
@@ -15,7 +12,8 @@ class APICrudController extends \GemaDigital\Framework\app\Http\Controllers\Admi
         return $this->entitySearch(MediaTag::class, ['name']);
     }
 
-    public function mediaTypeSearch(){
+    public function mediaTypeSearch()
+    {
         return $this->entitySearch(MediaType::class, ['type']);
     }
 }

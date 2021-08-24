@@ -10,7 +10,13 @@ class MediaType extends Model
     use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasFactory;
 
-    protected $table ='media_types';
+    /*
+    |--------------------------------------------------------------------------
+    | GLOBAL VARIABLES
+    |--------------------------------------------------------------------------
+    */
+
+    protected $table = 'media_types';
     protected $fillable = ['key', 'name'];
 
     /*

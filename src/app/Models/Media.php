@@ -4,7 +4,6 @@ namespace GemaDigital\FileManager\app\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
-use GemaDigital\FileManager\app\Models\MediaContent;
 
 class Media extends Model
 {

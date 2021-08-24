@@ -3,7 +3,6 @@
 namespace GemaDigital\FileManager\app\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-use GemaDigital\FileManager\app\Models\MediaContent;
 use Illuminate\Database\Eloquent\Model;
 
 class MediaField extends Model
@@ -39,7 +38,6 @@ class MediaField extends Model
     {
         return $this->belongsToMany('GemaDigital\FileManager\app\Models\Media', 'media_field_has_media', 'media_field_id', 'media_id');
     }
-
 
     /*
     |--------------------------------------------------------------------------
