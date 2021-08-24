@@ -21,7 +21,7 @@ class MediaTag extends Model
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     // protected $guarded = ['id'];
-    protected $fillable = ['name', 'parent_id'];
+    protected $fillable = ['name', 'parent_id', 'parent_type'];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -40,10 +40,6 @@ class MediaTag extends Model
     public function medias()
     {
         return $this->belongsToMany('App\Models\Media', 'media_has_tags', 'tag_id', 'media_id');
-    }
-
-    public function parent(){
-        return $this->morphTo();
     }
 
     /*
