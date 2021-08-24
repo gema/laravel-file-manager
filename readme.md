@@ -26,7 +26,7 @@ $ php artisan migrate
 ### Publishing the config
 
 ``` bash
-$ php artisan vendor:publish --provider="gemadigital/file-manager/FileManagerServiceProvider"
+$ php artisan vendor:publish --provider="GemaDigital/FileManager/FileManagerServiceProvider"
 ```
 
 ### Sample config file
