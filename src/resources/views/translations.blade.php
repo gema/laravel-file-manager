@@ -24,13 +24,13 @@
     }
   }
 
-  const packagePrefix = 'fileManager';
+  const packagePrefix = 'file-manager';
   const fileManagerTranslations = window.FileManager.translations;
   const projectTranslations = window.Laravel.translations;
 
   Object.keys(fileManagerTranslations)
     .forEach(key => {
-      let newKey = `${packagePrefix}_${key}`;
+      let newKey = `${packagePrefix}.${key}`;
       fileManagerTranslations[newKey] = fileManagerTranslations[key];
       delete FileManager[key];
     });
@@ -38,7 +38,7 @@
   window.Laravel.translations = { ...projectTranslations, ...fileManagerTranslations }
 
   window.__ = window.trans = (key, args = []) => {
-    let result = window.Laravel.translations[`${packagePrefix}_${key}`];
+    let result = window.Laravel.translations[`${packagePrefix}.${key}`];
     args.forEach(arg => result = result.replace('$', arg));
     return result;
   }
