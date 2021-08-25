@@ -1,3 +1,7 @@
+#upload-modal .modal-body {
+  overflow: auto;
+  max-height: 70vh;
+}
 #upload-modal .confirm-crop {
   position: absolute;
   z-index: 1;

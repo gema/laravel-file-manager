@@ -97,7 +97,7 @@ class MediaAPIController
         DB::beginTransaction();
         try {
             $media = Media::create([
-                'parent_id' => $request->parentId ?: null,
+                'parent_id' => $request->parent_id ?: null,
                 'parent_type' => $request->parent_model ?: null,
                 'type_id' => $request->type,
             ]);

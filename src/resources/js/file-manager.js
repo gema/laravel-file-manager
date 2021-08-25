@@ -1,11 +1,10 @@
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
-const { apiRequest, truncate } = require('./utils');
+const { request, truncate } = require('./utils');
 
 let globalTags = [];
 let globalMediaTypes = [];
-const globalParents = {};
 let modalShown = false;
 let mediaList = [];
 
@@ -148,7 +147,7 @@ const initAsignTag = prefix => {
 };
 
 const getMedias = (page = 1, tags = null, type = false, callback = false) => {
-  apiRequest(`/admin/media/fetch/media?page=${page}`, callback, 'POST', {
+  request(`/admin/media/fetch/media?page=${page}`, callback, 'POST', {
     _token: document.querySelector('meta[name=csrf-token]').content,
     tags,
     type,
@@ -189,41 +188,6 @@ const mediaItemTemplate = media => `
     <small>${truncate(media.media_content.title, 10)}</small>
   </div>
 `;
-
-const loadGlobals = (callback = false) => {
-  toggleLoader('', true);
-
-  apiRequest('/admin/file-manager/api/mediaTag/ajax/search', tagsResponse => {
-    globalTags = tagsResponse.data;
-    apiRequest(
-      '/admin/file-manager/api/mediaType/ajax/search',
-      typesResponse => {
-        globalMediaTypes = typesResponse.data;
-        apiRequest(
-          '/admin/media/fetch/parent',
-          parentsResponse => {
-            Object.entries(parentsResponse.data).forEach(
-              ([entity, response]) => {
-                const parentList = {};
-                Object.values(response.data).forEach(parent => {
-                  parentList[parent.id] =
-                    parent.name || parent.title || parent.label || parent.slug;
-                });
-                globalParents[entity] = parentList;
-              }
-            );
-
-            if (callback) callback();
-          },
-          'POST',
-          {
-            _token: document.querySelector('meta[name=csrf-token]').content,
-          }
-        );
-      }
-    );
-  });
-};
 
 const mediaUploadPromise = (media, metadata) => {
   const formData = new FormData();
@@ -355,6 +319,17 @@ const renderUploadMediaList = (medias, types) => {
       </audio>`;
     }
 
+    let mediaSize = media.size;
+    let unit = '';
+    let j = 0;
+    const units = ['KB', 'MB', 'GB']
+
+    while (mediaSize > 1024 && j < units.length) {
+      mediaSize = Math.round(mediaSize / 1024);
+      unit = units[j];
+      j++;
+    }
+
     mediasList.innerHTML += `
       <div class="card file-row" data-name="${media.name}">
         <div class="card-header" id="heading_${i}">
@@ -365,9 +340,9 @@ const renderUploadMediaList = (medias, types) => {
               data-target="#collapse_${i}"
               aria-expanded="true"
               aria-controls="collapse_${i}"
+              title="${media.name}"
             >
-            ${media.name}
-            <small>${media.size} KB</small>
+            <b>${truncate(media.name, 25)}</b> ${mediaSize} ${unit}
             <span class="loader-container"></span>
             </button>
             <a href="#" style="float:right" class="text-danger">
@@ -381,7 +356,7 @@ const renderUploadMediaList = (medias, types) => {
         </div>
         <div
           id="collapse_${i}" 
-          class="collapse"
+          class="collapse ${i === 0 ? 'show' : ''}"
           aria-labelledby="heading_${i}"
           data-parent="#accordion">   
           <div class="card-body">
@@ -814,6 +789,7 @@ const initUploadModal = (medias, types) => {
           const dataAttrs = $(parentSelect).find(':selected').data();
           if (dataAttrs !== undefined) {
             metadata.parent_model = dataAttrs.namespace;
+            metadata.parent_id = parentSelect.value;
           }
         }
 
@@ -871,12 +847,15 @@ const initUploadModal = (medias, types) => {
                 const fileLoader = fileRow.querySelector(
                   'span.loader-container'
                 );
+
                 fileLoader.innerHTML = '❌';
                 fileRow.querySelector('.card-header').innerHTML += `
                   <p class="mt-2 mb-0 text-danger text-center">
                     ${__('invalidMetadata')}
                   </p>
                 `;
+
+                $(fileRow).find(`.collapse`).collapse('show');
               }
             });
           });
@@ -973,7 +952,14 @@ const onMediaLoadedSingle = medias => {
   initUploadModalHandler();
 };
 
-const onGlobalsLoaded = () => {
+const setGlobals = ({data}) => {
+  const { tags, types } = data;
+  globalTags = tags.data;
+  globalMediaTypes = types.data;
+}
+
+const onGlobalsLoaded = (response) => {
+  setGlobals(response);
   // Render upload modal
   const modalTemplate = document.querySelector('template.upload-modal');
   const node = modalTemplate.content.cloneNode(true);
@@ -1001,8 +987,18 @@ const onGlobalsLoaded = () => {
   }
 };
 
+
 const init = () => {
   loadGlobals(onGlobalsLoaded);
+};
+
+const loadGlobals = (callback = false) => {
+  toggleLoader('', true);
+  request(
+    '/admin/media/fetch/global-data',
+    callback,
+    'POST'
+  )
 };
 
 module.exports = { init };

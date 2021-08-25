@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
-const apiRequest = (
+const request = (
   endpoint,
   callback,
   method = 'GET',
@@ -41,6 +41,20 @@ const apiRequest = (
     }
   }
 
+  if (method.toLowerCase() === 'post') {
+    let csrfToken = false;
+    const csrfTokenElement = document.querySelector('meta[name=csrf-token]');
+    
+    if (csrfTokenElement !== undefined) {
+      csrfToken = csrfTokenElement.content
+    }
+
+    if (csrfToken) {
+      if (formData === null) formData = new FormData();
+      formData.append('_token', csrfToken);
+    }
+  }
+
   fetch(document.location.origin + endpoint, {
     method,
     headers: head,
@@ -59,6 +73,6 @@ const truncate = (str, length, ending = '...') => {
 };
 
 module.exports = {
-  apiRequest,
+  request,
   truncate,
 };

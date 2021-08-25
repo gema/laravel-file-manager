@@ -14,24 +14,6 @@ class MediaCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
 
-    protected function fetchParent()
-    {
-        $data = [];
-        foreach (config('file-manager.parents') as $class) {
-            $response = $this->fetch([
-                'model' => $class,
-                'query' => function ($model) {
-                    return $model;
-                },
-                'searchable_attributes' => [],
-            ]);
-
-            $data[$class] = $response;
-        }
-
-        return json_response($data);
-    }
-
     protected function fetchMedia()
     {
         return $this->fetch([
@@ -67,6 +49,30 @@ class MediaCrudController extends CrudController
                 return $model;
             },
             'searchable_attributes' => [],
+        ]);
+    }
+
+    protected function fetchGlobalData()
+    {
+        return json_response([
+            'tags' => $this->fetchTags(),
+            'types' => $this->fetchTypes(),
+        ]);
+    }
+
+    protected function fetchTags()
+    {
+        return $this->fetch([
+            'model' => 'GemaDigital\FileManager\app\Models\MediaTag',
+            'paginate' => 20,
+        ]);
+    }
+
+    protected function fetchTypes()
+    {
+        return $this->fetch([
+            'model' => 'GemaDigital\FileManager\app\Models\MediaType',
+            'paginate' => 20,
         ]);
     }
 }

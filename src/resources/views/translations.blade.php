@@ -24,16 +24,22 @@
     }
   }
 
-  if(window.__ !== undefined){
-    const translations = window.FileManager.translations;
-    const baseTranslations = window.Laravel.translations;
-    window.Laravel.translations = { ...baseTranslations, ...translations }
-  } else {
-    window.Laravel = { translations : window.FileManager.translations };
-    window.__ = window.trans = (key, args = []) => {
-      let result = window.Laravel.translations[key];
-      args.forEach(arg => result = result.replace('$', arg));
-      return result;
-    }
+  const packagePrefix = 'fileManager';
+  const fileManagerTranslations = window.FileManager.translations;
+  const projectTranslations = window.Laravel.translations;
+
+  Object.keys(fileManagerTranslations)
+    .forEach(key => {
+      let newKey = `${packagePrefix}_${key}`;
+      fileManagerTranslations[newKey] = fileManagerTranslations[key];
+      delete FileManager[key];
+    });
+
+  window.Laravel.translations = { ...projectTranslations, ...fileManagerTranslations }
+
+  window.__ = window.trans = (key, args = []) => {
+    let result = window.Laravel.translations[`${packagePrefix}_${key}`];
+    args.forEach(arg => result = result.replace('$', arg));
+    return result;
   }
 </script>
