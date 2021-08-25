@@ -17,6 +17,7 @@ class MediaTagCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
+    use Traits\Access;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -28,6 +29,9 @@ class MediaTagCrudController extends CrudController
         $this->crud->setModel(\GemaDigital\FileManager\app\Models\MediaTag::class);
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/media-tag');
         $this->crud->setEntityNameStrings(ucfirst(__('file-manager::messages.media_tag')), ucfirst(__('file-manager::messages.media_tags')));
+
+        // Access
+        $this->hasAccess('media-tag') || abort(401);
     }
 
     /**
@@ -40,17 +44,15 @@ class MediaTagCrudController extends CrudController
     {
         $this->crud->column('name');
 
-        if (admin()) {
-            $this->crud->addColumn([
-                'name' => 'parent_id',
-                'label' => ucfirst(__('parent')),
-            ]);
+        $this->crud->addColumn([
+            'name' => 'parent_id',
+            'label' => ucfirst(__('parent')),
+        ]);
 
-            $this->crud->addColumn([
-                'name' => 'parent_type',
-                'label' => ucfirst(__('parent')),
-            ]);
-        }
+        $this->crud->addColumn([
+            'name' => 'parent_type',
+            'label' => ucfirst(__('parent')),
+        ]);
     }
 
     /**

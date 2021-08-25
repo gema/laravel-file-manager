@@ -17,6 +17,7 @@ class MediaTypeCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
+    use Traits\Access;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -28,6 +29,9 @@ class MediaTypeCrudController extends CrudController
         $this->crud->setModel(\GemaDigital\FileManager\app\Models\MediaType::class);
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/media-type');
         $this->crud->setEntityNameStrings(ucfirst(__('file-manager::messages.media_type')), ucfirst(__('file-manager::messages.media_types')));
+
+        // Access
+        $this->hasAccess('media-type') || abort(401);
     }
 
     protected function setupListOperation()

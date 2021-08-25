@@ -19,6 +19,7 @@ class MediaVersionCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use Traits\Access;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -29,7 +30,10 @@ class MediaVersionCrudController extends CrudController
     {
         $this->crud->setModel(\GemaDigital\FileManager\app\Models\MediaVersion::class);
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/media-version');
-        $this->crud->setEntityNameStrings(ucfirst(__('file-manager::messages.media_version')), ucfirst(__('file-manager::messages.media_versions')), );
+        $this->crud->setEntityNameStrings(ucfirst(__('file-manager::messages.media_version')), ucfirst(__('file-manager::messages.media_versions')));
+
+        // Access
+        $this->hasAccess('media-version') || abort(401);
     }
 
     /**

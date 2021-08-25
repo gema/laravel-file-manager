@@ -27,9 +27,9 @@
   if(window.__ !== undefined){
     const translations = window.FileManager.translations;
     const baseTranslations = window.Laravel.translations;
-    window.Laravel.translations = {...baseTranslations, ...translations}
-  }else{
-    window.Laravel = {translations : window.FileManager.translations};
+    window.Laravel.translations = { ...baseTranslations, ...translations }
+  } else {
+    window.Laravel = { translations : window.FileManager.translations };
     window.__ = window.trans = (key, args = []) => {
       let result = window.Laravel.translations[key];
       args.forEach(arg => result = result.replace('$', arg));

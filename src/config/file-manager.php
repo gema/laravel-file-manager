@@ -3,8 +3,16 @@
 return [
     // Media parents
     'parents' => [
-        // App\Models\Project::class
+        // App\Models\Project::class,
     ],
+
+    // TODO
+    // Parent field should appear or should be infer
+    // You may use a closure to define the access to this
+    'parents_field' => (function () {
+        // return user()->hasManyProjects();
+        return true;
+    }),
 
     // File Manager listing filters
     'filter' => (function ($query) {
@@ -13,4 +21,13 @@ return [
         //     ->where('parent_type', App\Models\Project::class);
         return $query;
     }),
+
+    // Menu
+    // You may use a closure to define the access on CRUD
+    'access' => [
+        'file-manager' => true,
+        'media-tag' => true,
+        'media-type' => true,
+        'media-version' => true,
+    ],
 ];
