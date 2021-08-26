@@ -5,6 +5,7 @@ namespace GemaDigital\FileManager\app\Http\Controllers\Admin;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use GemaDigital\FileManager\app\Http\Requests\MediaTagRequest;
+use \GemaDigital\FileManager\app\Models\MediaTag;
 
 /**
  * Class MediaTagCrudController
@@ -19,55 +20,44 @@ class MediaTagCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use Traits\Access;
 
-    /**
-     * Configure the CrudPanel object. Apply settings to all operations.
-     *
-     * @return void
-     */
     public function setup()
     {
-        $this->crud->setModel(\GemaDigital\FileManager\app\Models\MediaTag::class);
-        $this->crud->setRoute(config('backpack.base.route_prefix') . '/media-tag');
-        $this->crud->setEntityNameStrings(ucfirst(__('file-manager::messages.media_tag')), ucfirst(__('file-manager::messages.media_tags')));
+        CRUD::setModel(MediaTag::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/media-tag');
+        CRUD::setEntityNameStrings(ucfirst(__('file-manager::messages.media_tag')), ucfirst(__('file-manager::messages.media_tags')));
 
         // Access
         $this->hasAccess('media-tag') || abort(401);
     }
 
-    /**
-     * Define what happens when the List operation is loaded.
-     *
-     * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
-     * @return void
-     */
     protected function setupListOperation()
     {
-        $this->crud->column('name');
-
-        $this->crud->addColumn([
-            'name' => 'parent_id',
-            'label' => ucfirst(__('parent')),
+        CRUD::addColumn([
+            'name' => 'name',
+            'label' => ucFirst(__('file-manager::messages.name')),
         ]);
 
-        $this->crud->addColumn([
+        CRUD::addColumn([
+            'name' => 'parent_id',
+            'label' => ucfirst(__('file-manager::messages.parent')),
+        ]);
+
+        CRUD::addColumn([
             'name' => 'parent_type',
-            'label' => ucfirst(__('parent')),
+            'label' => ucfirst(__('file-manager::messages.parent_type')),
         ]);
     }
 
-    /**
-     * Define what happens when the Create operation is loaded.
-     *
-     * @see https://backpackforlaravel.com/docs/crud-operation-create
-     * @return void
-     */
     protected function setupCreateOperation()
     {
-        $this->crud->setValidation(MediaTagRequest::class);
+        CRUD::setValidation(MediaTagRequest::class);
 
-        $this->crud->field('name');
+        CRUD::addField([
+            'name' => 'name',
+            'label' => ucFirst(__('file-manager::messages.name')),
+        ]);
 
-        $this->crud->addField([
+        CRUD::addField([
             'name' => 'parent_id',
             'label' => ucFirst(__('parent')),
             'type' => 'select2-morph',
@@ -75,7 +65,7 @@ class MediaTagCrudController extends CrudController
             'url' => '/api/media/parent',
         ]);
 
-        $this->crud->addField([
+        CRUD::addField([
             'name' => 'parent_type',
             'type' => 'text',
             'wrapperAttributes' => [
@@ -84,12 +74,6 @@ class MediaTagCrudController extends CrudController
         ]);
     }
 
-    /**
-     * Define what happens when the Update operation is loaded.
-     *
-     * @see https://backpackforlaravel.com/docs/crud-operation-update
-     * @return void
-     */
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();

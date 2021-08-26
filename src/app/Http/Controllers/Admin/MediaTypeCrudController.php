@@ -3,7 +3,9 @@
 namespace GemaDigital\FileManager\app\Http\Controllers\Admin;
 
 use Backpack\CRUD\app\Http\Controllers\CrudController;
+use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use GemaDigital\FileManager\app\Http\Requests\MediaTypeRequest;
+use \GemaDigital\FileManager\app\Models\MediaType;
 
 /**
  * Class MediaTypeCrudController.
@@ -19,16 +21,11 @@ class MediaTypeCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
     use Traits\Access;
 
-    /**
-     * Configure the CrudPanel object. Apply settings to all operations.
-     *
-     * @return void
-     */
     public function setup()
     {
-        $this->crud->setModel(\GemaDigital\FileManager\app\Models\MediaType::class);
-        $this->crud->setRoute(config('backpack.base.route_prefix') . '/media-type');
-        $this->crud->setEntityNameStrings(ucfirst(__('file-manager::messages.media_type')), ucfirst(__('file-manager::messages.media_types')));
+        CRUD::setModel(MediaType::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/media-type');
+        CRUD::setEntityNameStrings(ucfirst(__('file-manager::messages.media_type')), ucfirst(__('file-manager::messages.media_types')));
 
         // Access
         $this->hasAccess('media-type') || abort(401);
@@ -36,8 +33,12 @@ class MediaTypeCrudController extends CrudController
 
     protected function setupListOperation()
     {
-        $this->crud->column('name');
-        $this->crud->addColumn([
+        CRUD::addColumn([
+            'name' => 'name',
+            'label' => ucFirst(__('file-manager::messages.name')),
+        ]);
+
+        CRUD::addColumn([
             'type' => 'relationship',
             'name' => 'mediaVersions',
             'label' => 'Media Versions',
@@ -46,11 +47,19 @@ class MediaTypeCrudController extends CrudController
 
     protected function setupCreateOperation()
     {
-        $this->crud->setValidation(MediaTypeRequest::class);
+        CRUD::setValidation(MediaTypeRequest::class);
 
-        $this->crud->field('name');
-        $this->crud->field('key');
-        $this->crud->addField([
+        CRUD::addField([
+            'name' => 'name',
+            'label' => ucFirst(__('file-manager::messages.name')),
+        ]);
+
+        CRUD::addField([
+            'name' => 'key',
+            'label' => ucFirst(__('file-manager::messages.key')),
+        ]);
+
+        CRUD::addField([
             'type' => 'relationship',
             'name' => 'mediaVersions',
             'label' => 'Media Versions',

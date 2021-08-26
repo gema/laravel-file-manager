@@ -1,6 +1,7 @@
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
+const Select2 = require('./select2');
 const { request, truncate } = require('./utils');
 
 let globalTags = [];
@@ -222,10 +223,8 @@ const typesListTemplate = types => {
 
 const metadataFormTemplate = (types, i) => {
   const select = `
-    <div class="form-group">
-      <label>${__('parent')}</label>
-      <select id="parent-select-${i}" class="select2-parent" name="parentId" style="width:100%">
-      </select>
+    <div id="select2-container-${i}" class="form-group">
+      
     </div>
   `;
 
@@ -308,7 +307,7 @@ const renderUploadMediaList = (medias, types) => {
       hasVideo = true;
       mediaTemplate = `
         <video controls id="video-preview-video-${i}" class="w-100 my-3">
-          <source id="video-preview-source-${i}" src="splashVideo">
+          <source id="video-preview-source-${i}" src="">
           Your browser does not support the video tag.
         </video>`;
     } else if (/^audio/.test(media.type)) {
@@ -377,79 +376,23 @@ const renderUploadMediaList = (medias, types) => {
       reader.readAsDataURL(media);
     }
 
-    if (hasAudio) {
+    if (hasAudio ) {
       document.querySelector(`#audio-preview-source-${i}`).src =
         URL.createObjectURL(media);
       document.querySelector(`#audio-preview-audio-${i}`).load();
     }
 
-    const finished = [];
-    const x = i;
-    $(`#parent-select-${i}`)
-      .select2({
-        ajax: {
-          url: '/api/media/parent',
-          dataType: 'json',
-          processResults({ data }) {
-            const parentsNumber = Object.keys(data).length;
-            const results = [];
-            let more;
-
-            if (parentsNumber > 1) {
-              Object.entries(data).forEach(([namespace, response]) => {
-                if (response.current_page === response.last_page) {
-                  finished.push(namespace);
-                }
-                if (response.data.length) {
-                  results.push({
-                    text: namespace.split('\\').pop(),
-                    children: Object.values(response.data).map(entry => ({
-                      id: entry.id,
-                      text: entry.name,
-                      namespace,
-                      i: x,
-                    })),
-                  });
-                }
-              });
-              more = finished.length < parentsNumber;
-            } else {
-              Object.entries(data).forEach(([namespace, response]) => {
-                Object.values(response.data).forEach(entry => {
-                  results.push({
-                    id: entry.id,
-                    text: entry.name,
-                    namespace,
-                    i: x,
-                  });
-                });
-                more = response.current_page < response.last_page;
-              });
-            }
-
-            return {
-              results,
-              pagination: { more },
-            };
-          },
-          data: params => {
-            const query = {
-              search: params.term,
-              page: params.page || 1,
-            };
-
-            return query;
-          },
-        },
-      })
-      .on('select2:select', e => {
-        const { data } = e.params;
-        $(`#parent-select-${data.i}`).children()[0].dataset.namespace =
-          data.namespace;
-      });
+    Select2.createGroupedField({
+      container: document.querySelector(`#select2-container-${i}`),
+      name: 'parentId',
+      label: 'Parent',
+      url: '/api/media/parent',
+    });
 
     i += 1;
   });
+
+  Select2.initGroupedFields();
 };
 
 const initSelectedMediasEdition = (prefix, medias, type) => {
@@ -855,24 +798,24 @@ const initUploadModal = (medias, types) => {
                   </p>
                 `;
 
-                $(fileRow).find(`.collapse`).collapse('show');
+                $(fileRow).find('.collapse').collapse('show');
               }
             });
           });
         });
-
-      $('.crop-btn')
-        .unbind()
-        .click(e1 => {
-          const i1 = e1.target.dataset.id;
-          const imageCropper = document.querySelector(`#imageCropper_${i1}`);
-          initCropper(i1);
-          if (Object.values(imageCropper.classList).includes('d-none')) {
-            imageCropper.classList.remove('d-none');
-          } else {
-            imageCropper.classList.add('d-none');
-          }
-        });
+    });
+  
+  $('.crop-btn')
+    .unbind()
+    .click(e1 => {
+      const i1 = e1.target.dataset.id;
+      const imageCropper = document.querySelector(`#imageCropper_${i1}`);
+      initCropper(i1);
+      if (Object.values(imageCropper.classList).includes('d-none')) {
+        imageCropper.classList.remove('d-none');
+      } else {
+        imageCropper.classList.add('d-none');
+      }
     });
 };
 
@@ -958,7 +901,7 @@ const setGlobals = ({data}) => {
   globalMediaTypes = types.data;
 }
 
-const onGlobalsLoaded = (response) => {
+const onGlobalsLoaded = response => {
   setGlobals(response);
   // Render upload modal
   const modalTemplate = document.querySelector('template.upload-modal');

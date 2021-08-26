@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'key' => 'key',
+    'name' => 'name',
     'media_explorer' => 'Media Explorer',
     'media_tags' => 'Media Tags',
     'media_tag' => 'Media Tag',
@@ -25,6 +27,7 @@ return [
     'no' => 'no',
     'browse' => 'browse',
     'parent' => 'parent',
+    'parent_type' => 'parent type',
     'save_selection' => 'save selection',
     'select_medias_first' => 'Select some medias first',
     'tags_unsigned' => 'Tags removed with success',

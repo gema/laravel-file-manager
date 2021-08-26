@@ -27,10 +27,10 @@
         @endpush
 
         @include('file-manager::filemanager-modals')
-        @include("file-manager::translations")  
+        @include("file-manager::translations")
     @endif
 @else
-    @include("file-manager::translations")  
+    @include("file-manager::translations")
     @push('after_styles')
         <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet"/>
         <style>{!! $cssBundle !!}</style>
@@ -58,19 +58,19 @@
                 <i class="las la-tag"></i>
                 {{__("file-manager::messages.asign_tag")}}
                 </a>
-            </li> 
+            </li>
             <li class="list-inline-item">
                 <a id="unsign-tag-button">
                 <i class="las la-trash"></i>
                 {{__("file-manager::messages.remove_tag")}}
                 </a>
-            </li> 
+            </li>
             <li class="list-inline-item">
                 <a id="refreshBtn">
                     <i class="las la-sync"></i>
                     {{__("file-manager::messages.refresh")}}
                 </a>
-            </li> 
+            </li>
         </ul>
     </div>
     <div class="selection-area-container card-body">

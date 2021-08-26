@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'key' => 'chave',
+    'name' => 'nome',
     'media_explorer' => 'Explorador de Mídias',
     'media_tags' => 'Etiquetas de Mídia',
     'media_tag' => 'Etiqueta de Mídia',
@@ -25,6 +27,7 @@ return [
     'no' => 'nenhum',
     'browse' => 'procurar',
     'parent' => 'pai',
+    'parent_type' => 'tipo de pai',
     'save_selection' => 'salvar seleção',
     'select_medias_first' => 'Selecione algum mídia primeiro',
     'tags_unsigned' => 'Etiquetas removidas com sucesso',

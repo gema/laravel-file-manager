@@ -1,4 +1,6 @@
 <script>
+  if(window.Laravel === undefined) window.Laravel = {translations: {}}
+
   window.FileManager = {
     translations : {
       selectMediasFirst : '{{__("file-manager::messages.select_medias_first")}}',
