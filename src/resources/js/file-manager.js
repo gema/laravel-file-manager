@@ -17,9 +17,12 @@ const toast = (text, type = 'success') => {
 };
 
 const toggleLoader = (prefix, show = true) => {
-  document.querySelector(`${prefix}.selection-area`).innerHTML = '';
-  const loader = document.querySelector(`${prefix}.media-loader`);
-  loader.classList.toggle('d-none', !show);
+  const container = document.querySelector(`${prefix}.selection-area`)
+  if (container) {
+    container.innerHTML = '';
+    const loader = document.querySelector(`${prefix}.media-loader`);
+    loader.classList.toggle('d-none', !show);
+  } 
 };
 
 const getSelectedTags = prefix => {
