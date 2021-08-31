@@ -1,4 +1,7 @@
-const { request } = require('../utils');
+import $ from 'jquery';
+import 'jquery-ui/ui/widgets/selectable';
+
+const { request, toast } = require('../utils');
 const { templates } = require('./templates');
 
 let globalTags;
@@ -98,8 +101,41 @@ const renderNoMediasFound = () => {
 
 // Selection
 
-const initSelection = ({data}) => {
-  // Use jQueryUI
+const initSelection = medias => {
+  $('.selection-area')
+    .selectable();
+
+  $('#media-modal .modal-footer')
+    .find('.btn-primary')
+    .on('click', () => onMediasSelected(medias));
+}
+
+const onMediasSelected = medias => {
+  const selectedMedias = getSelectedMedias();
+  const value = JSON.stringify({ medias: selectedMedias });
+  const totalSelectedMedias = selectedMedias.length;
+  const { min, max } = globalOptions;
+
+  if(totalSelectedMedias > max || totalSelectedMedias < min){
+    if(min === max){
+      console.log(`Please select exactly ${min} medias`);
+      toast(`Please select exactly ${min} medias`, 'error');
+    }else{
+      console.log(`Please select between ${min} and ${max} medias`);
+      toast(`Please select between ${min} and ${max} medias`, 'error')
+    }
+  }
+  else if(selectedMedias.length){
+   $(`.selected-medias-input[name="${globalOptions.name}"]`)
+    .val(value)
+    const event = new CustomEvent(`change_${globalOptions.name}`,{detail: {value, medias, selectedMedias}})
+    window.dispatchEvent(event);
+  }
+}
+
+const getSelectedMedias = () => {
+  return Object.values(document.querySelectorAll('.selection-area div.ui-selected'))
+    .map(selectable => selectable.dataset.file);
 }
 
 
@@ -192,4 +228,4 @@ const onListLoaded = ({data}) => {
   renderMediaList(data);
 }
 
-module.exports = { init };
+export default { init };

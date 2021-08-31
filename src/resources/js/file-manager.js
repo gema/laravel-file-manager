@@ -2,19 +2,12 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
 const Select2 = require('./select2');
-const { request, truncate } = require('./utils');
+const { request, truncate, toast } = require('./utils');
 
 let globalTags = [];
 let globalMediaTypes = [];
 let modalShown = false;
 let mediaList = [];
-
-const toast = (text, type = 'success') => {
-  new Noty({
-    type,
-    text,
-  }).show();
-};
 
 const toggleLoader = (prefix, show = true) => {
   const container = document.querySelector(`${prefix}.selection-area`)

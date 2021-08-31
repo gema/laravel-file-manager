@@ -22,9 +22,6 @@ Route::group(
                 Route::crud('media-type', 'MediaTypeCrudController');
                 Route::crud('media-version', 'MediaVersionCrudController');
                 Route::crud('media', 'MediaCrudController');
-
-                // API
-                Route::any('/file-manager/api/{entity}/ajax/{action}/{arg1?}/{arg2?}/{arg3?}', '\GemaDigital\FileManager\app\Http\Controllers\Admin\APICrudController@ajax');
             }
         );
     }

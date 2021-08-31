@@ -3,7 +3,7 @@ const { truncate } = require('../utils');
 const mediaItem = media => `
 <div
   title="${media.media_content.title}" 
-  class="selectable col-md-2 col-sm-3 m-1" data-file="${media.id}"
+  class="ui-widget-content selectable col-md-2 col-sm-3 m-1" data-file="${media.id}"
 >
   <img src="${media.media_content.preview}">
   <small>${truncate(media.media_content.title, 10)}</small>

@@ -72,7 +72,15 @@ const truncate = (str, length, ending = '...') => {
   return str;
 };
 
+const toast = (text, type = 'success') => {
+  new Noty({
+    type,
+    text,
+  }).show();
+};
+
 module.exports = {
   request,
   truncate,
+  toast
 };

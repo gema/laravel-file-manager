@@ -1,17 +1,32 @@
 <template>
     <div>
+        <!-- Selected Medias -->
+        <input type="hidden" class="selected-medias-input" :name="name" />
+        <div v-for="media in selectedMedias">
+          <a @click="editSelectedMedia" :data-media="media.id">
+            <slot name="selectedMedia" v-bind:media="media" />
+          </a>
+        </div>
+        <!-- End Selected Medias -->
+
         <!-- Trigger -->
         <a 
             @click="instantiateField"
             type="button" 
             class="filemanager-toggle btn-primary btn"
         >
-            <slot/>
+            <slot name="trigger" />
         </a>
         <!-- End Trigger -->
 
         <!-- File Manager Modal -->
-        <b-modal size="xl" :id="`media-modal-${name}`" ref="media-modal" centered title="Media Manager">
+        <b-modal 
+          size="xl" 
+          id="media-modal" 
+          ref="media-modal" 
+          title="Media Manager"
+          @ok="onModalOk"
+        >
             <div id="filemanager-container" class="col-12">
                 <div class="custom-file-manager card">
                     <div class="card-header">
@@ -73,18 +88,52 @@
 </template>
 <script>
 
-const {init} = require('./file-manager');
+const FileManager = require('./file-manager');
+const {toast} = require('../utils');
 
 export default {
-    props : ['name', 'mediaType'],
-    methods: {
-        instantiateField(){
-            this.$refs['media-modal'].show()
-            init({
-                mediaType: this.mediaType
-            });
-        },
+  props : ['name', 'mediaType', 'min', 'max'],
+  data(){
+    return{
+      selectedMedias: false,
+      medias : false,
     }
+  },
+  mounted(){
+    window.addEventListener(`change_${this.name}`, this.onMediasSelected)
+  },
+  methods: {
+    instantiateField(){
+      this.$refs['media-modal'].show()
+      FileManager.default.init({
+        name : this.name,
+        mediaType: this.mediaType,
+        min : this.min || 0,
+        max : this.max || 10
+      });
+    },
+    onMediasSelected({detail}){
+      const selectedMedias = [];
+      this.medias = detail.medias;
+      this.medias.forEach(media => {
+        if(detail.selectedMedias.includes(String(media.id))){
+          selectedMedias.push(media);
+        }
+      })
+      this.selectedMedias = selectedMedias;
+
+      this.$refs['media-modal'].hide();
+      toast(`Medias selected successfully`);
+      this.$emit('save', this.selectedMedias)
+    },
+    editSelectedMedia(e){
+      console.log('editing selected media', e)
+      console.log('Edit media with ID: ', e.currentTarget.dataset.media);
+    },
+    onModalOk(e){
+      e.preventDefault();
+    }
+  },
 }
 </script>
 
@@ -237,4 +286,9 @@ export default {
       }
     }
   }
+
+  // JQUERY UI
+
+  .selection-area .ui-selecting { background: #7c69ef; color: white; }
+  .selection-area .ui-selected { background: #7c69ef; color: white; }
 </style>
