@@ -2,7 +2,7 @@
     <div>
         <!-- Selected Medias -->
         <input type="hidden" class="selected-medias-input" :name="name" />
-        <div v-for="media in selectedMedias">
+        <div v-for="media in selectedMedias" :key="media.id">
           <a @click="editSelectedMedia" :data-media="media.id">
             <slot name="selectedMedia" v-bind:media="media" />
           </a>
@@ -13,7 +13,7 @@
         <a 
             @click="instantiateField"
             type="button" 
-            class="filemanager-toggle btn-primary btn"
+            :class="`filemanager-toggle ${triggerClasses}`"
         >
             <slot name="trigger" />
         </a>
@@ -65,7 +65,7 @@
                                 </ul>
                             </div>
                             <div class="col-sm-10">
-                                <div class="col-sm-12 d-flex justify-content-center m-0">
+                                <div class="loader-container col-sm-12 d-flex justify-content-center m-0">
                                     <h4 class="media-loader d-none"><span class="la la-spinner la-spin mt-3"></span></h4>
                                 </div>
                                 <div class="selection-area list row my-2">
@@ -80,10 +80,18 @@
         <!-- End File Manager Modal -->
 
         <!-- Asign Tag Modal -->
-        <b-modal size="sm" id="tag-modal" ref="asign-tag-modal" centered title="Asign Tag">
+        <b-modal size="sm" id="tag-modal" ref="tag-modal">
        
        </b-modal>
         <!-- End Asign Tag Modal -->
+
+        <!-- Upload Modal -->
+        <b-modal @ok="onUploadModalOk" size="md" id="upload-modal" ref="upload-modal">
+          <div id="accordion" class="medias-list">
+        
+          </div>
+       </b-modal>
+        <!-- End Upload Modal -->
     </div>
 </template>
 <script>
@@ -92,7 +100,7 @@ const FileManager = require('./file-manager');
 const {toast} = require('../utils');
 
 export default {
-  props : ['name', 'mediaType', 'min', 'max'],
+  props : ['name', 'mediaType', 'min', 'max', 'triggerClasses'],
   data(){
     return{
       selectedMedias: false,
@@ -101,6 +109,9 @@ export default {
   },
   mounted(){
     window.addEventListener(`change_${this.name}`, this.onMediasSelected)
+    window.addEventListener(`asign_tag_${this.name}`, this.onAsignTag)
+    window.addEventListener(`unsign_tag_${this.name}`, this.onUnsignTag)
+    window.addEventListener(`upload_modal_open_${this.name}`, this.onUploadModalOpen)
   },
   methods: {
     instantiateField(){
@@ -112,6 +123,7 @@ export default {
         max : this.max || 10
       });
     },
+
     onMediasSelected({detail}){
       const selectedMedias = [];
       this.medias = detail.medias;
@@ -126,11 +138,27 @@ export default {
       toast(`Medias selected successfully`);
       this.$emit('save', this.selectedMedias)
     },
+
+    onAsignTag(){
+      this.$refs['tag-modal'].show();
+    },
+
+    onUnsignTag(){
+      this.$refs['tag-modal'].show();
+    },
+
+    onUploadModalOpen(){
+      this.$refs['upload-modal'].show();
+    },
+
     editSelectedMedia(e){
       console.log('editing selected media', e)
       console.log('Edit media with ID: ', e.currentTarget.dataset.media);
     },
     onModalOk(e){
+      e.preventDefault();
+    },
+    onUploadModalOk(e){
       e.preventDefault();
     }
   },

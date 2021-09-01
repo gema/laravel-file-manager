@@ -79,8 +79,14 @@ const toast = (text, type = 'success') => {
   }).show();
 };
 
+const customEvent = (event, details = {}, parent = window) => {
+  const e = new CustomEvent(event, {details});
+  parent.dispatchEvent(e);
+}
+
 module.exports = {
   request,
   truncate,
-  toast
+  toast,
+  customEvent
 };
