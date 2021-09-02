@@ -67,11 +67,12 @@ return [
 <?php
 
 use GemaDigital\FileManager\app\Models\Traits\MediaTrait;
-use GemaDigital\Framework\app\Models\Model; // Or an extension of this class
+use GemaDigital\Framework\app\Models\Model;
 
 class MyEntity extends Model {
   use MediaTrait; // Use the trait
-  protected static $mediable = ['images', 'videos'] // Define which columns will have medias
+
+  protected static $mediable = ['images', 'videos']; // Define which columns will have medias
 }
 ```
 
@@ -85,11 +86,11 @@ class MyEntityCrudController extends CrudController {
     // Setting up the fields
     
     $this->crud->addField([
-            'name' => 'images',
-            'type' => 'file-manager',
-            'view_namespace' => 'file-manager::field',
-            'media_type' => 1 // Get this from `media_types.id`
-        ]);
+        'name' => 'images',
+        'type' => 'file-manager',
+        'view_namespace' => 'file-manager::field',
+        'media_type' => 1 // Get this from `media_types.id`
+    ]);
 
     $this->crud->addField([
         'name' => 'videos',
