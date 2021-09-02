@@ -5,6 +5,7 @@ namespace GemaDigital\FileManager\app\Models;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Str;
 
 class MediaTag extends Model
 {
@@ -31,5 +32,21 @@ class MediaTag extends Model
     public function medias()
     {
         return $this->belongsToMany(Media::class, 'media_has_tags', 'tag_id', 'media_id');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESSORS
+    |--------------------------------------------------------------------------
+    */
+
+    public function getParentAttribute()
+    {
+        return (new $this->parent_type())->where('id', $this->parent_id)->first() ?? null;
+    }
+
+    public function getParentLabelAttribute()
+    {
+        return ($this->parent->{$this->parent->identifiableAttribute()} ?? '') . ' (' . (Str::of($this->parent_type)->afterLast('\\') ?? '') . ')';
     }
 }
