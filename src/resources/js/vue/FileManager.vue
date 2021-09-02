@@ -66,7 +66,7 @@
                             </div>
                             <div class="col-sm-10">
                                 <div class="loader-container col-sm-12 d-flex justify-content-center m-0">
-                                    <h4 class="media-loader d-none"><span class="la la-spinner la-spin mt-3"></span></h4>
+                                    <h4 class="media-loader"><span class="la la-spinner la-spin mt-3"></span></h4>
                                 </div>
                                 <div class="selection-area list row my-2">
                                 </div>
@@ -80,24 +80,24 @@
         <!-- End File Manager Modal -->
 
         <!-- Asign Tag Modal -->
-        <b-modal size="sm" id="tag-modal" ref="tag-modal">
-       
-       </b-modal>
+        <b-modal size="sm" id="tag-modal" ref="tag-modal"></b-modal>
         <!-- End Asign Tag Modal -->
 
         <!-- Upload Modal -->
-        <b-modal @ok="onUploadModalOk" size="md" id="upload-modal" ref="upload-modal">
-          <div id="accordion" class="medias-list">
-        
-          </div>
+        <b-modal @hidden="onUploadModalCLose" @ok="onUploadModalOk" size="md" id="upload-modal" ref="upload-modal">
+          <div id="accordion" class="medias-list"></div>
        </b-modal>
         <!-- End Upload Modal -->
+
+         <!-- Edit Media Modal -->
+        <b-modal @shown="onEditModalShown" size="md" id="edit-media-modal" ref="edit-media-modal"></b-modal>
+        <!-- End Edit Media Modal -->
     </div>
 </template>
 <script>
 
 const FileManager = require('./file-manager');
-const {toast} = require('../utils');
+const {toast, customEvent} = require('../utils');
 
 export default {
   props : ['name', 'mediaType', 'min', 'max', 'triggerClasses'],
@@ -112,6 +112,9 @@ export default {
     window.addEventListener(`asign_tag_${this.name}`, this.onAsignTag)
     window.addEventListener(`unsign_tag_${this.name}`, this.onUnsignTag)
     window.addEventListener(`upload_modal_open_${this.name}`, this.onUploadModalOpen)
+    window.addEventListener(`loaded_new_page_${this.name}`, this.onPageLoaded)
+    window.addEventListener(`loaded_${this.name}`, this.onLoad)
+    window.addEventListener(`updated_media_${this.name}`, this.onMediaUpdated)
   },
   methods: {
     instantiateField(){
@@ -126,7 +129,6 @@ export default {
 
     onMediasSelected({detail}){
       const selectedMedias = [];
-      this.medias = detail.medias;
       this.medias.forEach(media => {
         if(detail.selectedMedias.includes(String(media.id))){
           selectedMedias.push(media);
@@ -137,6 +139,17 @@ export default {
       this.$refs['media-modal'].hide();
       toast(`Medias selected successfully`);
       this.$emit('save', this.selectedMedias)
+    },
+
+    onMediaUpdated({detail}){
+      const {media} = detail;
+      this.selectedMedias = this.selectedMedias.map(m => {
+        if(m.id === media.id){
+          return media
+        }
+        return m;
+      });
+      toast('Media updated with success');
     },
 
     onAsignTag(){
@@ -151,15 +164,31 @@ export default {
       this.$refs['upload-modal'].show();
     },
 
+    onUploadModalCLose(){
+      customEvent(`upload_modal_close_${this.name}`)
+    },
+
     editSelectedMedia(e){
-      console.log('editing selected media', e)
-      console.log('Edit media with ID: ', e.currentTarget.dataset.media);
+      this.$refs['edit-media-modal'].show();
+      this.editedMediaId = e.currentTarget.dataset.media;
+    },
+    onEditModalShown(){
+      customEvent(`edit_media_${this.name}`, {
+        mediaId : this.editedMediaId,
+        medias: this.medias
+      })
     },
     onModalOk(e){
       e.preventDefault();
     },
     onUploadModalOk(e){
       e.preventDefault();
+    },
+    onPageLoaded({detail}){
+      this.medias = this.medias.concat(detail.medias);
+    },
+    onLoad({detail}){
+      this.medias = detail.medias;
     }
   },
 }

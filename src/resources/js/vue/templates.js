@@ -229,6 +229,10 @@ const uploadFeedback = (msg, textClass) => `
   ${msg}
 </p>`;
 
+const editMediaModal = () => {
+
+}
+
 module.exports = {
   templates: {
     mediaItem,
@@ -245,6 +249,7 @@ module.exports = {
     videoPreview,
     audioPreview,
     uploadPreview,
-    uploadFeedback
+    uploadFeedback,
+    metadataForm
   },
 }

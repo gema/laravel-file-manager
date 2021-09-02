@@ -3,8 +3,9 @@ import 'jquery-ui/ui/widgets/selectable';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 
-const { request, toast, customEvent } = require('../utils');
 const { templates } = require('./templates');
+const Select2 = require('../select2');
+const { request, toast, customEvent } = require('../utils');
 
 let globalTags;
 let globalMediaTypes;
@@ -20,7 +21,6 @@ const init = options => {
 }
 
 const loadGlobals = (callback = false) => {
-  // toggleLoader(true);
   request(
     '/admin/media/fetch/global-data',
     callback,
@@ -70,11 +70,13 @@ const fetchMedias = ({page, tags, type}, callback = false) => {
 };
 
 const initMediaField = ({data, last_page}) => {
+  customEvent(`loaded_${globalOptions.name}`, {medias: data})
   renderMediaList(data);
   initScroll(last_page);
   initTags();
   initRefresh();
   initUpload();
+  initSelectedMediaEdition();
 }
 
 
@@ -141,10 +143,10 @@ const getSelectedMedias = () => {
 
 
 // Init Scroll
+let isLoading = false;
 
 const initScroll = lastPage => {
   let page = 1;
-  let isLoading = false;
   $(globalMediaListContainer).on('scroll', () => {
     if( globalMediaListContainer.offsetHeight + globalMediaListContainer.scrollTop >=
         globalMediaListContainer.scrollHeight - 1) {
@@ -165,8 +167,10 @@ const initScroll = lastPage => {
 
 const onPageLoaded = ({data}) => {
   removePaginationLoader();
-  renderMediaList(data);
-  // isLoading = false;
+  // renderMediaList(data);
+  renderMediaItems(data);
+  customEvent(`loaded_new_page_${globalOptions.name}`, {medias: data})
+  isLoading = false;
 }
 
 const removePaginationLoader = () => {
@@ -366,17 +370,21 @@ const onHiddenInputChange = e => {
 
 const initUploadModal = (files = globalUploadList) => {
   const uploadModal = document.querySelector('#upload-modal');
-  uploadModal.querySelector('.modal-title').innerHTML += templates.uploadModalTitle(files.length)
+  uploadModal.querySelector('.modal-title').innerHTML = templates.uploadModalTitle(files.length)
+  
   renderUploadsPreview(files);
+ 
   uploadModal.querySelector('footer .btn-primary')
     .addEventListener('click', e => {
       onUploadSave(e, files)
     });
+
+  window.addEventListener(`upload_modal_close_${globalOptions.name}`, onRefreshClick)
+
   initCrop();
 }
 
 const renderUploadsPreview = files => {
-  initRemoveButtons(files);
   const listContainer = document.querySelector('#upload-modal .medias-list');
   listContainer.innerHTML = '';
   let i = 0;
@@ -385,8 +393,12 @@ const renderUploadsPreview = files => {
     listContainer.innerHTML += templates.uploadPreview(file, i, globalMediaTypes);
     initVideoPreview(file.media, i);
     initAudioPreview(file.media, i);
+    initParentSelect2(i);
     i++;
   })
+
+  initRemoveButtons(files);
+  Select2.initGroupedFields();
 }
 
 const initRemoveButtons = (files) => {
@@ -420,7 +432,17 @@ const initAudioPreview = (media, i) => {
   }
 }
 
+const initParentSelect2 = i => {
+  Select2.createGroupedField({
+    container: document.querySelector(`#select2-container-${i}`),
+    name: 'parentId',
+    label: 'Parent',
+    url: '/api/media/parent',
+  });
+}
+
 const onUploadSave = (e, files) => {
+  removeValidationErrors();
   e.currentTarget.classList.add('d-none');
   appendLoadersToUploads(files);
   resolveUploadPromises(generateUploadPromises(files));
@@ -456,16 +478,16 @@ const generateFileMetadata = (file, i) => {
   metadata.cropped = file.cropped ? file.cropped : null;
   metadata.name = file.media.name;
 
-  // const parentSelect = document.querySelector(
-  //   `#metadata-form-${i} select[name="parentId"]`
-  // );
-  // if (parentSelect !== null) {
-  //   const dataAttrs = $(parentSelect).find(':selected').data();
-  //   if (dataAttrs !== undefined) {
-  //     metadata.parent_model = dataAttrs.namespace;
-  //     metadata.parent_id = parentSelect.value;
-  //   }
-  // }
+  const parentSelect = document.querySelector(
+    `#metadata-form-${i} select[name="parentId"]`
+  );
+  if (parentSelect !== null) {
+    const dataAttrs = $(parentSelect).find(':selected').data();
+    if (dataAttrs !== undefined) {
+      metadata.parent_model = dataAttrs.namespace;
+      metadata.parent_id = parentSelect.value;
+    }
+  }
 
   return metadata;
 }
@@ -503,7 +525,6 @@ const resolveUploadPromises = promises => {
 }
 
 const handleUploadResponse = ({data, errors}) => {
-  removeValidationErrors();
   const fileRow = document
     .querySelector(`.file-row[data-name="${data.filename}"]`);
 
@@ -516,7 +537,7 @@ const handleUploadResponse = ({data, errors}) => {
 
 const removeValidationErrors = () => {
   document
-    .querySelectorAll('small.text-danger')
+    .querySelectorAll('span.text-danger, p.text-danger')
     .forEach(err => err.remove());
 }
 
@@ -538,7 +559,7 @@ const handleErrorResponse = (row, errors) => {
       `input[name="${name}"], select[name="${name}"]`
     );
     errors.forEach(error => {
-      field.parentElement.innerHTML += `<small class="text-danger">${error}</small>`;
+      $(field.parentElement).append(`<span class="text-danger">${error}</div>`);
     });
   });
 
@@ -552,6 +573,8 @@ const handleErrorResponse = (row, errors) => {
       The provided metadata is invalid
     </p>
   `;
+
+  document.querySelector('#upload-modal footer .btn-primary').classList.remove('d-none');
 
   // $(row).find('.collapse').collapse('show');
 }
@@ -598,6 +621,84 @@ const initCropper = i => {
       });
     }
   });
+}
+
+// Selected media edition
+
+const initSelectedMediaEdition = () => {
+  window.addEventListener(`edit_media_${globalOptions.name}`, onEditSelectedMedia)
+}
+
+const onEditSelectedMedia = ({detail}) => {
+  const {mediaId, medias} = detail;
+  const [media] = medias.filter(m => String(m.id) === mediaId);
+  const modal = document.querySelector('#edit-media-modal');
+
+  initEditMediaModal(media.id, modal);
+  setEditableValues(media, modal)
+  modal.querySelector('footer .btn-primary').addEventListener('click', e => {
+    onEditionSave(modal, media)
+  })
+}
+
+const initEditMediaModal = (id, modal) => {
+  modal.querySelector('.modal-body').innerHTML = templates.metadataForm(id, globalMediaTypes);
+  modal.querySelector('footer .btn-primary').innerHTML = 'Save';
+  modal.querySelector('header .modal-title').textContent = 'Edit Media';
+}
+
+const setEditableValues = (media, modal) => {
+  const parentField = modal.querySelector('select[name="parentId"]');
+  if (parentField !== null) {
+    parentField.value = media ? media.parent_id : '';
+  }
+  
+  const titleField = modal.querySelector('input[name="title"]');
+  titleField.value = media.media_content ? media.media_content.title : '';
+
+  const descriptionField = modal.querySelector(
+    'textarea[name="description"]'
+  );
+  descriptionField.value = media.media_content
+    ? media.media_content.description
+    : '';
+}
+
+const onEditionSave = (modal, media) => {
+  const mediaData = {
+    title: modal.querySelector('input[name="title"]').value,
+    description: modal.querySelector('textarea[name="description"]')
+      .value,
+  };
+
+  const parentField = modal.querySelector('select[name="parentId"]');
+  if (parentField !== null) {
+    mediaData.parent = modal.querySelector(
+      'select[name="parentId"]'
+    ).value;
+  }
+
+  const formData = new FormData();
+  Object.entries(mediaData).forEach(([key, value]) => {
+    formData.append(key, value);
+  });
+
+  fetch(`/api/media/${media.media_content.id}/edit`, {
+    method: 'POST',
+    body: formData,
+  })
+  .then(r=>r.json())
+  .then(onEditionResponse)
+}
+
+const onEditionResponse = data => {
+  document
+    .querySelectorAll('#edit-media-modal small.text-danger')
+    .forEach(err => err.remove());
+  
+    if(!data.errors && data.data.updated){
+      customEvent(`updated_media_${globalOptions.name}`, {media : data.data.media});
+    }
 }
 
 export default { init };

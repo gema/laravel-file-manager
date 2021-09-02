@@ -79,8 +79,8 @@ const toast = (text, type = 'success') => {
   }).show();
 };
 
-const customEvent = (event, details = {}, parent = window) => {
-  const e = new CustomEvent(event, {details});
+const customEvent = (event, detail = {}, parent = window) => {
+  const e = new CustomEvent(event, {detail});
   parent.dispatchEvent(e);
 }
 
