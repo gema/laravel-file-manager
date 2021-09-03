@@ -101,6 +101,52 @@ class MyEntityCrudController extends CrudController {
   }
 }
 ```
+### Using File-Manager as a Vuejs Component
+**`MyComponent.vue`**
+```vue
+
+<template>
+<div>
+<FileManager 
+  name="fieldName"
+  mediaType="1"
+  min="1"
+  max="1"
+  triggerClasses="btn btn-primary"
+  @save="onSave"
+>
+  <!-- Trigger Template (sample) -->
+  <template v-slot:trigger>
+    My trigger
+  </template>
+
+  <!-- Selected Media Template (sample) -->
+  <template v-slot:selectedMedia="slot">
+    <!-- slot property holds all the data from the media -->
+    <img class="w-100" :src="slot.media.media_content.preview"/>
+  </template>
+</FileManager>
+</div>
+</template>
+
+<script>
+// Import FileManager component
+import FileManager from "../../../../vendor/gemadigital/file-manager/src/resources/js/vue/FileManager.vue";
+
+export default {
+  components:{
+    FileManager,
+  },
+  methods: {
+    // Define what happens when medias are selected
+    onSave(selectedMedias){
+      console.log('Do something with' , {selectedMedias});
+    }
+  },
+};
+</script>
+
+```
 
 ## Change log
 
