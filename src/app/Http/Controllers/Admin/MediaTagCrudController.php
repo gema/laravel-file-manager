@@ -38,13 +38,8 @@ class MediaTagCrudController extends CrudController
         ]);
 
         CRUD::addColumn([
-            'name' => 'parent_id',
+            'name' => 'parent_label',
             'label' => ucfirst(__('file-manager::messages.parent')),
-        ]);
-
-        CRUD::addColumn([
-            'name' => 'parent_type',
-            'label' => ucfirst(__('file-manager::messages.parent_type')),
         ]);
     }
 
