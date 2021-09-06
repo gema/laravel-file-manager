@@ -130,8 +130,8 @@ const onMediasSelected = medias => {
     }
   }
   else if(selectedMedias.length){
-   $(`.selected-medias-input[name="${globalOptions.name}"]`)
-    .val(value)
+    $(`.selected-medias-input[name="${globalOptions.name}"]`)
+      .val(value)
     customEvent(`change_${globalOptions.name}`, {value, medias, selectedMedias});
   }
 }
@@ -237,7 +237,7 @@ const initAsignTag = () => {
   document.querySelector('#asign-tag-button').addEventListener('click', onAsignTagClick)
 }
 
-const onAsignTagClick = e => {
+const onAsignTagClick = () => {
   const selectedMedias = getSelectedMedias();
   if(selectedMedias.length) {
     customEvent(`asign_tag_${globalOptions.name}`)
@@ -258,7 +258,7 @@ const initTagsModal = title => {
   return modal;
 }
 
-const onSaveAsignTag = e => {
+const onSaveAsignTag = () => {
   const tags = [document.querySelector('#tag-modal .tags-select').value]
   const formData = new FormData();
   formData.append('tags', tags);
@@ -285,7 +285,7 @@ const initUnsignTag = () => {
   document.querySelector('#unsign-tag-button').addEventListener('click', onUnsignTagClick)
 }
 
-const onUnsignTagClick = e => {
+const onUnsignTagClick = () => {
   const selectedMedias = getSelectedMedias();
   if(selectedMedias.length) {
     customEvent(`unsign_tag_${globalOptions.name}`)
@@ -299,7 +299,7 @@ const onUnsignTagClick = e => {
   }
 }
 
-const onSaveUnsignTag = e => {
+const onSaveUnsignTag = () => {
   const tags = [document.querySelector('#tag-modal .tags-select').value]
   const formData = new FormData();
   formData.append('tags', tags);
@@ -329,11 +329,11 @@ const initRefresh = () => {
   document.querySelector('#refreshBtn').addEventListener('click', onRefreshClick);
 }
 
-const onRefreshClick = e => {
+const onRefreshClick = () => {
   toggleLoader(true);
   fetchMedias({
     page: 1,
-    type: globalOptions.mediaType
+    type: globalOptions.mediaType,
   }, onRefresh)
 }
 
@@ -345,15 +345,15 @@ const onRefresh = ({data}) => {
 // Upload
 
 const initUpload = () => {
-  const uploadButton = document.querySelector(`#upload-button`);
-  const hiddenInput = document.querySelector(`#upload-field`);
+  const uploadButton = document.querySelector('#upload-button');
+  const hiddenInput = document.querySelector('#upload-field');
 
   hiddenInput.addEventListener('change', onHiddenInputChange)
   uploadButton.addEventListener('click', onUploadClick)
 }
 
-const onUploadClick = e => {
-  const hiddenInput = document.querySelector(`#upload-field`);
+const onUploadClick = () => {
+  const hiddenInput = document.querySelector('#upload-field');
   hiddenInput.value = '';
   hiddenInput.click();
 }
@@ -401,7 +401,7 @@ const renderUploadsPreview = files => {
   Select2.initGroupedFields();
 }
 
-const initRemoveButtons = (files) => {
+const initRemoveButtons = files => {
   const removeMediaBtns = document.querySelectorAll('.remove-media-btn');
   removeMediaBtns.forEach(removeBtn => {
     removeBtn.addEventListener('click', e => {
@@ -450,10 +450,10 @@ const onUploadSave = (e, files) => {
 
 const appendLoadersToUploads = () => {
   const fileNames = document.querySelectorAll('span.loader-container');
-    fileNames.forEach(fileName => {
-      fileName.innerHTML +=
+  fileNames.forEach(fileName => {
+    fileName.innerHTML +=
         '<span class="ml-2 la la-spinner la-spin"></span>';
-    });
+  });
 }
 
 const generateUploadPromises = files => {
@@ -492,7 +492,7 @@ const generateFileMetadata = (file, i) => {
   return metadata;
 }
 
-const makeUploadPromise = (metadata) => {
+const makeUploadPromise = metadata => {
   const formData = new FormData();
   Object.entries(metadata).forEach(([key, value]) => {
     formData.append(key, value);
@@ -636,7 +636,7 @@ const onEditSelectedMedia = ({detail}) => {
 
   initEditMediaModal(media.id, modal);
   setEditableValues(media, modal)
-  modal.querySelector('footer .btn-primary').addEventListener('click', e => {
+  modal.querySelector('footer .btn-primary').addEventListener('click', () => {
     onEditionSave(modal, media)
   })
 }
@@ -687,18 +687,18 @@ const onEditionSave = (modal, media) => {
     method: 'POST',
     body: formData,
   })
-  .then(r=>r.json())
-  .then(onEditionResponse)
+    .then(r=>r.json())
+    .then(onEditionResponse)
 }
 
-const onEditionResponse = data => {
+const onEditionResponse = ({data, errors}) => {
   document
     .querySelectorAll('#edit-media-modal small.text-danger')
     .forEach(err => err.remove());
   
-    if(!data.errors && data.data.updated){
-      customEvent(`updated_media_${globalOptions.name}`, {media : data.data.media});
-    }
+  if(!errors && data.updated){
+    customEvent(`updated_media_${globalOptions.name}`, { media: data.data.media });
+  }
 }
 
 export default { init };

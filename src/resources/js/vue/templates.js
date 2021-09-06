@@ -143,8 +143,6 @@ const mediaPreview = (media, i) => {
   const typesWithoutPreview = ['video/avi'];
 
   let template = '';
-  let hasVideo = false;
-  let hasAudio = false;
 
   if(typesWithoutPreview.includes(type)){
     template = noPreview(type);
@@ -153,11 +151,9 @@ const mediaPreview = (media, i) => {
     template = imagePreview(media, i)
   }
   else if (/^video/.test(type)) {
-    hasVideo = true;
     template = videoPreview(i)
   }
   else if (/^audio/.test(type)) {
-    hasAudio = true;
     template = audioPreview(i)
   }
 
@@ -229,10 +225,6 @@ const uploadFeedback = (msg, textClass) => `
   ${msg}
 </p>`;
 
-const editMediaModal = () => {
-
-}
-
 module.exports = {
   templates: {
     mediaItem,
@@ -250,6 +242,6 @@ module.exports = {
     audioPreview,
     uploadPreview,
     uploadFeedback,
-    metadataForm
+    metadataForm,
   },
 }

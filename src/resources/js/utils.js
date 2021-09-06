@@ -88,5 +88,5 @@ module.exports = {
   request,
   truncate,
   toast,
-  customEvent
+  customEvent,
 };
