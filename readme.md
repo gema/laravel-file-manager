@@ -67,11 +67,12 @@ return [
 <?php
 
 use GemaDigital\FileManager\app\Models\Traits\MediaTrait;
-use GemaDigital\Framework\app\Models\Model; // Or an extension of this class
+use GemaDigital\Framework\app\Models\Model;
 
 class MyEntity extends Model {
   use MediaTrait; // Use the trait
-  protected static $mediable = ['images', 'videos'] // Define which columns will have medias
+
+  protected static $mediable = ['images', 'videos']; // Define which columns will have medias
 }
 ```
 
@@ -85,11 +86,11 @@ class MyEntityCrudController extends CrudController {
     // Setting up the fields
     
     $this->crud->addField([
-            'name' => 'images',
-            'type' => 'file-manager',
-            'view_namespace' => 'file-manager::field',
-            'media_type' => 1 // Get this from `media_types.id`
-        ]);
+        'name' => 'images',
+        'type' => 'file-manager',
+        'view_namespace' => 'file-manager::field',
+        'media_type' => 1 // Get this from `media_types.id`
+    ]);
 
     $this->crud->addField([
         'name' => 'videos',
@@ -99,6 +100,52 @@ class MyEntityCrudController extends CrudController {
     ]);
   }
 }
+```
+### Using File-Manager as a Vuejs Component
+**`MyComponent.vue`**
+```vue
+
+<template>
+<div>
+<FileManager 
+  name="fieldName"
+  mediaType="1"
+  min="1"
+  max="1"
+  triggerClasses="btn btn-primary"
+  @save="onSave"
+>
+  <!-- Trigger Template (sample) -->
+  <template v-slot:trigger>
+    My trigger
+  </template>
+
+  <!-- Selected Media Template (sample) -->
+  <template v-slot:selectedMedia="slot">
+    <!-- slot property holds all the data from the media -->
+    <img class="w-100" :src="slot.media.media_content.preview"/>
+  </template>
+</FileManager>
+</div>
+</template>
+
+<script>
+// Import FileManager component
+import FileManager from "../../../../vendor/gemadigital/file-manager/src/resources/js/vue/FileManager.vue";
+
+export default {
+  components:{
+    FileManager,
+  },
+  methods: {
+    // Define what happens when medias are selected
+    onSave(selectedMedias){
+      console.log('Do something with' , {selectedMedias});
+    }
+  },
+};
+</script>
+
 ```
 
 ## Change log
