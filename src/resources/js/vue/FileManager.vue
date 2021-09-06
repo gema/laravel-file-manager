@@ -90,7 +90,7 @@
         <!-- End Upload Modal -->
 
          <!-- Edit Media Modal -->
-        <b-modal @shown="onEditModalShown" size="md" id="edit-media-modal" ref="edit-media-modal"></b-modal>
+        <b-modal @ok="onEditModalOk" @shown="onEditModalShown" size="md" id="edit-media-modal" ref="edit-media-modal"></b-modal>
         <!-- End Edit Media Modal -->
     </div>
 </template>
@@ -150,6 +150,7 @@ export default {
         return m;
       });
       toast('Media updated with success');
+      this.$refs['edit-media-modal'].hide();
     },
 
     onAsignTag(){
@@ -175,8 +176,11 @@ export default {
     onEditModalShown(){
       customEvent(`edit_media_${this.name}`, {
         mediaId : this.editedMediaId,
-        medias: this.medias
+        medias: this.selectedMedias
       })
+    },
+     onEditModalOk(e){
+      e.preventDefault();
     },
     onModalOk(e){
       e.preventDefault();

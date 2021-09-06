@@ -697,7 +697,17 @@ const onEditionResponse = ({data, errors}) => {
     .forEach(err => err.remove());
   
   if(!errors && data.updated){
-    customEvent(`updated_media_${globalOptions.name}`, { media: data.data.media });
+    customEvent(`updated_media_${globalOptions.name}`, { media: data.media });
+  } else {
+    const modal = document.querySelector('#edit-media-modal');
+    Object.entries(errors).forEach(([name, errors]) => {
+      const field = modal.querySelector(
+        `input[name="${name}"], select[name="${name}"]`
+      );
+      errors.forEach(error => {
+        $(field.parentElement).append(`<span class="text-danger">${error}</div>`);
+      });
+    });
   }
 }
 
