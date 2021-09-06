@@ -64,7 +64,7 @@ class MediaCrudController extends CrudController
     {
         return $this->fetch([
             'model' => 'GemaDigital\FileManager\app\Models\MediaTag',
-            'paginate' => 20,
+            'paginate' => 10,
         ]);
     }
 

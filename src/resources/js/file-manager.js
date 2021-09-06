@@ -5,6 +5,7 @@ const Select2 = require('./select2');
 const { request, truncate, toast } = require('./utils');
 
 let globalTags = [];
+let globalTagsLastPage = 1;
 let globalMediaTypes = [];
 let modalShown = false;
 let mediaList = [];
@@ -77,7 +78,7 @@ const initUnsignTag = prefix => {
       const modal = initTagsModal(prefix, __('removeTag'));
 
       const saveBtn = $('#asign-tag-modal .modal-save');
-      saveBtn.unbind('click');
+      saveBtn.off('click');
       saveBtn.on('click', () => {
         const tags = [modal.querySelector('.asign-tags-select').value];
         const unsignData = {
@@ -114,7 +115,7 @@ const initAsignTag = prefix => {
       const modal = initTagsModal(prefix, __('asignTag'));
 
       const saveBtn = $('#asign-tag-modal .modal-save');
-      saveBtn.unbind('click');
+      saveBtn.off('click');
       saveBtn.on('click', () => {
         const tags = [modal.querySelector('.asign-tags-select').value];
         const asignData = {
@@ -553,7 +554,7 @@ const initScroll = (container, lastPage, prefix = '', type) => {
   let page = 1;
   let isLoading = false;
 
-  $(container).unbind('scroll');
+  $(container).off('scroll');
   $(container).on('scroll', () => {
     if (
       container.offsetHeight + container.scrollTop >=
@@ -630,6 +631,8 @@ const initTags = (prefix = '', type = false) => {
     `;
   });
 
+  initTagsPagination(tagsContainer.parentElement, globalTagsLastPage)
+
   initAsignTag(prefix);
   initUnsignTag(prefix);
 
@@ -642,9 +645,48 @@ const initTags = (prefix = '', type = false) => {
       toggleLoader(prefix, true);
 
       getMedias(1, selectedTags, type, medias => {
-        renderMediasTable(medias, prefix);
+        renderMediasTable(medias, prefix, globalTagsLastPage);
       });
     });
+  });
+};
+
+const initTagsPagination = (container, lastPage) => {
+  let page = 1;
+  let isLoading = false;
+
+  $(container).off('scroll');
+  $(container).on('scroll', () => {
+    if (
+      container.offsetHeight + container.scrollTop >=
+      container.scrollHeight - 1
+    ) {
+      if (!isLoading && page + 1 <= lastPage) {
+        page += 1;
+        isLoading = true;
+
+        container.innerHTML += '<span class="w-100 text-center tags-loader la la-spinner la-spin mt-3"></span>';
+        getTags(page, ({data}) => {
+          document.querySelector('.tags-loader').remove();
+          data.forEach(tag => {
+            container.querySelector('ul').innerHTML += `
+              <li class="list-group-item">
+                <a href="#" title="${tag.name}" class="select-tag" data-tag="${tag.id}">
+                  ${truncate(tag.name, 10)}
+                </a>
+              </li>
+            `;
+          })
+          isLoading = false;
+        })
+      }
+    }
+  });
+}
+
+const getTags = (page = 1, callback = false) => {
+  request(`/admin/media/fetch/tags?page=${page}`, callback, 'POST', {
+    _token: document.querySelector('meta[name=csrf-token]').content,
   });
 };
 
@@ -700,8 +742,8 @@ const initUploadModal = (medias, types) => {
   });
 
   $('#upload-modal .modal-save')
-    .unbind()
-    .click(e => {
+    .off('click')
+    .on('clcik', e => {
       e.currentTarget.classList.add('d-none');
       const promises = [];
       const promiseResponses = [];
@@ -802,8 +844,8 @@ const initUploadModal = (medias, types) => {
     });
   
   $('.crop-btn')
-    .unbind()
-    .click(e1 => {
+    .off('click')
+    .on('click', e1 => {
       const i1 = e1.target.dataset.id;
       const imageCropper = document.querySelector(`#imageCropper_${i1}`);
       initCropper(i1);
@@ -841,7 +883,7 @@ const initUpload = prefix => {
     hiddenInput.click();
   };
 
-  $(uploadButton).unbind('click');
+  $(uploadButton).off('click');
   $(uploadButton).on('click', uploadClickListener);
 
   hiddenInput.addEventListener('change', () => {
@@ -894,6 +936,7 @@ const onMediaLoadedSingle = medias => {
 const setGlobals = ({data}) => {
   const { tags, types } = data;
   globalTags = tags.data;
+  globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
 }
 

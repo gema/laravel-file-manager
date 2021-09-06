@@ -11,6 +11,7 @@ let globalTags;
 let globalMediaTypes;
 let globalOptions;
 let globalUploadList;
+let globalTagsLastPage;
 
 let globalMediaListContainer;
 let globalTagsListContainer;
@@ -45,6 +46,7 @@ const onGlobalsLoaded = globals => {
 const setGlobals = ({ data }) => {    
   const { tags, types } = data;
   globalTags = tags.data;
+  globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
     
   globalMediaListContainer = document.querySelector('.custom-file-manager .list');
@@ -183,6 +185,7 @@ const removePaginationLoader = () => {
 const initTags = () => {
   clearTagsListContainer();
   globalTags.length ? renderTagItems(globalTags) : renderNoTagsFound();
+  initTagsPagination(globalTagsListContainer.parentElement, globalTagsLastPage);
   initFilterByTag();
   initAsignTag();
   initUnsignTag();
@@ -202,6 +205,8 @@ const renderNoTagsFound = () => {
   globalTagsListContainer.innerHTML += templates.noTagsFound();
 }
 
+
+
 const initFilterByTag = () => {
   document.querySelectorAll('.select-tag').forEach(tagBtn => {
     tagBtn.addEventListener('click', event => {
@@ -215,6 +220,39 @@ const initFilterByTag = () => {
     })
   })
 }
+
+const initTagsPagination = (container, lastPage) => {
+  let page = 1;
+  let isLoading = false;
+
+  $(container).off('scroll');
+  $(container).on('scroll', () => {
+    if (
+      container.offsetHeight + container.scrollTop >=
+      container.scrollHeight - 1
+    ) {
+      if (!isLoading && page + 1 <= lastPage) {
+        page += 1;
+        isLoading = true;
+
+        container.innerHTML += templates.tagsLoader();
+        getTags(page, ({data}) => {
+          document.querySelector('.tags-loader').remove();
+          data.forEach(tag => {
+            container.querySelector('ul').innerHTML += templates.tagItem(tag)
+          })
+          isLoading = false;
+        })
+      }
+    }
+  });
+}
+
+const getTags = (page = 1, callback = false) => {
+  request(`/admin/media/fetch/tags?page=${page}`, callback, 'POST', {
+    _token: document.querySelector('meta[name=csrf-token]').content,
+  });
+};
 
 const toggleTagBtn = parent => {
   const isSelected = Object.values(parent.classList).includes('selected');

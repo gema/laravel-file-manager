@@ -41,6 +41,8 @@ const tagsSelect = tags => {
   </select>`;
 }
 
+const tagsLoader = () => '<span class="w-100 text-center tags-loader la la-spinner la-spin mt-3"></span>';
+
 const uploadModalTitle = length => `
   Uploading <span class="medias-count">${length}</span> medias
 `;
@@ -234,6 +236,7 @@ module.exports = {
     noTagsFound,
     tagsSelectOptions,
     tagsSelect,
+    tagsLoader,
     uploadModalTitle,
     mediaPreview,
     noPreview,
