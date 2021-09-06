@@ -7,6 +7,7 @@ use GemaDigital\FileManager\app\Models\Media;
 use GemaDigital\FileManager\app\Models\MediaContent;
 use GemaDigital\FileManager\app\Models\MediaVersion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -102,25 +103,47 @@ class MediaAPIController
                 'type_id' => $request->type,
             ]);
 
-            $mediaCloudResponse = $this->mediaCloudRequest($request);
+            $preview;
 
-            $mediaContent = MediaContent::create([
-                'uuid' => $mediaCloudResponse['uuid'], // get from media cloud
-                'media_id' => $media->id,
-                'title' => $request->title ?: '[No title provided]',
-                'description' => $request->description ?: '[No description provided]',
-                'preview' => $mediaCloudResponse['preview'], // get from media cloud
-            ]);
+            $disk = config('file-manager.disk');
+            if (!$disk) {
+                $mediaCloudResponse = $this->mediaCloudRequest($request);
+                $mediaContent = MediaContent::create([
+                    'uuid' => $mediaCloudResponse['uuid'], // get from media cloud
+                    'media_id' => $media->id,
+                    'title' => $request->title ?: '[No title provided]',
+                    'description' => $request->description ?: '[No description provided]',
+                    'preview' => $mediaCloudResponse['preview'], // get from media cloud
+                ]);
+                $preview = $mediaCloudResponse['preview'];
+            } else {
+                $uuid = Str::uuid();
+                $parentClass = new $request->parent_model;
+                $parentFolder = $parentClass::find($request->parentId)->name;
+                $path = $request->file('media')->store(
+                    $parentFolder, $disk
+                );
+
+                $mediaContent = MediaContent::create([
+                    'uuid' => $uuid,
+                    'media_id' => $media->id,
+                    'title' => $request->title ?: '[No title provided]',
+                    'description' => $request->description ?: '[No description provided]',
+                    'preview' => Storage::disk($disk)->path($path),
+                ]);
+
+                $preview = Storage::disk($disk)->path($path);
+            }
 
             DB::commit();
 
             return json_response([
-                'preview' => $mediaCloudResponse['preview'],
+                'preview' => $preview,
                 'filename' => $filename,
                 'success' => true,
                 'msg' => 'Media uploaded successfully.',
             ]);
-        } catch (\Exception$e) {
+        } catch (\Exception $e) {
             $response = [
                 'filename' => $filename,
                 'success' => false,

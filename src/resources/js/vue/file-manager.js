@@ -476,6 +476,7 @@ const initParentSelect2 = i => {
     name: 'parentId',
     label: 'Parent',
     url: '/api/media/parent',
+    class: 'form-control',
   });
 }
 

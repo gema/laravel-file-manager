@@ -378,12 +378,14 @@ const renderUploadMediaList = (medias, types) => {
         URL.createObjectURL(media);
       document.querySelector(`#audio-preview-audio-${i}`).load();
     }
-
+    console.log(window.parentsField)
     Select2.createGroupedField({
       container: document.querySelector(`#select2-container-${i}`),
       name: 'parentId',
       label: 'Parent',
       url: '/api/media/parent',
+      class: 'form-control',
+      singleParent: window.parentsField,
     });
 
     i += 1;
@@ -743,7 +745,7 @@ const initUploadModal = (medias, types) => {
 
   $('#upload-modal .modal-save')
     .off('click')
-    .on('clcik', e => {
+    .on('click', e => {
       e.currentTarget.classList.add('d-none');
       const promises = [];
       const promiseResponses = [];

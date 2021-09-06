@@ -30,4 +30,7 @@ return [
         'media-type' => true,
         'media-version' => true,
     ],
+
+    // Disk where to save the medias, set false to use media cloud
+    'disk' => false,
 ];

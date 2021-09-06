@@ -1,12 +1,10 @@
-// const { executeFunctionByName } = require('./utils');
-
 const createGroupedField = options => {
   const fieldHtml = generateFieldHtml(options, 'select2-grouped');
   options.container.innerHTML += fieldHtml;
 }
 
 const generateFieldHtml = (options, fieldType) => {
-  return `
+  const html = `
         <label>${options.label}</label>
         <select
             name="${options.name}"
@@ -15,6 +13,8 @@ const generateFieldHtml = (options, fieldType) => {
             data-url="${options.url}"
         >
         </select>`;
+
+  return html;
 }
 
 const initGroupedFields = () => {
