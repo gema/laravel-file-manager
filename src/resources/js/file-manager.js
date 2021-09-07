@@ -30,13 +30,13 @@ const getSelectedTags = prefix => {
 
 const toggleTagBtn = parent => {
   const isSelected = Object.values(parent.classList).includes('selected');
-  parent.classList.toggle('selected', isSelected);
+  parent.classList.toggle('selected', !isSelected);
 };
 
 const getSelectedMedias = prefix => {
   selectedMedias = [];
   document
-    .querySelectorAll(`${prefix}.selectable.selected`)
+    .querySelectorAll(`${prefix}.selectable.ui-selected`)
     .forEach(selectable => {
       selectedMedias.push(selectable.dataset.file);
     });
@@ -379,14 +379,13 @@ const renderUploadMediaList = (medias, types) => {
         URL.createObjectURL(media);
       document.querySelector(`#audio-preview-audio-${i}`).load();
     }
-    console.log(window.parentsField);
+
     Select2.createGroupedField({
       container: document.querySelector(`#select2-container-${i}`),
       name: 'parentId',
       label: 'Parent',
       url: '/api/media/parent',
       class: 'form-control',
-      singleParent: window.parentsField,
     });
 
     i += 1;
@@ -487,35 +486,8 @@ const initSelectedMediasEdition = (prefix, medias, type) => {
 };
 
 const initSelection = (medias, prefix, type) => {
-  const selection = new SelectionArea({
-    boundaries: ['html'],
-    selectables: ['.selection-area > .selectable'],
-  })
-    .on('start', ({ store, event }) => {
-      if (!event.ctrlKey && !event.metaKey) {
-        for (const el of store.stored) {
-          el.classList.remove('selected');
-        }
-
-        selection.clearSelection();
-      }
-    })
-    .on(
-      'move',
-      ({
-        store: {
-          changed: { added, removed },
-        },
-      }) => {
-        for (const el of added) {
-          el.classList.add('selected');
-        }
-
-        for (const el of removed) {
-          el.classList.remove('selected');
-        }
-      }
-    );
+  $('.selection-area')
+    .selectable();
 
   if (prefix !== '') {
     document
@@ -587,7 +559,7 @@ const initScroll = (container, lastPage, prefix = '', type) => {
   });
 };
 
-const renderMediasTable = (medias, prefix, type) => {
+const renderMediasTable = (medias, prefix, type = false) => {
   toggleLoader(prefix, false);
   const container = document.querySelector(
     `${prefix} .custom-file-manager .list`
@@ -648,7 +620,7 @@ const initTags = (prefix = '', type = false) => {
       toggleLoader(prefix, true);
 
       getMedias(1, selectedTags, type, medias => {
-        renderMediasTable(medias, prefix, globalTagsLastPage);
+        renderMediasTable(medias, prefix);
       });
     });
   });

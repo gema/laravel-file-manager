@@ -349,7 +349,6 @@ export default {
   }
 
   // JQUERY UI
-
-  .selection-area .ui-selecting { background: #7c69ef; color: white; }
+  .selection-area .ui-selecting { background: #9789e7; color: white; }
   .selection-area .ui-selected { background: #7c69ef; color: white; }
 </style>

@@ -120,3 +120,13 @@
   position: absolute;
   bottom: 0;
 }
+
+.selection-area .ui-selecting {
+  background: #9789e7;
+  color: white;
+}
+
+.selection-area .ui-selected {
+  background: #7c69ef;
+  color: white;
+}
