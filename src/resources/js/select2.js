@@ -1,7 +1,8 @@
+/* eslint-disable no-use-before-define */
 const createGroupedField = options => {
   const fieldHtml = generateFieldHtml(options, 'select2-grouped');
   options.container.innerHTML += fieldHtml;
-}
+};
 
 const generateFieldHtml = (options, fieldType) => {
   const html = `
@@ -15,12 +16,12 @@ const generateFieldHtml = (options, fieldType) => {
         </select>`;
 
   return html;
-}
+};
 
 const initGroupedFields = () => {
   document.querySelectorAll('.select2-grouped').forEach(selectElement => {
     const { url } = selectElement.dataset;
-    const finished= [];
+    const finished = [];
     $(selectElement).select2({
       theme: 'bootstrap',
       multiple: false,
@@ -33,10 +34,10 @@ const initGroupedFields = () => {
             search: params.term,
             page: params.page || 1,
           };
-                
+
           return query;
         },
-        processResults({data}) {
+        processResults({ data }) {
           const parentsNumber = Object.keys(data).length;
           const results = [];
           let more;
@@ -70,7 +71,7 @@ const initGroupedFields = () => {
               more = response.current_page < response.last_page;
             });
           }
-            
+
           return {
             results,
             pagination: { more },
@@ -81,8 +82,8 @@ const initGroupedFields = () => {
       const { data } = e.params;
       $(e.currentTarget).children()[0].dataset.namespace = data.namespace;
     });
-  })
-}
+  });
+};
 
 module.exports = {
   createGroupedField,

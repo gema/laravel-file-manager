@@ -120,19 +120,17 @@ class MediaAPIController
                 $uuid = Str::uuid();
                 $parentClass = new $request->parent_model;
                 $parentFolder = $parentClass::find($request->parentId)->name;
-                $path = $request->file('media')->store(
-                    $parentFolder, $disk
-                );
-
+                $fileName = $request->file('media')->store($parentFolder, $disk);
+                $path = Storage::disk($disk)->url($fileName);
                 $mediaContent = MediaContent::create([
                     'uuid' => $uuid,
                     'media_id' => $media->id,
                     'title' => $request->title ?: '[No title provided]',
                     'description' => $request->description ?: '[No description provided]',
-                    'preview' => Storage::disk($disk)->path($path),
+                    'preview' => $path,
                 ]);
 
-                $preview = Storage::disk($disk)->path($path);
+                $preview = $path;
             }
 
             DB::commit();
@@ -209,7 +207,7 @@ class MediaAPIController
         // Simulate media cloud response
         return [
             'uuid' => Str::uuid(),
-            'preview' => 'https://mcleansmartialarts.com/wp-content/uploads/2017/04/default-image-620x600.jpg',
+            'preview' => 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgMzIgMzIiPgo8cGF0aCBkPSJNMjkuOTk2IDRjMC4wMDEgMC4wMDEgMC4wMDMgMC4wMDIgMC4wMDQgMC4wMDR2MjMuOTkzYy0wLjAwMSAwLjAwMS0wLjAwMiAwLjAwMy0wLjAwNCAwLjAwNGgtMjcuOTkzYy0wLjAwMS0wLjAwMS0wLjAwMy0wLjAwMi0wLjAwNC0wLjAwNHYtMjMuOTkzYzAuMDAxLTAuMDAxIDAuMDAyLTAuMDAzIDAuMDA0LTAuMDA0aDI3Ljk5M3pNMzAgMmgtMjhjLTEuMSAwLTIgMC45LTIgMnYyNGMwIDEuMSAwLjkgMiAyIDJoMjhjMS4xIDAgMi0wLjkgMi0ydi0yNGMwLTEuMS0wLjktMi0yLTJ2MHoiPjwvcGF0aD4KPHBhdGggZD0iTTI2IDljMCAxLjY1Ny0xLjM0MyAzLTMgM3MtMy0xLjM0My0zLTMgMS4zNDMtMyAzLTMgMyAxLjM0MyAzIDN6Ij48L3BhdGg+CjxwYXRoIGQ9Ik0yOCAyNmgtMjR2LTRsNy0xMiA4IDEwaDJsNy02eiI+PC9wYXRoPgo8L3N2Zz4K',
         ];
     }
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 const { truncate } = require('../utils');
 
 const mediaItem = media => `
@@ -31,7 +32,7 @@ const tagsSelectOptions = tags => tags.map(tag => `
   <option value="${tag.id}">
     ${tag.name}
   </option>
-`)
+`);
 
 const tagsSelect = tags => {
   const options = tagsSelectOptions(tags);
@@ -39,7 +40,7 @@ const tagsSelect = tags => {
   <select name="tags" class="tags-select form-control">
   ${options}
   </select>`;
-}
+};
 
 const tagsLoader = () => '<span class="w-100 text-center tags-loader la la-spinner la-spin mt-3"></span>';
 
@@ -48,19 +49,19 @@ const uploadModalTitle = length => `
 `;
 
 const uploadPreview = (file, i, types) => {
-  const {media} = file;
+  const { media } = file;
   const mediaPreviewTemplate = mediaPreview(media, i);
   const metadataFormTemplate = metadataForm(i, types);
 
   let mediaSize = media.size;
   let unit = '';
   let j = 0;
-  const units = ['KB', 'MB', 'GB']
+  const units = ['KB', 'MB', 'GB'];
 
   while (mediaSize > 1024 && j < units.length) {
     mediaSize = Math.round(mediaSize / 1024);
     unit = units[j];
-    j++;
+    j += 1;
   }
 
   return `
@@ -99,7 +100,7 @@ const uploadPreview = (file, i, types) => {
       </div>
     </div>
   `;
-}
+};
 
 const metadataForm = (i, types) => {
   const typesListTemplate = typesList(types);
@@ -122,45 +123,41 @@ const metadataForm = (i, types) => {
       </div>
       ${typesListTemplate}
     </form>`;
-}
+};
 
 const typesList = types => {
-  let typesList = '';
+  let list = '';
   types.forEach(type => {
-    typesList += `<option value="${type.id}">${type.name}</option>`;
+    list += `<option value="${type.id}">${type.name}</option>`;
   });
 
   return `
   <div class="form-group">
     <label>Media Type</label>
     <select name="type" class="form-control">
-      ${typesList}
+      ${list}
     </select>
   </div>`;
-}
+};
 
 const mediaPreview = (media, i) => {
-  const {type} = media;
-  console.log(type);
+  const { type } = media;
   const typesWithoutPreview = ['video/avi'];
 
   let template = '';
 
-  if(typesWithoutPreview.includes(type)){
+  if (typesWithoutPreview.includes(type)) {
     template = noPreview(type);
-  }
-  else if(/^image/.test(type)){
-    template = imagePreview(media, i)
-  }
-  else if (/^video/.test(type)) {
-    template = videoPreview(i)
-  }
-  else if (/^audio/.test(type)) {
-    template = audioPreview(i)
+  } else if (/^image/.test(type)) {
+    template = imagePreview(media, i);
+  } else if (/^video/.test(type)) {
+    template = videoPreview(i);
+  } else if (/^audio/.test(type)) {
+    template = audioPreview(i);
   }
 
   return template;
-}
+};
 
 const noPreview = type => `
   <small>No preview available for type ${type}</small>
@@ -170,7 +167,7 @@ const imagePreview = (media, i) => {
   const uncropableTypes = ['image/gif'];
   let cropTemplate = '';
 
-  if(!uncropableTypes.includes(media.type)){
+  if (!uncropableTypes.includes(media.type)) {
     cropTemplate = `
     <button id="crop-btn-${i}" class="form-control btn btn-default btn-sm crop-btn" data-id="${i}">
       Crop
@@ -189,7 +186,7 @@ const imagePreview = (media, i) => {
     >
     ${cropTemplate}
   `;
-}
+};
 
 const cropImageTemplate = (media, i) => {
   const tmpImg = document.createElement('img');
@@ -247,4 +244,4 @@ module.exports = {
     uploadFeedback,
     metadataForm,
   },
-}
+};

@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import $ from 'jquery';
 import 'jquery-ui/ui/widgets/selectable';
 import Cropper from 'cropperjs';
@@ -19,14 +20,14 @@ let globalTagsListContainer;
 const init = options => {
   globalOptions = options;
   loadGlobals(onGlobalsLoaded);
-}
+};
 
 const loadGlobals = (callback = false) => {
   request(
     '/admin/media/fetch/global-data',
     callback,
     'POST'
-  )
+  );
 };
 
 const toggleLoader = visible => {
@@ -34,36 +35,36 @@ const toggleLoader = visible => {
   if (container) {
     container.innerHTML = '';
     const loader = document.querySelector('.media-loader');
-    loader.classList.toggle('d-none', !visible)
+    loader.classList.toggle('d-none', !visible);
   }
-}
+};
 
 const onGlobalsLoaded = globals => {
   setGlobals(globals);
   loadMedias();
-}
+};
 
-const setGlobals = ({ data }) => {    
+const setGlobals = ({ data }) => {
   const { tags, types } = data;
   globalTags = tags.data;
   globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
-    
+
   globalMediaListContainer = document.querySelector('.custom-file-manager .list');
   globalTagsListContainer = document.querySelector('.tags-container ul');
-}
+};
 
 const loadMedias = () => {
   fetchMedias({
     type: globalOptions.mediaType,
-  }, initMediaField)
-}
+  }, initMediaField);
+};
 
-const fetchMedias = ({page, tags, type}, callback = false) => {
+const fetchMedias = ({ page, tags, type }, callback = false) => {
   if (page === undefined) page = 1;
   if (tags === undefined) tags = null;
   if (type === undefined) type = false;
-    
+
   request(`/admin/media/fetch/media?page=${page}`, callback, 'POST', {
     _token: document.querySelector('meta[name=csrf-token]').content,
     tags,
@@ -71,41 +72,38 @@ const fetchMedias = ({page, tags, type}, callback = false) => {
   });
 };
 
-const initMediaField = ({data, last_page}) => {
-  customEvent(`loaded_${globalOptions.name}`, {medias: data})
+// eslint-disable-next-line camelcase
+const initMediaField = ({ data, last_page }) => {
+  customEvent(`loaded_${globalOptions.name}`, { medias: data });
   renderMediaList(data);
   initScroll(last_page);
   initTags();
   initRefresh();
   initUpload();
   initSelectedMediaEdition();
-}
-
+};
 
 // Render Media List
 
 const renderMediaList = medias => {
   toggleLoader(false);
   clearMediaListContainer();
-  medias.length ?
-    renderMediaItems(medias) : renderNoMediasFound()
+  if (medias.length) renderMediaItems(medias);
+  else renderNoMediasFound();
   initSelection(medias);
-}
+};
 
 const clearMediaListContainer = () => {
   globalMediaListContainer.innerHTML = '';
-}
+};
 
 const renderMediaItems = medias => {
-  medias.forEach(media =>
-    globalMediaListContainer.innerHTML += templates.mediaItem(media)
-  );
-}
+  medias.forEach(media => globalMediaListContainer.innerHTML += templates.mediaItem(media));
+};
 
 const renderNoMediasFound = () => {
   globalMediaListContainer.innerHTML += templates.noMediasFound();
-}
-
+};
 
 // Selection
 
@@ -116,7 +114,7 @@ const initSelection = medias => {
   $('#media-modal .modal-footer')
     .find('.btn-primary')
     .on('click', () => onMediasSelected(medias));
-}
+};
 
 const onMediasSelected = medias => {
   const selectedMedias = getSelectedMedias();
@@ -124,25 +122,21 @@ const onMediasSelected = medias => {
   const totalSelectedMedias = selectedMedias.length;
   const { min, max } = globalOptions;
 
-  if(totalSelectedMedias > max || totalSelectedMedias < min){
-    if(min === max){
+  if (totalSelectedMedias > max || totalSelectedMedias < min) {
+    if (min === max) {
       toast(`Please select exactly ${min} medias`, 'error');
-    }else{
-      toast(`Please select between ${min} and ${max} medias`, 'error')
+    } else {
+      toast(`Please select between ${min} and ${max} medias`, 'error');
     }
-  }
-  else if(selectedMedias.length){
+  } else if (selectedMedias.length) {
     $(`.selected-medias-input[name="${globalOptions.name}"]`)
-      .val(value)
-    customEvent(`change_${globalOptions.name}`, {value, medias, selectedMedias});
+      .val(value);
+    customEvent(`change_${globalOptions.name}`, { value, medias, selectedMedias });
   }
-}
+};
 
-const getSelectedMedias = () => {
-  return Object.values(document.querySelectorAll('.selection-area div.ui-selected'))
-    .map(selectable => selectable.dataset.file);
-}
-
+const getSelectedMedias = () => Object.values(document.querySelectorAll('.selection-area div.ui-selected'))
+  .map(selectable => selectable.dataset.file);
 
 // Init Scroll
 let isLoading = false;
@@ -150,8 +144,8 @@ let isLoading = false;
 const initScroll = lastPage => {
   let page = 1;
   $(globalMediaListContainer).on('scroll', () => {
-    if( globalMediaListContainer.offsetHeight + globalMediaListContainer.scrollTop >=
-        globalMediaListContainer.scrollHeight - 1) {
+    if (globalMediaListContainer.offsetHeight + globalMediaListContainer.scrollTop
+        >= globalMediaListContainer.scrollHeight - 1) {
       if (!isLoading && page + 1 <= lastPage) {
         page += 1;
         isLoading = true;
@@ -161,51 +155,49 @@ const initScroll = lastPage => {
           page,
           tags: getSelectedTags(),
           type: globalOptions.mediaType,
-        }, onPageLoaded)
+        }, onPageLoaded);
       }
     }
-  })
-}
+  });
+};
 
-const onPageLoaded = ({data}) => {
+const onPageLoaded = ({ data }) => {
   removePaginationLoader();
-  // renderMediaList(data);
+  // renderMediaisTagsLoadingList(data);
   renderMediaItems(data);
-  customEvent(`loaded_new_page_${globalOptions.name}`, {medias: data})
+  customEvent(`loaded_new_page_${globalOptions.name}`, { medias: data });
   isLoading = false;
-}
+};
 
 const removePaginationLoader = () => {
   document.querySelector('.pagination-loader').remove();
-}
-
+};
 
 // Init Tags
 
 const initTags = () => {
   clearTagsListContainer();
-  globalTags.length ? renderTagItems(globalTags) : renderNoTagsFound();
+  if (globalTags.length) renderTagItems(globalTags);
+  else renderNoTagsFound();
   initTagsPagination(globalTagsListContainer.parentElement, globalTagsLastPage);
   initFilterByTag();
   initAsignTag();
   initUnsignTag();
-}
+};
 
 const clearTagsListContainer = () => {
   globalTagsListContainer.innerHTML = '';
-}
+};
 
 const renderTagItems = tags => {
   tags.forEach(tag => {
-    globalTagsListContainer.innerHTML += templates.tagItem(tag)
-  })
-}
+    globalTagsListContainer.innerHTML += templates.tagItem(tag);
+  });
+};
 
 const renderNoTagsFound = () => {
   globalTagsListContainer.innerHTML += templates.noTagsFound();
-}
-
-
+};
 
 const initFilterByTag = () => {
   document.querySelectorAll('.select-tag').forEach(tagBtn => {
@@ -216,37 +208,38 @@ const initFilterByTag = () => {
         page: 1,
         tags: getSelectedTags(),
         type: globalOptions.mediaType,
-      }, onListLoaded)
-    })
-  })
-}
+      }, onListLoaded);
+    });
+  });
+};
+
+let isTagsLoading = false;
 
 const initTagsPagination = (container, lastPage) => {
   let page = 1;
-  let isLoading = false;
 
   $(container).off('scroll');
   $(container).on('scroll', () => {
     if (
-      container.offsetHeight + container.scrollTop >=
-      container.scrollHeight - 1
+      container.offsetHeight + container.scrollTop
+      >= container.scrollHeight - 1
     ) {
-      if (!isLoading && page + 1 <= lastPage) {
+      if (!isTagsLoading && page + 1 <= lastPage) {
         page += 1;
-        isLoading = true;
+        isTagsLoading = true;
 
         container.innerHTML += templates.tagsLoader();
-        getTags(page, ({data}) => {
+        getTags(page, ({ data }) => {
           document.querySelector('.tags-loader').remove();
           data.forEach(tag => {
-            container.querySelector('ul').innerHTML += templates.tagItem(tag)
-          })
-          isLoading = false;
-        })
+            container.querySelector('ul').innerHTML += templates.tagItem(tag);
+          });
+          isTagsLoading = false;
+        });
       }
     }
   });
-}
+};
 
 const getTags = (page = 1, callback = false) => {
   request(`/admin/media/fetch/tags?page=${page}`, callback, 'POST', {
@@ -257,7 +250,7 @@ const getTags = (page = 1, callback = false) => {
 const toggleTagBtn = parent => {
   const isSelected = Object.values(parent.classList).includes('selected');
   parent.classList.toggle('selected', !isSelected);
-}
+};
 
 const getSelectedTags = () => {
   const tagsIds = [];
@@ -265,45 +258,45 @@ const getSelectedTags = () => {
     .querySelectorAll('.selected .select-tag')
     .forEach(tagBtn => tagsIds.push(parseInt(tagBtn.dataset.tag, 10)));
   return tagsIds;
-}
+};
 
-const onListLoaded = ({data}) => {
+const onListLoaded = ({ data }) => {
   renderMediaList(data);
-}
+};
 
 const initAsignTag = () => {
-  document.querySelector('#asign-tag-button').addEventListener('click', onAsignTagClick)
-}
+  document.querySelector('#asign-tag-button').addEventListener('click', onAsignTagClick);
+};
 
 const onAsignTagClick = () => {
   const selectedMedias = getSelectedMedias();
-  if(selectedMedias.length) {
-    customEvent(`asign_tag_${globalOptions.name}`)
+  if (selectedMedias.length) {
+    customEvent(`asign_tag_${globalOptions.name}`);
     setTimeout(() => {
       const modal = initTagsModal('Asign Tag');
       const saveButton = modal.querySelector('footer .btn-primary');
       saveButton.addEventListener('click', onSaveAsignTag);
-    }, 100)
-  }else{
+    }, 100);
+  } else {
     toast('Select some medias first', 'error');
   }
-}
+};
 
 const initTagsModal = title => {
   const modal = document.querySelector('#tag-modal');
   modal.querySelector('.modal-title').textContent = title;
   modal.querySelector('.modal-body').innerHTML += templates.tagsSelect(globalTags);
   return modal;
-}
+};
 
 const onSaveAsignTag = () => {
-  const tags = [document.querySelector('#tag-modal .tags-select').value]
+  const tags = [document.querySelector('#tag-modal .tags-select').value];
   const formData = new FormData();
   formData.append('tags', tags);
-  formData.append('medias', getSelectedMedias())
+  formData.append('medias', getSelectedMedias());
 
   asignTagRequest(formData);
-}
+};
 
 const asignTagRequest = body => {
   fetch('/api/media/tag', {
@@ -317,34 +310,34 @@ const asignTagRequest = body => {
       } else toast('There was an error asigning tags', 'danger');
     })
     .catch(e => console.log(e));
-}
+};
 
 const initUnsignTag = () => {
-  document.querySelector('#unsign-tag-button').addEventListener('click', onUnsignTagClick)
-}
+  document.querySelector('#unsign-tag-button').addEventListener('click', onUnsignTagClick);
+};
 
 const onUnsignTagClick = () => {
   const selectedMedias = getSelectedMedias();
-  if(selectedMedias.length) {
-    customEvent(`unsign_tag_${globalOptions.name}`)
+  if (selectedMedias.length) {
+    customEvent(`unsign_tag_${globalOptions.name}`);
     setTimeout(() => {
       const modal = initTagsModal('Unsign Tag');
       const saveButton = modal.querySelector('footer .btn-primary');
       saveButton.addEventListener('click', onSaveUnsignTag);
-    }, 100)
-  }else{
+    }, 100);
+  } else {
     toast('Select some medias first', 'error');
   }
-}
+};
 
 const onSaveUnsignTag = () => {
-  const tags = [document.querySelector('#tag-modal .tags-select').value]
+  const tags = [document.querySelector('#tag-modal .tags-select').value];
   const formData = new FormData();
   formData.append('tags', tags);
-  formData.append('medias', getSelectedMedias())
+  formData.append('medias', getSelectedMedias());
 
   unsignTagRequest(formData);
-}
+};
 
 const unsignTagRequest = body => {
   fetch('/api/media/tag/unsign', {
@@ -358,27 +351,25 @@ const unsignTagRequest = body => {
       } else toast('There was an error unsigning tags', 'danger');
     })
     .catch(e => console.log(e));
-}
-
+};
 
 // Refresh
 
 const initRefresh = () => {
   document.querySelector('#refreshBtn').addEventListener('click', onRefreshClick);
-}
+};
 
 const onRefreshClick = () => {
   toggleLoader(true);
   fetchMedias({
     page: 1,
     type: globalOptions.mediaType,
-  }, onRefresh)
-}
+  }, onRefresh);
+};
 
-const onRefresh = ({data}) => {
+const onRefresh = ({ data }) => {
   renderMediaList(data);
-}
-
+};
 
 // Upload
 
@@ -386,41 +377,41 @@ const initUpload = () => {
   const uploadButton = document.querySelector('#upload-button');
   const hiddenInput = document.querySelector('#upload-field');
 
-  hiddenInput.addEventListener('change', onHiddenInputChange)
-  uploadButton.addEventListener('click', onUploadClick)
-}
+  hiddenInput.addEventListener('change', onHiddenInputChange);
+  uploadButton.addEventListener('click', onUploadClick);
+};
 
 const onUploadClick = () => {
   const hiddenInput = document.querySelector('#upload-field');
   hiddenInput.value = '';
   hiddenInput.click();
-}
+};
 
 const onHiddenInputChange = e => {
   globalUploadList = [];
   e.currentTarget.files.forEach(media => {
-    globalUploadList.push({media, cropped: null })
+    globalUploadList.push({ media, cropped: null });
   });
 
   customEvent(`upload_modal_open_${globalOptions.name}`);
   setTimeout(initUploadModal, 100);
-}
+};
 
 const initUploadModal = (files = globalUploadList) => {
   const uploadModal = document.querySelector('#upload-modal');
-  uploadModal.querySelector('.modal-title').innerHTML = templates.uploadModalTitle(files.length)
-  
+  uploadModal.querySelector('.modal-title').innerHTML = templates.uploadModalTitle(files.length);
+
   renderUploadsPreview(files);
- 
+
   uploadModal.querySelector('footer .btn-primary')
     .addEventListener('click', e => {
-      onUploadSave(e, files)
+      onUploadSave(e, files);
     });
 
-  window.addEventListener(`upload_modal_close_${globalOptions.name}`, onRefreshClick)
+  window.addEventListener(`upload_modal_close_${globalOptions.name}`, onRefreshClick);
 
   initCrop();
-}
+};
 
 const renderUploadsPreview = files => {
   const listContainer = document.querySelector('#upload-modal .medias-list');
@@ -432,12 +423,12 @@ const renderUploadsPreview = files => {
     initVideoPreview(file.media, i);
     initAudioPreview(file.media, i);
     initParentSelect2(i);
-    i++;
-  })
+    i += 1;
+  });
 
   initRemoveButtons(files);
   Select2.initGroupedFields();
-}
+};
 
 const initRemoveButtons = files => {
   const removeMediaBtns = document.querySelectorAll('.remove-media-btn');
@@ -448,7 +439,7 @@ const initRemoveButtons = files => {
       initUploadModal(files);
     });
   });
-}
+};
 
 const initVideoPreview = (media, i) => {
   const video = document.querySelector(`#video-preview-video-${i}`);
@@ -459,16 +450,15 @@ const initVideoPreview = (media, i) => {
     };
     reader.readAsDataURL(media);
   }
-}
+};
 
 const initAudioPreview = (media, i) => {
   const audio = document.querySelector(`#audio-preview-source-${i}`);
-  if (audio ) {
-    audio.src =
-    URL.createObjectURL(media);
+  if (audio) {
+    audio.src = URL.createObjectURL(media);
     document.querySelector(`#audio-preview-audio-${i}`).load();
   }
-}
+};
 
 const initParentSelect2 = i => {
   Select2.createGroupedField({
@@ -478,22 +468,22 @@ const initParentSelect2 = i => {
     url: '/api/media/parent',
     class: 'form-control',
   });
-}
+};
 
 const onUploadSave = (e, files) => {
   removeValidationErrors();
   e.currentTarget.classList.add('d-none');
   appendLoadersToUploads(files);
   resolveUploadPromises(generateUploadPromises(files));
-}
+};
 
 const appendLoadersToUploads = () => {
   const fileNames = document.querySelectorAll('span.loader-container');
   fileNames.forEach(fileName => {
-    fileName.innerHTML +=
-        '<span class="ml-2 la la-spinner la-spin"></span>';
+    fileName.innerHTML
+        += '<span class="ml-2 la la-spinner la-spin"></span>';
   });
-}
+};
 
 const generateUploadPromises = files => {
   let i = 0;
@@ -501,10 +491,10 @@ const generateUploadPromises = files => {
   files.forEach(file => {
     const metadata = generateFileMetadata(file, i);
     promises.push(makeUploadPromise(metadata));
-    i++;
-  })
+    i += 1;
+  });
   return promises;
-}
+};
 
 const generateFileMetadata = (file, i) => {
   const metadata = {};
@@ -529,7 +519,7 @@ const generateFileMetadata = (file, i) => {
   }
 
   return metadata;
-}
+};
 
 const makeUploadPromise = metadata => {
   const formData = new FormData();
@@ -541,7 +531,7 @@ const makeUploadPromise = metadata => {
     method: 'POST',
     body: formData,
   });
-}
+};
 
 const resolveUploadPromises = promises => {
   const promiseResponses = [];
@@ -549,38 +539,38 @@ const resolveUploadPromises = promises => {
     .then(
       responsesAll => {
         responsesAll.forEach(responseAll => {
-          if(responseAll.ok){
-            promiseResponses.push(responseAll.json())
+          if (responseAll.ok) {
+            promiseResponses.push(responseAll.json());
           }
-        })
+        });
       },
       e1 => console.log(e1)
     )
     .then(() => {
       Promise.all(promiseResponses).then(responses => {
-        responses.forEach(response => handleUploadResponse(response))
-      })
-    })
-}
+        responses.forEach(response => handleUploadResponse(response));
+      });
+    });
+};
 
-const handleUploadResponse = ({data, errors}) => {
+const handleUploadResponse = ({ data, errors }) => {
   const fileRow = document
     .querySelector(`.file-row[data-name="${data.filename}"]`);
 
-  if(!errors){
-    handleSuccessResponse(fileRow, data)
-  }else if(fileRow){
-    handleErrorResponse(fileRow, errors)
+  if (!errors) {
+    handleSuccessResponse(fileRow, data);
+  } else if (fileRow) {
+    handleErrorResponse(fileRow, errors);
   }
-}
+};
 
 const removeValidationErrors = () => {
   document
     .querySelectorAll('span.text-danger, p.text-danger')
     .forEach(err => err.remove());
-}
+};
 
-const handleSuccessResponse = (row, {msg, success}) => {
+const handleSuccessResponse = (row, { msg, success }) => {
   const fileLoader = row.querySelector(
     'span.loader-container'
   );
@@ -590,14 +580,14 @@ const handleSuccessResponse = (row, {msg, success}) => {
 
   const textClass = success ? 'success' : 'danger';
   row.querySelector('.card-header').innerHTML += templates.uploadFeedback(msg, textClass);
-}
+};
 
 const handleErrorResponse = (row, errors) => {
-  Object.entries(errors).forEach(([name, errors]) => {
+  Object.entries(errors).forEach(([name, errs]) => {
     const field = row.querySelector(
       `input[name="${name}"], select[name="${name}"]`
     );
-    errors.forEach(error => {
+    errs.forEach(error => {
       $(field.parentElement).append(`<span class="text-danger">${error}</div>`);
     });
   });
@@ -616,7 +606,7 @@ const handleErrorResponse = (row, errors) => {
   document.querySelector('#upload-modal footer .btn-primary').classList.remove('d-none');
 
   // $(row).find('.collapse').collapse('show');
-}
+};
 
 const initCrop = () => {
   $('.crop-btn')
@@ -631,7 +621,7 @@ const initCrop = () => {
         imageCropper.classList.add('d-none');
       }
     });
-}
+};
 
 const initCropper = i => {
   const imgTobeCrop = document.querySelector(`.to_be_crop_${i}`);
@@ -653,45 +643,44 @@ const initCropper = i => {
         });
 
         globalUploadList[i].media = croppedImage;
-        document.querySelector(`#image-preview-${i}`).src =
-          URL.createObjectURL(croppedImage);
+        document.querySelector(`#image-preview-${i}`).src = URL.createObjectURL(croppedImage);
         $(`#crop-btn-${i}`).click();
         toast('Image cropped with success');
       });
     }
   });
-}
+};
 
 // Selected media edition
 
 const initSelectedMediaEdition = () => {
-  window.addEventListener(`edit_media_${globalOptions.name}`, onEditSelectedMedia)
-}
+  window.addEventListener(`edit_media_${globalOptions.name}`, onEditSelectedMedia);
+};
 
-const onEditSelectedMedia = ({detail}) => {
-  const {mediaId, medias} = detail;
+const onEditSelectedMedia = ({ detail }) => {
+  const { mediaId, medias } = detail;
   const [media] = medias.filter(m => String(m.id) === mediaId);
   const modal = document.querySelector('#edit-media-modal');
 
   initEditMediaModal(media.id, modal);
-  setEditableValues(media, modal)
+  setEditableValues(media, modal);
   modal.querySelector('footer .btn-primary').addEventListener('click', () => {
-    onEditionSave(modal, media)
-  })
-}
+    onEditionSave(modal, media);
+  });
+};
 
 const initEditMediaModal = (id, modal) => {
   modal.querySelector('.modal-body').innerHTML = templates.metadataForm(id, globalMediaTypes);
   modal.querySelector('footer .btn-primary').innerHTML = 'Save';
   modal.querySelector('header .modal-title').textContent = 'Edit Media';
-}
+};
 
 const setEditableValues = (media, modal) => {
   const parentField = modal.querySelector('select[name="parentId"]');
   if (parentField !== null) {
     parentField.value = media ? media.parent_id : '';
   }
-  
+
   const titleField = modal.querySelector('input[name="title"]');
   titleField.value = media.media_content ? media.media_content.title : '';
 
@@ -701,7 +690,7 @@ const setEditableValues = (media, modal) => {
   descriptionField.value = media.media_content
     ? media.media_content.description
     : '';
-}
+};
 
 const onEditionSave = (modal, media) => {
   const mediaData = {
@@ -726,28 +715,28 @@ const onEditionSave = (modal, media) => {
     method: 'POST',
     body: formData,
   })
-    .then(r=>r.json())
-    .then(onEditionResponse)
-}
+    .then(r => r.json())
+    .then(onEditionResponse);
+};
 
-const onEditionResponse = ({data, errors}) => {
+const onEditionResponse = ({ data, errors }) => {
   document
     .querySelectorAll('#edit-media-modal small.text-danger')
     .forEach(err => err.remove());
-  
-  if(!errors && data.updated){
+
+  if (!errors && data.updated) {
     customEvent(`updated_media_${globalOptions.name}`, { media: data.media });
   } else {
     const modal = document.querySelector('#edit-media-modal');
-    Object.entries(errors).forEach(([name, errors]) => {
+    Object.entries(errors).forEach(([name, errs]) => {
       const field = modal.querySelector(
         `input[name="${name}"], select[name="${name}"]`
       );
-      errors.forEach(error => {
+      errs.forEach(error => {
         $(field.parentElement).append(`<span class="text-danger">${error}</div>`);
       });
     });
   }
-}
+};
 
 export default { init };

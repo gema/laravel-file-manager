@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
@@ -11,12 +12,12 @@ let modalShown = false;
 let mediaList = [];
 
 const toggleLoader = (prefix, show = true) => {
-  const container = document.querySelector(`${prefix}.selection-area`)
+  const container = document.querySelector(`${prefix}.selection-area`);
   if (container) {
     container.innerHTML = '';
     const loader = document.querySelector(`${prefix}.media-loader`);
     loader.classList.toggle('d-none', !show);
-  } 
+  }
 };
 
 const getSelectedTags = prefix => {
@@ -318,12 +319,12 @@ const renderUploadMediaList = (medias, types) => {
     let mediaSize = media.size;
     let unit = '';
     let j = 0;
-    const units = ['KB', 'MB', 'GB']
+    const units = ['KB', 'MB', 'GB'];
 
     while (mediaSize > 1024 && j < units.length) {
       mediaSize = Math.round(mediaSize / 1024);
       unit = units[j];
-      j++;
+      j += 1;
     }
 
     mediasList.innerHTML += `
@@ -373,12 +374,12 @@ const renderUploadMediaList = (medias, types) => {
       reader.readAsDataURL(media);
     }
 
-    if (hasAudio ) {
+    if (hasAudio) {
       document.querySelector(`#audio-preview-source-${i}`).src =
         URL.createObjectURL(media);
       document.querySelector(`#audio-preview-audio-${i}`).load();
     }
-    console.log(window.parentsField)
+    console.log(window.parentsField);
     Select2.createGroupedField({
       container: document.querySelector(`#select2-container-${i}`),
       name: 'parentId',
@@ -633,7 +634,7 @@ const initTags = (prefix = '', type = false) => {
     `;
   });
 
-  initTagsPagination(tagsContainer.parentElement, globalTagsLastPage)
+  initTagsPagination(tagsContainer.parentElement, globalTagsLastPage);
 
   initAsignTag(prefix);
   initUnsignTag(prefix);
@@ -668,7 +669,7 @@ const initTagsPagination = (container, lastPage) => {
         isLoading = true;
 
         container.innerHTML += '<span class="w-100 text-center tags-loader la la-spinner la-spin mt-3"></span>';
-        getTags(page, ({data}) => {
+        getTags(page, ({ data }) => {
           document.querySelector('.tags-loader').remove();
           data.forEach(tag => {
             container.querySelector('ul').innerHTML += `
@@ -678,13 +679,13 @@ const initTagsPagination = (container, lastPage) => {
                 </a>
               </li>
             `;
-          })
+          });
           isLoading = false;
-        })
+        });
       }
     }
   });
-}
+};
 
 const getTags = (page = 1, callback = false) => {
   request(`/admin/media/fetch/tags?page=${page}`, callback, 'POST', {
@@ -844,7 +845,7 @@ const initUploadModal = (medias, types) => {
           });
         });
     });
-  
+
   $('.crop-btn')
     .off('click')
     .on('click', e1 => {
@@ -935,12 +936,12 @@ const onMediaLoadedSingle = medias => {
   initUploadModalHandler();
 };
 
-const setGlobals = ({data}) => {
+const setGlobals = ({ data }) => {
   const { tags, types } = data;
   globalTags = tags.data;
   globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
-}
+};
 
 const onGlobalsLoaded = response => {
   setGlobals(response);
@@ -971,7 +972,6 @@ const onGlobalsLoaded = response => {
   }
 };
 
-
 const init = () => {
   loadGlobals(onGlobalsLoaded);
 };
@@ -982,7 +982,7 @@ const loadGlobals = (callback = false) => {
     '/admin/media/fetch/global-data',
     callback,
     'POST'
-  )
+  );
 };
 
 module.exports = { init };

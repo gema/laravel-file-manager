@@ -44,9 +44,9 @@ const request = (
   if (method.toLowerCase() === 'post') {
     let csrfToken = false;
     const csrfTokenElement = document.querySelector('meta[name=csrf-token]');
-    
+
     if (csrfTokenElement !== undefined) {
-      csrfToken = csrfTokenElement.content
+      csrfToken = csrfTokenElement.content;
     }
 
     if (csrfToken) {
@@ -80,9 +80,9 @@ const toast = (text, type = 'success') => {
 };
 
 const customEvent = (event, detail = {}, parent = window) => {
-  const e = new CustomEvent(event, {detail});
+  const e = new CustomEvent(event, { detail });
   parent.dispatchEvent(e);
-}
+};
 
 module.exports = {
   request,
