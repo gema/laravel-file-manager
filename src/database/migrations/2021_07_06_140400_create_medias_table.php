@@ -26,11 +26,11 @@ class CreateMediasTable extends Migration
 
         Schema::create('media_content', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid');
+            $table->integer('media_cloud_id')->nullable();
             $table->foreignId('media_id')->constrained('medias');
             $table->string('title')->nullable();
             $table->string('description')->nullable();
-            $table->string('preview');
+            $table->string('preview')->nullable();
             $table->text('content')->nullable();
             $table->boolean('state')->default(0);
 

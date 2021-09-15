@@ -4,6 +4,8 @@
 /* eslint-disable no-console */
 const Select2 = require('./select2');
 const { request, truncate, toast } = require('./utils');
+const { templates } = require('./templates');
+
 
 let globalTags = [];
 let globalTagsLastPage = 1;
@@ -49,20 +51,7 @@ const initTagsModal = (prefix, title) => {
 
   if (selectedMedias.length) {
     modal.querySelector('.modal-title').textContent = title;
-    const options = globalTags.map(
-      tag => `
-      <option value="${tag.id}">
-        ${tag.name}
-      </option>
-    `
-    );
-
-    modal.querySelector('.modal-body').innerHTML = `
-      <select name="tags" class="asign-tags-select form-control">
-        ${options}
-      </select>
-    `;
-
+    modal.querySelector('.modal-body').innerHTML = templates.tagsSelect(globalTags);
     $(modal).modal('show');
     return modal;
   }
@@ -81,7 +70,7 @@ const initUnsignTag = prefix => {
       const saveBtn = $('#asign-tag-modal .modal-save');
       saveBtn.off('click');
       saveBtn.on('click', () => {
-        const tags = [modal.querySelector('.asign-tags-select').value];
+        const tags = [modal.querySelector('.tags-select').value];
         const unsignData = {
           tags,
           medias: selectedMedias,
@@ -118,7 +107,7 @@ const initAsignTag = prefix => {
       const saveBtn = $('#asign-tag-modal .modal-save');
       saveBtn.off('click');
       saveBtn.on('click', () => {
-        const tags = [modal.querySelector('.asign-tags-select').value];
+        const tags = [modal.querySelector('.tags-select').value];
         const asignData = {
           tags,
           medias: selectedMedias,
@@ -153,31 +142,31 @@ const getMedias = (page = 1, tags = null, type = false, callback = false) => {
   });
 };
 
-const selectedMediaTemplate = media => {
-  const description = media.media_content
-    ? media.media_content.description
-    : __('noDescription');
+// const selectedMediaTemplate = media => {
+//   const description = media.media_content
+//     ? media.media_content.description
+//     : __('noDescription');
 
-  return `
-  <a
-    href="#"
-    data-media="${media.id}"
-    class="selected-media list-group-item list-group-item-action flex-column align-items-start">
-    <div class="d-flex w-100 justify-content-between">
-      <div>
-        <b class="mb-1 m-0">
-          ${media.media_content ? media.media_content.title : media.name}
-        </b>
-        </br>
-        <small class="mb-1">${description}</small>
-      </div>
-      <div>
-        <img src="${media.media_content.preview}">
-      </div>
-    </div>
-  </a>
-`;
-};
+//   return `
+//   <a
+//     href="#"
+//     data-media="${media.id}"
+//     class="selected-media list-group-item list-group-item-action flex-column align-items-start">
+//     <div class="d-flex w-100 justify-content-between">
+//       <div>
+//         <b class="mb-1 m-0">
+//           ${media.media_content ? media.media_content.title : media.name}
+//         </b>
+//         </br>
+//         <small class="mb-1">${description}</small>
+//       </div>
+//       <div>
+//         <img src="${media.media_content.preview}">
+//       </div>
+//     </div>
+//   </a>
+// `;
+// };
 
 const mediaItemTemplate = media => `
   <div
@@ -452,9 +441,9 @@ const initSelectedMediasEdition = (prefix, medias, type) => {
               .forEach(err => err.remove());
 
             if (!data.errors && data.data.updated) {
-              document(
+              document.querySelector(
                 `${prefix}.selected-media[data-media="${media.id}"]`
-              ).outerHTML = selectedMediaTemplate(data.data.media);
+              ).outerHTML = templates.selectedMedia(data.data.media);
 
               modal.querySelector('.modal-save').innerHTML =
                 '<span class="modal-loader la la-spinner la-spin"></span>';
@@ -507,9 +496,12 @@ const initSelection = (medias, prefix, type) => {
         ).innerHTML = `${selectedMedias.length}`;
 
         if (selectedMedias.length > 0) {
+          console.log(selectedMedias);
+          console.log({medias})
           medias.forEach(media => {
             if (selectedMedias.includes(String(media.id))) {
-              selectedMediasContainer.innerHTML += selectedMediaTemplate(media);
+              console.log('Match', String(media.id))
+              selectedMediasContainer.innerHTML += templates.selectedMedia(media);
             }
           });
 
@@ -552,7 +544,7 @@ const initScroll = (container, lastPage, prefix = '', type) => {
           });
 
           isLoading = false;
-          if (prefix !== '') initSelection(medias, prefix, type);
+          // if (prefix !== '') initSelection(medias, prefix, type);
         });
       }
     }

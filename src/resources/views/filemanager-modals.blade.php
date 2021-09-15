@@ -7,6 +7,8 @@
 <script src="{{ asset('packages/select2/dist/js/i18n/' . app()->getLocale() . '.js') }}"></script>
 @endif
 
+<script src="{{ asset('packages/select2/dist/js/select2.min.js') }}"></script>
+
 <!-- selection js -->
 <script src="https://cdn.jsdelivr.net/npm/@viselect/vanilla/lib/viselect.cjs.js"></script>
 

@@ -84,9 +84,15 @@ const customEvent = (event, detail = {}, parent = window) => {
   parent.dispatchEvent(e);
 };
 
+const arrayUniqueByKey = (array, key) => [
+  ...new Map(array.map(item =>[item[key], item])).values(),
+]
+
+
 module.exports = {
   request,
   truncate,
   toast,
   customEvent,
+  arrayUniqueByKey,
 };

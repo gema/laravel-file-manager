@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-const { truncate } = require('../utils');
+const { truncate } = require('./utils');
 
 const mediaItem = media => `
 <div
@@ -224,6 +224,32 @@ const uploadFeedback = (msg, textClass) => `
   ${msg}
 </p>`;
 
+const selectedMedia = ({media_content, name, id}) => {
+  const description = media_content
+    ? media_content.description
+    : __('noDescription');
+
+  return `
+  <a
+    href="#"
+    data-media="${id}"
+    class="selected-media list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <div>
+        <b class="mb-1 m-0">
+          ${media_content ? media_content.title : name}
+        </b>
+        </br>
+        <small class="mb-1">${description}</small>
+      </div>
+      <div>
+        <img src="${media_content.preview}">
+      </div>
+    </div>
+  </a>
+`;
+}
+
 module.exports = {
   templates: {
     mediaItem,
@@ -243,5 +269,6 @@ module.exports = {
     uploadPreview,
     uploadFeedback,
     metadataForm,
+    selectedMedia,
   },
 };

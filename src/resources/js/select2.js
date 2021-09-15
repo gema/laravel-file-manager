@@ -19,6 +19,7 @@ const generateFieldHtml = (options, fieldType) => {
 };
 
 const initGroupedFields = () => {
+  console.log(document.querySelectorAll('.select2-grouped'));
   document.querySelectorAll('.select2-grouped').forEach(selectElement => {
     const { url } = selectElement.dataset;
     const finished = [];

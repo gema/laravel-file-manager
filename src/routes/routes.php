@@ -42,6 +42,7 @@ Route::group(
             Route::post('/upload', [MediaAPIController::class, 'uploadMedia']);
             Route::post('/{id}/edit', [MediaAPIController::class, 'editMedia']);
             Route::post('/cloud', [MediaAPIController::class, 'mediaCloud'])->name('mediaCloud');
+            Route::post('/cloud/webhook', [MediaAPIController::class, 'mediaCloudWebhook']);
         });
     });
 
