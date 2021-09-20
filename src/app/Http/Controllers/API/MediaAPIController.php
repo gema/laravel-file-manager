@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class MediaAPIController
 {
@@ -115,12 +116,25 @@ class MediaAPIController
                     'preview' => $mediaCloudResponse->preview,
                 ]);
 
-                $preview = $mediaCloudResponse->preview;
+                $preview = $mediaCloudResponse->preview !== null ?: '';
             } else {
                 $parentClass = new $request->parent_model;
-                $parentFolder = $parentClass::find($request->parentId)->name;
+                $parent = $parentClass::find($request->parentId);
+                $parentFolder = '';
+                if (isset($parent->name)) {
+                    $parentName = $parent->name;
+                    if ($this->isJson($parentName)) {
+                        $parentFolder = json_decode($parentName)->en;
+                    } else {
+                        $parentFolder = $parentName;
+                    }
+                }
+
+                $parentFolder = Str::slug($parentFolder);
+
                 $fileName = $request->file('media')->store($parentFolder, $disk);
                 $path = Storage::disk($disk)->url($fileName);
+
                 $mediaContent = MediaContent::create([
                     'media_cloud_id' => null,
                     'media_id' => $media->id,
@@ -190,7 +204,7 @@ class MediaAPIController
         return json_response(['updated' => true, 'media' => $mediaData]);
     }
 
-    protected function mediaCloudRequest(Request $request)
+    private function mediaCloudRequest(Request $request)
     {
 
         $client = new \GuzzleHttp\Client([
@@ -199,11 +213,15 @@ class MediaAPIController
             ],
         ]);
 
+        $tmpFilePath = 'tmp/' . $request->media->getClientOriginalName();
+
+        // Create Tmp File
         Storage::disk('local')->put(
-            'tmp/' . $request->media->getClientOriginalName(),
+            $tmpFilePath,
             file_get_contents($request->file('media'))
         );
 
+        // Make request to media cloud
         $response = $client->post(env('MEDIA_CLOUD_ENDPOINT'), [
             'decode_content' => false,
             'multipart' => [
@@ -229,6 +247,9 @@ class MediaAPIController
         $bodyResponse = $response->getBody();
         $result = $bodyResponse->getContents();
         $result = json_decode($result);
+
+        // Delete tmp file
+        Storage::disk('local')->delete($tmpFilePath);
 
         return $result;
     }
@@ -273,5 +294,11 @@ class MediaAPIController
         }
 
         return json_response($data);
+    }
+
+    private function isJson($string)
+    {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
     }
 }

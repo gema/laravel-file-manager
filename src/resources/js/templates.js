@@ -242,7 +242,7 @@ const selectedMedia = ({media_content, name, id}) => {
         </br>
         <small class="mb-1">${description}</small>
       </div>
-      <div>
+      <div class="selected-media-preview">
         <img src="${media_content.preview}">
       </div>
     </div>
