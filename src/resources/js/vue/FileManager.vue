@@ -108,13 +108,13 @@ export default {
     }
   },
   mounted(){
-    window.addEventListener(`change_${this.name}`, this.onMediasSelected)
-    window.addEventListener(`asign_tag_${this.name}`, this.onAsignTag)
-    window.addEventListener(`unsign_tag_${this.name}`, this.onUnsignTag)
-    window.addEventListener(`upload_modal_open_${this.name}`, this.onUploadModalOpen)
-    window.addEventListener(`loaded_new_page_${this.name}`, this.onPageLoaded)
-    window.addEventListener(`loaded_${this.name}`, this.onLoad)
-    window.addEventListener(`updated_media_${this.name}`, this.onMediaUpdated)
+    $(window).off(`change_${this.name}`).on(`change_${this.name}`, this.onMediasSelected)
+    $(window).off(`asign_tag_${this.name}`).on(`asign_tag_${this.name}`, this.onAsignTag)
+    $(window).off(`unsign_tag_${this.name}`).on(`unsign_tag_${this.name}`, this.onUnsignTag)
+    $(window).off(`upload_modal_open_${this.name}`).on(`upload_modal_open_${this.name}`, this.onUploadModalOpen)
+    $(window).off(`loaded_new_page_${this.name}`).on(`loaded_new_page_${this.name}`, this.onPageLoaded)
+    $(window).off(`loaded_${this.name}`).on(`loaded_${this.name}`, this.onLoad)
+    $(window).off(`updated_media_${this.name}`).on(`updated_media_${this.name}`, this.onMediaUpdated)
   },
   methods: {
     instantiateField(){

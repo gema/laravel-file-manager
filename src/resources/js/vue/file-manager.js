@@ -267,7 +267,10 @@ const onListLoaded = ({ data }) => {
 };
 
 const initAsignTag = () => {
-  document.querySelector('#asign-tag-button').addEventListener('click', onAsignTagClick);
+  $(globalContainer)
+    .find('#asign-tag-button')
+    .off('click')
+    .on('click', onAsignTagClick);
 };
 
 const onAsignTagClick = () => {
@@ -315,7 +318,10 @@ const asignTagRequest = body => {
 };
 
 const initUnsignTag = () => {
-  document.querySelector('#unsign-tag-button').addEventListener('click', onUnsignTagClick);
+  $(globalContainer)
+    .find('#unsign-tag-button')
+    .off('click')
+    .on('click', onUnsignTagClick);
 };
 
 const onUnsignTagClick = () => {

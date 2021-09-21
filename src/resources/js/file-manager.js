@@ -113,9 +113,10 @@ const initUnsignTag = prefix => {
 
 const initAsignTag = prefix => {
   // Asign Tag to medias
-  document
-    .querySelector(`${prefix}#asign-tag-button`)
-    .addEventListener('click', () => {
+  // console.log('initAsignTag')
+  $(`${prefix}#asign-tag-button`)
+    .off('click')
+    .on('click', () => {
       const modal = initTagsModal(prefix, __('asignTag'));
 
       const saveBtn = $('#asign-tag-modal .modal-save');
@@ -145,7 +146,7 @@ const initAsignTag = prefix => {
           })
           .catch(e => console.log(e));
       });
-    });
+    })
 };
 
 const getMedias = (page = 1, tags = null, type = false, callback = false) => {
