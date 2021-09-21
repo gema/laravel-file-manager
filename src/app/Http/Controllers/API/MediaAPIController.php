@@ -5,6 +5,7 @@ namespace GemaDigital\FileManager\app\Http\Controllers\API;
 use DB;
 use GemaDigital\FileManager\app\Models\Media;
 use GemaDigital\FileManager\app\Models\MediaContent;
+use GemaDigital\FileManager\app\Models\MediaTag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
@@ -294,6 +295,12 @@ class MediaAPIController
         }
 
         return json_response($data);
+    }
+
+    public function getTags()
+    {
+        $tags = MediaTag::paginate(10);
+        return json_response($tags);
     }
 
     private function isJson($string)

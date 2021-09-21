@@ -4,22 +4,70 @@ const createGroupedField = options => {
   options.container.innerHTML += fieldHtml;
 };
 
+const createAjaxField = options => {
+  const fieldHtml = generateFieldHtml(options, 'select2-ajax');
+  options.container.innerHTML = fieldHtml;
+}
+
 const generateFieldHtml = (options, fieldType) => {
   const html = `
-        <label>${options.label}</label>
-        <select
-            name="${options.name}"
-            style="${options.style || 'width:100%'}"
-            class="${options.class || 'form-control'} ${fieldType}"
-            data-url="${options.url}"
-        >
-        </select>`;
+    <label>${options.label}</label>
+    <select
+      ${options.id !== undefined ? `id="${options.id}"` : ''}
+      name="${options.name}"
+      style="${options.style || 'width:100%'}"
+      class="${options.class || 'form-control'} ${fieldType}"
+      data-url="${options.url}"
+    >
+    </select>`;
 
   return html;
 };
 
+const initAjaxField = id => {
+  const field = document.querySelector(`#${id}`);
+  const { url } = field.dataset;
+  $(field).select2({
+    theme: 'bootstrap',
+    multiple: false,
+    ajax: {
+      url,
+      type: 'GET',
+      dataType: 'json',
+      data: params => {
+        const query = {
+          search: params.term,
+          page: params.page || 1,
+        };
+        return query;
+      },
+      processResults(response) {
+        const results = [];
+        const { data, current_page, last_page } = response.data;
+        console.log({current_page, last_page})
+        Object.values(data).forEach(tag => {
+          // console.log(tag)
+          results.push({
+            id: tag.id,
+            text: tag.name,
+          })
+        })
+
+        more = current_page < last_page;
+        console.log({
+          results,
+          pagination: {more},
+        })
+        return {
+          results,
+          pagination: {more},
+        }
+      },
+    },
+  })
+}
+
 const initGroupedFields = () => {
-  console.log(document.querySelectorAll('.select2-grouped'));
   document.querySelectorAll('.select2-grouped').forEach(selectElement => {
     const { url } = selectElement.dataset;
     const finished = [];
@@ -89,4 +137,6 @@ const initGroupedFields = () => {
 module.exports = {
   createGroupedField,
   initGroupedFields,
+  createAjaxField,
+  initAjaxField,
 };

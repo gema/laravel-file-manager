@@ -51,7 +51,21 @@ const initTagsModal = (prefix, title) => {
 
   if (selectedMedias.length) {
     modal.querySelector('.modal-title').textContent = title;
-    modal.querySelector('.modal-body').innerHTML = templates.tagsSelect(globalTags);
+    // modal.querySelector('.modal-body').innerHTML = templates.tagsSelect(globalTags);
+    
+    console.log('tas modal under development')
+    modal.querySelector('.modal-body').innerHTML = 'Modal under fixes';
+    // Select2.createAjaxField({
+    //   container: modal.querySelector('.modal-body'),
+    //   id: 'tags-modal-select',
+    //   name: 'tags',
+    //   label: 'tags',
+    //   url: '/api/media/tag',
+    //   class: 'form-control tags-select',
+    // });
+
+    // Select2.initAjaxField('tags-modal-select');
+
     $(modal).modal('show');
     return modal;
   }

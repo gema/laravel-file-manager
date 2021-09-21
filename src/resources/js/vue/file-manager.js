@@ -14,6 +14,7 @@ let globalOptions;
 let globalUploadList;
 let globalTagsLastPage;
 
+let globalContainer;
 let globalMediaListContainer;
 let globalTagsListContainer;
 
@@ -31,10 +32,10 @@ const loadGlobals = (callback = false) => {
 };
 
 const toggleLoader = visible => {
-  const container = document.querySelector('.selection-area');
+  const container = globalContainer.querySelector('.selection-area');
   if (container) {
     container.innerHTML = '';
-    const loader = document.querySelector('.media-loader');
+    const loader = globalContainer.querySelector('.media-loader');
     loader.classList.toggle('d-none', !visible);
   }
 };
@@ -50,8 +51,9 @@ const setGlobals = ({ data }) => {
   globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
 
-  globalMediaListContainer = document.querySelector('.custom-file-manager .list');
-  globalTagsListContainer = document.querySelector('.tags-container ul');
+  globalContainer = document.querySelector('#media-modal___BV_modal_outer_');
+  globalMediaListContainer = globalContainer.querySelector('.custom-file-manager .list');
+  globalTagsListContainer = globalContainer.querySelector('.tags-container ul');
 };
 
 const loadMedias = () => {
