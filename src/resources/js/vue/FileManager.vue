@@ -84,7 +84,7 @@
         <!-- End Asign Tag Modal -->
 
         <!-- Upload Modal -->
-        <b-modal @hidden="onUploadModalCLose" @ok="onUploadModalOk" size="md" id="upload-modal" ref="upload-modal">
+        <b-modal @hidden="onUploadModalCLose" @ok="onUploadModalOk" size="md" id="upload-modal-vue" ref="upload-modal-vue">
           <div id="accordion" class="medias-list"></div>
        </b-modal>
         <!-- End Upload Modal -->
@@ -162,7 +162,7 @@ export default {
     },
 
     onUploadModalOpen(){
-      this.$refs['upload-modal'].show();
+      this.$refs['upload-modal-vue'].show();
     },
 
     onUploadModalCLose(){
@@ -199,7 +199,7 @@ export default {
 </script>
 
 <style lang="scss">
-  #upload-modal{
+  #upload-modal-vue{
     .modal-body{
       overflow: auto;
       max-height: 70vh;
@@ -226,7 +226,7 @@ export default {
     }
   }
   
-  #upload-modal, #tagModal{
+  #upload-modal-vue, #tagModal{
     .invalid-feedback{
       display:block;
     }

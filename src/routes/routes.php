@@ -36,7 +36,7 @@ Route::group(
     function () {
         Route::group(['prefix' => 'media'], function () {
             Route::get('/', [MediaAPIController::class, 'getMedias']);
-            Route::get('/tag', [MediaAPIController::class, 'getTags']);
+            // Route::get('/tag', [MediaAPIController::class, 'getTags']);
             Route::get('/parent', [MediaAPIController::class, 'getParents']);
             Route::post('/tag', [MediaAPIController::class, 'addTags']);
             Route::post('/tag/unsign', [MediaAPIController::class, 'removeTags']);

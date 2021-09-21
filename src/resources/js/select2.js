@@ -32,7 +32,7 @@ const initAjaxField = id => {
     multiple: false,
     ajax: {
       url,
-      type: 'GET',
+      type: 'POST',
       dataType: 'json',
       data: params => {
         const query = {
@@ -41,10 +41,8 @@ const initAjaxField = id => {
         };
         return query;
       },
-      processResults(response) {
+      processResults({ data, current_page, last_page }) {
         const results = [];
-        const { data, current_page, last_page } = response.data;
-        console.log({current_page, last_page})
         Object.values(data).forEach(tag => {
           // console.log(tag)
           results.push({

@@ -290,7 +290,17 @@ const onAsignTagClick = () => {
 const initTagsModal = title => {
   const modal = document.querySelector('#tag-modal');
   modal.querySelector('.modal-title').textContent = title;
-  modal.querySelector('.modal-body').innerHTML += templates.tagsSelect(globalTags);
+  // modal.querySelector('.modal-body').innerHTML += templates.tagsSelect(globalTags);
+  Select2.createAjaxField({
+    container: modal.querySelector('.modal-body'),
+    id: 'tags-modal-select-vue',
+    name: 'tags',
+    label: 'tags',
+    url: '/admin/media/fetch/tags',
+    class: 'form-control tags-select',
+  });
+
+  Select2.initAjaxField('tags-modal-select-vue');
   return modal;
 };
 
@@ -364,7 +374,7 @@ const unsignTagRequest = body => {
 // Refresh
 
 const initRefresh = () => {
-  document.querySelector('#refreshBtn').addEventListener('click', onRefreshClick);
+  globalContainer.querySelector('#refreshBtn').addEventListener('click', onRefreshClick);
 };
 
 const onRefreshClick = () => {
@@ -382,15 +392,15 @@ const onRefresh = ({ data }) => {
 // Upload
 
 const initUpload = () => {
-  const uploadButton = document.querySelector('#upload-button');
-  const hiddenInput = document.querySelector('#upload-field');
+  const uploadButton = globalContainer.querySelector('#upload-button');
+  const hiddenInput = globalContainer.querySelector('#upload-field');
 
   hiddenInput.addEventListener('change', onHiddenInputChange);
   uploadButton.addEventListener('click', onUploadClick);
 };
 
 const onUploadClick = () => {
-  const hiddenInput = document.querySelector('#upload-field');
+  const hiddenInput = globalContainer.querySelector('#upload-field');
   hiddenInput.value = '';
   hiddenInput.click();
 };
@@ -406,7 +416,8 @@ const onHiddenInputChange = e => {
 };
 
 const initUploadModal = (files = globalUploadList) => {
-  const uploadModal = document.querySelector('#upload-modal');
+  const uploadModal = document.querySelector('#upload-modal-vue');
+  console.log(uploadModal);
   uploadModal.querySelector('.modal-title').innerHTML = templates.uploadModalTitle(files.length);
 
   renderUploadsPreview(files);
@@ -422,7 +433,7 @@ const initUploadModal = (files = globalUploadList) => {
 };
 
 const renderUploadsPreview = files => {
-  const listContainer = document.querySelector('#upload-modal .medias-list');
+  const listContainer = document.querySelector('#upload-modal-vue .medias-list');
   listContainer.innerHTML = '';
   let i = 0;
 
@@ -611,7 +622,7 @@ const handleErrorResponse = (row, errors) => {
     </p>
   `;
 
-  document.querySelector('#upload-modal footer .btn-primary').classList.remove('d-none');
+  document.querySelector('#upload-modal-vue footer .btn-primary').classList.remove('d-none');
 
   // $(row).find('.collapse').collapse('show');
 };
