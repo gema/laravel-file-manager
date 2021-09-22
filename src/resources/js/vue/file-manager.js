@@ -417,7 +417,6 @@ const onHiddenInputChange = e => {
 
 const initUploadModal = (files = globalUploadList) => {
   const uploadModal = document.querySelector('#upload-modal-vue');
-  console.log(uploadModal);
   uploadModal.querySelector('.modal-title').innerHTML = templates.uploadModalTitle(files.length);
 
   renderUploadsPreview(files);
@@ -598,7 +597,11 @@ const handleSuccessResponse = (row, { msg, success }) => {
   fileLoader.innerHTML = success ? '✅' : '❌';
 
   const textClass = success ? 'success' : 'danger';
-  row.querySelector('.card-header').innerHTML += templates.uploadFeedback(msg, textClass);
+  const feedback = row.querySelector('.card-header p');
+  feedback.innerHTML = msg;
+  feedback.classList.remove('text-danger');
+  feedback.classList.remove('text-success');
+  feedback.classList.add(`text-${textClass}`);
 };
 
 const handleErrorResponse = (row, errors) => {
@@ -616,14 +619,12 @@ const handleErrorResponse = (row, errors) => {
   );
 
   fileLoader.innerHTML = '❌';
-  row.querySelector('.card-header').innerHTML += `
-    <p class="mt-2 mb-0 text-danger text-center">
-      The provided metadata is invalid
-    </p>
-  `;
+  const feedback = row.querySelector('.card-header p')
+  feedback.innerHTML = 'The provided metadata is invalid';
+  feedback.classList.add('text-danger');
+  feedback.classList.remove('text-success');
 
   document.querySelector('#upload-modal-vue footer .btn-primary').classList.remove('d-none');
-
   // $(row).find('.collapse').collapse('show');
 };
 

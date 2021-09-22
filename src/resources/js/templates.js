@@ -78,6 +78,7 @@ const uploadPreview = (file, i, types) => {
           >
           <b>${truncate(media.name, 25)}</b> ${mediaSize} ${unit}
           <span class="loader-container"></span>
+          <p class="mt-2 mb-0 text-center"></p>
           </button>
           <a href="#" style="float:right" class="text-danger">
             <i

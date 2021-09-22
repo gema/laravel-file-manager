@@ -73,10 +73,9 @@ const initTagsModal = (prefix, title) => {
 };
 
 const initUnsignTag = prefix => {
-  // Asign Tag to medias
-  document
-    .querySelector(`${prefix}#unsign-tag-button`)
-    .addEventListener('click', () => {
+  $(`${prefix}#unsign-tag-button`)
+    .off('click')
+    .on('click', () => {
       const modal = initTagsModal(prefix, __('removeTag'));
 
       const saveBtn = $('#asign-tag-modal .modal-save');
@@ -110,8 +109,6 @@ const initUnsignTag = prefix => {
 };
 
 const initAsignTag = prefix => {
-  // Asign Tag to medias
-  // console.log('initAsignTag')
   $(`${prefix}#asign-tag-button`)
     .off('click')
     .on('click', () => {
@@ -154,32 +151,6 @@ const getMedias = (page = 1, tags = null, type = false, callback = false) => {
     type,
   });
 };
-
-// const selectedMediaTemplate = media => {
-//   const description = media.media_content
-//     ? media.media_content.description
-//     : __('noDescription');
-
-//   return `
-//   <a
-//     href="#"
-//     data-media="${media.id}"
-//     class="selected-media list-group-item list-group-item-action flex-column align-items-start">
-//     <div class="d-flex w-100 justify-content-between">
-//       <div>
-//         <b class="mb-1 m-0">
-//           ${media.media_content ? media.media_content.title : media.name}
-//         </b>
-//         </br>
-//         <small class="mb-1">${description}</small>
-//       </div>
-//       <div>
-//         <img src="${media.media_content.preview}">
-//       </div>
-//     </div>
-//   </a>
-// `;
-// };
 
 const mediaItemTemplate = media => `
   <div
@@ -343,6 +314,7 @@ const renderUploadMediaList = (medias, types) => {
             >
             <b>${truncate(media.name, 25)}</b> ${mediaSize} ${unit}
             <span class="loader-container"></span>
+            <p class="mt-2 mb-0 text-center"></p>
             </button>
             <a href="#" style="float:right" class="text-danger">
               <i
@@ -496,8 +468,15 @@ const initSelection = (medias, prefix, type) => {
       .querySelector(`${prefix}#selectFilesBtn`)
       .addEventListener('click', () => {
         const selectedMedias = getSelectedMedias(prefix);
-        document.querySelector(`${prefix} .selected-medias-input`).value =
-          JSON.stringify({ medias: selectedMedias });
+        let value;
+
+        if (selectedMedias.length) {
+          value = JSON.stringify({ medias: selectedMedias });
+        } else {
+          value = null
+        }
+        
+        document.querySelector(`${prefix} .selected-medias-input`).value = value;
 
         const selectedMediasContainer = document.querySelector(
           `${prefix}.selected-medias-list`
@@ -789,12 +768,11 @@ const initUploadModal = (medias, types) => {
                 fileLoader.innerHTML = success ? '✅' : '❌';
 
                 const textClass = success ? 'success' : 'danger';
-                fileRow.querySelector('.card-header').innerHTML += `
-                  <p
-                    class="mt-2 mb-0 text-${textClass} text-center">
-                    ${msg}
-                  </p>
-                `;
+                const feedback = fileRow.querySelector('.card-header p')
+                feedback.textContent = msg;
+                feedback.classList.remove('text-danger');
+                feedback.classList.remove('text-success');
+                feedback.classList.add(`text-${textClass}`);
               } else if (fileRow) {
                 Object.entries(response.errors).forEach(([name, errors]) => {
                   const field = fileRow.querySelector(
@@ -810,13 +788,13 @@ const initUploadModal = (medias, types) => {
                 );
 
                 fileLoader.innerHTML = '❌';
-                fileRow.querySelector('.card-header').innerHTML += `
-                  <p class="mt-2 mb-0 text-danger text-center">
-                    ${__('invalidMetadata')}
-                  </p>
-                `;
+                const feedback = fileRow.querySelector('.card-header p')
+                feedback.innerHTML = __('invalidMetadata');
+                feedback.classList.add('text-danger');
+                feedback.classList.remove('text-success');
 
                 $(fileRow).find('.collapse').collapse('show');
+                e.currentTarget.classList.remove('d-none');
               }
             });
           });

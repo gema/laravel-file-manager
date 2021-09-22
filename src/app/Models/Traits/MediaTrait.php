@@ -14,14 +14,12 @@ trait MediaTrait
             foreach (self::$mediable as $column) {
                 if ($entry[$column] !== null) {
                     $decoded = json_decode($entry[$column]);
-                    if (isset($decoded->medias)) {
+                    if (is_object($decoded) && count($decoded->medias) > 0) {
                         $mediaIds = $decoded->medias;
                         $mediaField = MediaField::create([
                             'entity_type' => self::class,
                             'entity_id' => $entry->id,
                         ]);
-
-                        $entry[$column] = $mediaField->id;
 
                         $data = [];
 
@@ -33,15 +31,16 @@ trait MediaTrait
                         }
 
                         DB::table('media_field_has_media')->insert($data);
-                        $entry::withoutEvents(function () use ($entry) {
-                            return $entry->save();
-                        });
+
+                        $entry[$column] = $mediaField->id;
+                        $entry->unsetEventDispatcher();
+                        $entry->save();
                     }
                 }
             }
 
             DB::commit();
-        } catch (\Exception$e) {
+        } catch (\Exception $e) {
             DB::rollback();
         }
     }
@@ -53,9 +52,11 @@ trait MediaTrait
             $original = $entry->getOriginal();
 
             foreach (self::$mediable as $column) {
-                DB::table('media_field_has_media')
-                    ->where('media_field_id', $original[$column])
-                    ->delete();
+                if ($original[$column] !== null) {
+                    DB::table('media_field_has_media')
+                        ->where('media_field_id', $original[$column])
+                        ->delete();
+                }
             }
 
             MediaField::where('entity_id', $entry->id)
@@ -65,7 +66,7 @@ trait MediaTrait
             DB::commit();
 
             self::afterCreate($entry);
-        } catch (\Exception$e) {
+        } catch (\Exception $e) {
             DB::rollback();
         }
     }

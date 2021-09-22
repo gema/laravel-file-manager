@@ -26,7 +26,7 @@ if(isset($entry)){
         <div class="mb-1">
             <a class="selected-medias-count btn-sm btn-link text-primary"><span class="selected-medias-number">{{count($medias)}}</span> {{__("file-manager::messages.medias_selected")}}<i class="las la-caret-down"></i></a>
         </div>
-       
+
         <ul class="list-group selected-medias-list d-none">
             @if(count($medias) > 0)
                 @foreach ($medias as $media)
@@ -34,7 +34,7 @@ if(isset($entry)){
                         <div class="d-flex w-100 justify-content-between">
                             <div>
                                 <b class="mb-1 m-0">{{$media->mediaContent->title}}</b>
-                                <br> 
+                                <br>
                                 <small class="mb-1">{{$media->mediaContent->description}}</small>
                             </div>
                             <div>
@@ -109,11 +109,18 @@ if(isset($entry)){
                         }
                     }
                     $(fieldSelector+' #selected-medias-num').text(selectedMedias.length)
-                });  
-                $(fieldSelector+ ' input[name="{{ $field['name'] }}"]').val(JSON.stringify({ medias : getSelectedMedias()}))
+                });
+                var value = '';
+                var values = getSelectedMedias();
+                console.log({values})
+                if(values.length){
+                    value = JSON.stringify({ medias : values});
+                }
+
+                $(fieldSelector+ ' input[name="{{ $field['name'] }}"]').val(value)
             })
         }
-        
+
         $(fieldSelector+' .selected-medias-count').click(toggleSelectedMedias)
 
         function getSelectedMedias(){

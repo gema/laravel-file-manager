@@ -118,19 +118,22 @@ class MediaAPIController
 
                 $preview = $mediaCloudResponse->preview !== null ?: '';
             } else {
-                $parentClass = new $request->parent_model;
-                $parent = $parentClass::find($request->parentId);
                 $parentFolder = '';
-                if (isset($parent->name)) {
-                    $parentName = $parent->name;
-                    if ($this->isJson($parentName)) {
-                        $parentFolder = json_decode($parentName)->en;
-                    } else {
-                        $parentFolder = $parentName;
+                if ($parentClass) {
+                    $parentClass = new $request->parent_model;
+                    $parent = $parentClass::find($request->parentId);
+                    $parentFolder = '';
+                    if (isset($parent->name)) {
+                        $parentName = $parent->name;
+                        if ($this->isJson($parentName)) {
+                            $parentFolder = json_decode($parentName)->en;
+                        } else {
+                            $parentFolder = $parentName;
+                        }
                     }
-                }
 
-                $parentFolder = Str::slug($parentFolder);
+                    $parentFolder = Str::slug($parentFolder);
+                }
 
                 $fileName = $request->file('media')->store($parentFolder, $disk);
                 $path = Storage::disk($disk)->url($fileName);
