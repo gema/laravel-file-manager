@@ -3,10 +3,10 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
 const Select2 = require('./select2');
-const { request, truncate, toast } = require('./utils');
+const { request, truncate, toast, arrayUniqueByKey } = require('./utils');
 const { templates } = require('./templates');
 
-
+let globalMedias = [];
 let globalTags = [];
 let globalTagsLastPage = 1;
 let globalMediaTypes = [];
@@ -300,6 +300,8 @@ const renderUploadMediaList = (medias, types) => {
       j += 1;
     }
 
+    const metadataForm = templates.metadataForm(i, types, {media});
+
     mediasList.innerHTML += `
       <div class="card file-row" data-name="${media.name}">
         <div class="card-header" id="heading_${i}">
@@ -332,7 +334,7 @@ const renderUploadMediaList = (medias, types) => {
           data-parent="#accordion">   
           <div class="card-body">
             ${mediaTemplate}
-            ${metadataFormTemplate(types, i)}
+            ${metadataForm}
           </div>
         </div>
       </div>`;
@@ -488,11 +490,8 @@ const initSelection = (medias, prefix, type) => {
         ).innerHTML = `${selectedMedias.length}`;
 
         if (selectedMedias.length > 0) {
-          console.log(selectedMedias);
-          console.log({medias})
           medias.forEach(media => {
             if (selectedMedias.includes(String(media.id))) {
-              console.log('Match', String(media.id))
               selectedMediasContainer.innerHTML += templates.selectedMedia(media);
             }
           });
@@ -535,8 +534,10 @@ const initScroll = (container, lastPage, prefix = '', type) => {
             container.innerHTML += mediaItemTemplate(media);
           });
 
+          globalMedias = arrayUniqueByKey(globalMedias.concat(medias), 'id');
+
           isLoading = false;
-          // if (prefix !== '') initSelection(medias, prefix, type);
+          if (prefix !== '') initSelection(globalMedias, prefix, type);
         });
       }
     }
@@ -544,6 +545,7 @@ const initScroll = (container, lastPage, prefix = '', type) => {
 };
 
 const renderMediasTable = (medias, prefix, type = false) => {
+  globalMedias = arrayUniqueByKey(globalMedias.concat(medias.data), 'id');
   toggleLoader(prefix, false);
   const container = document.querySelector(
     `${prefix} .custom-file-manager .list`
@@ -556,7 +558,7 @@ const renderMediasTable = (medias, prefix, type = false) => {
       container.innerHTML += mediaItemTemplate(media);
 
       initScroll(container, medias.last_page, prefix, type);
-      initSelection(medias.data, prefix, type);
+      initSelection(globalMedias, prefix, type);
     });
   } else {
     container.innerHTML = `
@@ -590,12 +592,14 @@ const initTags = (prefix = '', type = false) => {
     `;
   });
 
-  initTagsPagination(tagsContainer.parentElement, globalTagsLastPage);
+  initTagsPagination(tagsContainer.parentElement, globalTagsLastPage, prefix, type);
 
   initAsignTag(prefix);
   initUnsignTag(prefix);
+  initTagsFilter(prefix, type);
+};
 
-  // Toggle and refresh media list (filter by tag)
+const initTagsFilter = (prefix, type) => {
   document.querySelectorAll(`${prefix}.select-tag`).forEach(tagBtn => {
     tagBtn.addEventListener('click', e => {
       toggleTagBtn(e.currentTarget.parentNode);
@@ -608,9 +612,9 @@ const initTags = (prefix = '', type = false) => {
       });
     });
   });
-};
+}
 
-const initTagsPagination = (container, lastPage) => {
+const initTagsPagination = (container, lastPage, prefix, type) => {
   let page = 1;
   let isLoading = false;
 
@@ -637,6 +641,7 @@ const initTagsPagination = (container, lastPage) => {
             `;
           });
           isLoading = false;
+          initTagsFilter(prefix, type)
         });
       }
     }

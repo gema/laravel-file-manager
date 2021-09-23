@@ -51,7 +51,7 @@ const uploadModalTitle = length => `
 const uploadPreview = (file, i, types) => {
   const { media } = file;
   const mediaPreviewTemplate = mediaPreview(media, i);
-  const metadataFormTemplate = metadataForm(i, types);
+  const metadataFormTemplate = metadataForm(i, types, file);
 
   let mediaSize = media.size;
   let unit = '';
@@ -103,8 +103,9 @@ const uploadPreview = (file, i, types) => {
   `;
 };
 
-const metadataForm = (i, types) => {
-  const typesListTemplate = typesList(types);
+const metadataForm = (i, types, {media}) => {
+  const { name, type } = media;
+  const typesListTemplate = typesList(types, type);
   const select = `
     <div id="select2-container-${i}" class="form-group">
       
@@ -116,7 +117,7 @@ const metadataForm = (i, types) => {
       ${select}
       <div class="form-group">
         <label>Title</label>
-        <input name="title" type="text" class="form-control">
+        <input name="title" type="text" class="form-control" value="${name.split('.').shift()}">
       </div>
       <div class="form-group">
         <label>Description</label>
@@ -126,11 +127,22 @@ const metadataForm = (i, types) => {
     </form>`;
 };
 
-const typesList = types => {
+const typesList = (types, type) => {
   let list = '';
+  let selectedType;
+
+  if (/^image/.test(type)) {
+    [selectedType] = types.filter(type => type.name === 'Image');
+  } else if (/^video/.test(type)) {
+    [selectedType] = types.filter(type => type.name === 'Video');
+  } else if (/^audio/.test(type)) {
+    [selectedType] = types.filter(type => type.name === 'Audio');
+  }
+
   types.forEach(type => {
-    list += `<option value="${type.id}">${type.name}</option>`;
+    list += `<option ${selectedType.id === type.id ? 'selected' : ''} value="${type.id}">${type.name}</option>`;
   });
+
 
   return `
   <div class="form-group">

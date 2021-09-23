@@ -1,4 +1,5 @@
 /* eslint-disable no-use-before-define */
+const { getPossibleTranslation } = require('./utils')
 const createGroupedField = options => {
   const fieldHtml = generateFieldHtml(options, 'select2-grouped');
   options.container.innerHTML += fieldHtml;
@@ -47,7 +48,7 @@ const initAjaxField = id => {
           // console.log(tag)
           results.push({
             id: tag.id,
-            text: tag.name,
+            text: getPossibleTranslation(JSON.stringify(tag.name)),
           })
         })
 
@@ -65,10 +66,11 @@ const initAjaxField = id => {
   })
 }
 
-const initGroupedFields = () => {
-  document.querySelectorAll('.select2-grouped').forEach(selectElement => {
+const initGroupedFields = (container = document) => {
+  container.querySelectorAll('.select2-grouped').forEach(selectElement => {
     const { url } = selectElement.dataset;
     const finished = [];
+    console.log(url);
     $(selectElement).select2({
       theme: 'bootstrap',
       multiple: false,
@@ -99,7 +101,7 @@ const initGroupedFields = () => {
                   text: namespace.split('\\').pop(),
                   children: Object.values(response.data).map(entry => ({
                     id: entry.id,
-                    text: entry.name,
+                    text: getPossibleTranslation(JSON.stringify(entry.name)),
                     namespace,
                   })),
                 });
@@ -111,7 +113,7 @@ const initGroupedFields = () => {
               Object.values(response.data).forEach(entry => {
                 results.push({
                   id: entry.id,
-                  text: entry.name,
+                  text: getPossibleTranslation(JSON.stringify(entry.name)),
                   namespace,
                 });
               });
@@ -119,6 +121,7 @@ const initGroupedFields = () => {
             });
           }
 
+          console.log({results});
           return {
             results,
             pagination: { more },

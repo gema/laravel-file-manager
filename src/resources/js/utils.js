@@ -88,6 +88,27 @@ const arrayUniqueByKey = (array, key) => [
   ...new Map(array.map(item =>[item[key], item])).values(),
 ]
 
+const isJson = str => {
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+};
+
+const getPossibleTranslation = value => {
+  const json = isJson(value);
+  if (typeof json === 'string') return json;
+  if (!json) return value;
+  else {
+    if (json.en !== undefined) return json.en;
+    else {
+      const locale = Object.keys(json).shift();
+      return json[locale];
+    }
+  }
+};
+
 
 module.exports = {
   request,
@@ -95,4 +116,5 @@ module.exports = {
   toast,
   customEvent,
   arrayUniqueByKey,
+  getPossibleTranslation,
 };

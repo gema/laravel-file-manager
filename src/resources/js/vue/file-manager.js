@@ -15,6 +15,7 @@ let globalUploadList;
 let globalTagsLastPage;
 
 let globalContainer;
+let globalUploadContainer;
 let globalMediaListContainer;
 let globalTagsListContainer;
 
@@ -137,7 +138,7 @@ const onMediasSelected = medias => {
   }
 };
 
-const getSelectedMedias = () => Object.values(document.querySelectorAll('.selection-area div.ui-selected'))
+const getSelectedMedias = () => Object.values(globalContainer.querySelectorAll('.selection-area div.ui-selected'))
   .map(selectable => selectable.dataset.file);
 
 // Init Scroll
@@ -237,6 +238,7 @@ const initTagsPagination = (container, lastPage) => {
             container.querySelector('ul').innerHTML += templates.tagItem(tag);
           });
           isTagsLoading = false;
+          initFilterByTag();
         });
       }
     }
@@ -416,6 +418,7 @@ const onHiddenInputChange = e => {
 };
 
 const initUploadModal = (files = globalUploadList) => {
+  globalUploadContainer = document.querySelector('#upload-modal-vue');
   const uploadModal = document.querySelector('#upload-modal-vue');
   uploadModal.querySelector('.modal-title').innerHTML = templates.uploadModalTitle(files.length);
 
@@ -445,7 +448,7 @@ const renderUploadsPreview = files => {
   });
 
   initRemoveButtons(files);
-  Select2.initGroupedFields();
+  Select2.initGroupedFields(globalUploadContainer);
 };
 
 const initRemoveButtons = files => {
@@ -480,7 +483,7 @@ const initAudioPreview = (media, i) => {
 
 const initParentSelect2 = i => {
   Select2.createGroupedField({
-    container: document.querySelector(`#select2-container-${i}`),
+    container: globalUploadContainer.querySelector(`#select2-container-${i}`),
     name: 'parentId',
     label: 'Parent',
     url: '/api/media/parent',

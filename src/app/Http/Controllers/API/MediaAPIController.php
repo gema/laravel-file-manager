@@ -119,7 +119,7 @@ class MediaAPIController
                 $preview = $mediaCloudResponse->preview !== null ?: '';
             } else {
                 $parentFolder = '';
-                if ($parentClass) {
+                if ($request->get('parent_model')) {
                     $parentClass = new $request->parent_model;
                     $parent = $parentClass::find($request->parentId);
                     $parentFolder = '';
