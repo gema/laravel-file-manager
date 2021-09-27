@@ -44,6 +44,12 @@ class MediaCrudController extends CrudController
                     $model = $model->where('type_id', $type);
                 }
 
+                $ids = request()->medias;
+
+                if($ids !== null){
+                    $model = $model->whereIn('id', explode(',', $ids));
+                }
+
                 $model = call_user_func_array(config('file-manager.filter'), [$model]);
 
                 return $model;

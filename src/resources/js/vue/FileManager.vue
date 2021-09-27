@@ -100,7 +100,7 @@ const FileManager = require('./file-manager');
 const {toast, customEvent} = require('../utils');
 
 export default {
-  props : ['name', 'mediaType', 'min', 'max', 'triggerClasses'],
+  props : ['name', 'mediaType', 'min', 'max', 'triggerClasses', 'asignedMedias'],
   data(){
     return{
       selectedMedias: false,
@@ -115,8 +115,31 @@ export default {
     $(window).off(`loaded_new_page_${this.name}`).on(`loaded_new_page_${this.name}`, this.onPageLoaded)
     $(window).off(`loaded_${this.name}`).on(`loaded_${this.name}`, this.onLoad)
     $(window).off(`updated_media_${this.name}`).on(`updated_media_${this.name}`, this.onMediaUpdated)
+
+    if(this.asignedMedias.length) this.fetchAsignedMedias();
   },
   methods: {
+    fetchAsignedMedias(){
+      const body = new FormData();
+      body.append('medias', this.asignedMedias);
+
+      fetch('http://localhost:8000/admin/media/fetch/media', {
+        method: 'POST',
+        body,
+        headers: {
+          'X-CSRF-TOKEN' : document.querySelector('meta[name=csrf-token]').content
+        }       
+      })
+      .then(res => res.json())
+      .then(({data}) => this.onAsignedMedias(data))
+      .catch(err => console.log(err));
+    },
+
+    onAsignedMedias(medias){
+      console.log('Medias ready for editing:', medias);
+      this.$emit('save', medias)
+    },
+
     instantiateField(){
       this.$refs['media-modal'].show()
       FileManager.default.init({
