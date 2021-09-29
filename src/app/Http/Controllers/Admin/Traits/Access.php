@@ -2,8 +2,6 @@
 
 namespace GemaDigital\FileManager\app\Http\Controllers\Admin\Traits;
 
-use DB;
-
 trait Access
 {
     public static function hasAccess($entry)

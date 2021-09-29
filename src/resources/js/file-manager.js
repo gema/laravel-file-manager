@@ -360,7 +360,7 @@ const renderUploadMediaList = (medias, types) => {
       container: document.querySelector(`#select2-container-${i}`),
       name: 'parentId',
       label: 'Parent',
-      url: '/api/media/parent',
+      url: '/admin/media/fetch/parents',
       class: 'form-control',
     });
 

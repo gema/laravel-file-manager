@@ -76,7 +76,7 @@ const initGroupedFields = (container = document) => {
       multiple: false,
       ajax: {
         url,
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         data: params => {
           const query = {

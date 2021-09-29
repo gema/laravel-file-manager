@@ -14,6 +14,15 @@ return [
         return true;
     }),
 
+    // Use to filter the parents list
+    'parents_filter' => (function($query){
+        // if(!admin()) {
+        //     return $query->whereIn('id', backpack_user()->visitsIds());
+        // }
+        
+        return $query;
+    }),
+
     // File Manager listing filters
     'filter' => (function ($query) {
         // return $query

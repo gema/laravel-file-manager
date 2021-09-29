@@ -81,4 +81,17 @@ class MediaCrudController extends CrudController
             'paginate' => 20,
         ]);
     }
+
+    public function fetchParents()
+    {
+        $data = [];
+        foreach (config('file-manager.parents') as $class) {
+            $object = new $class();
+            $result = $object->paginate(10);
+
+            $data[$class] = $result;
+        }
+
+        return json_response($data);
+    }
 }
