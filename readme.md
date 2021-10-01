@@ -39,6 +39,23 @@ return [
     'parents' => [
         Project::class, // Parent classes namespaces (multiple parents supported)
     ],
+    
+    // Parent field should appear or should be infer
+    // You may use a closure to define the access to this
+    'parents_field' => (function () {
+        // return user()->hasManyProjects();
+        return true;
+    }),
+    
+    // Use to filter the parents list
+    // You may use a closure to define the access to this
+    'parents_filter' => (function ($query){
+        if(!admin()) {
+            return $query->whereIn('id', user()->parentsIds());
+        }
+        return $query;
+    }),
+    
     'filter' => (function($query){
         /**
         * Function used in medias fetch operation.
@@ -52,6 +69,19 @@ return [
 
         return $query;
     })
+    
+    // Menu
+    // You may use a closure to define the access on CRUD
+    'access' => [
+        'file-manager' => true,
+        'media-tag' => true,
+        'media-type' => true,
+        'media-version' => true,
+    ],
+
+    // Use media cloud or use Laravel Storage
+    // Set as false to use media cloud, set a diskname to use Laravel Storage
+    'disk' => false,
 ];
 ```
 
@@ -102,6 +132,19 @@ class MyEntityCrudController extends CrudController {
 }
 ```
 ### Using File-Manager as a Vuejs Component
+
+#### Install dependencies for Vue.js
+File-manager uses [select2](https://select2.org/), but this cannot be installed on the fly, so you will need to do it manually, the easiest way is to include their CDN in your HTML:
+
+**`index.html`**
+```html
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+```
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+```
+
 **`MyComponent.vue`**
 ```vue
 
