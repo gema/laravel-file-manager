@@ -219,7 +219,7 @@ class MediaAPIController
         $tmpFilePath = 'tmp/' . $request->media->getClientOriginalName();
 
         // Create Tmp File
-        Storage::disk('local')->put(
+        Storage::disk(config('file-manager.disk'))->put(
             $tmpFilePath,
             file_get_contents($request->file('media'))
         );
@@ -284,19 +284,6 @@ class MediaAPIController
             DB::rollback();
             return json_response('Something went wrong');
         }
-    }
-
-    public function getParents()
-    {
-        $data = [];
-        foreach (config('file-manager.parents') as $class) {
-            $object = new $class();
-            $result = $object->paginate(10);
-
-            $data[$class] = $result;
-        }
-
-        return json_response($data);
     }
 
     private function isJson($string)
