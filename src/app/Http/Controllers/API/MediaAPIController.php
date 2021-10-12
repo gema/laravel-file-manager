@@ -153,6 +153,7 @@ class MediaAPIController
             DB::commit();
 
             return json_response([
+                'id' => $media->id,
                 'preview' => $preview,
                 'filename' => $filename,
                 'success' => true,
