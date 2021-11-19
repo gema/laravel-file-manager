@@ -33,8 +33,7 @@ trait MediaTrait
                         DB::table('media_field_has_media')->insert($data);
 
                         $entry[$column] = $mediaField->id;
-                        $entry->unsetEventDispatcher();
-                        $entry->save();
+                        $entry->saveQuietly();
                     }
                 }
             }
