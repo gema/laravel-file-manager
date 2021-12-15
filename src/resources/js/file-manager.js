@@ -157,7 +157,6 @@ const mediaItemTemplate = media => `
     title="${media.media_content.title}" 
     class="selectable col-md-2 col-sm-3 m-1" data-file="${media.id}">
     <img src="${media.media_content.preview}">
-    <small>${truncate(media.media_content.title, 10)}</small>
   </div>
 `;
 
@@ -234,12 +233,13 @@ const cropImageTemplate = (media, i) => {
 };
 
 const renderUploadMediaList = (medias, types) => {
+  console.log({medias, types})
   const mediasList = document.querySelector('#upload-modal .medias-list');
   mediasList.innerHTML = '';
   let i = 0;
 
-  medias.forEach(media => {
-    media = media.media;
+  medias.forEach(({media, is3d}) => {
+    // media = media.media;
 
     let mediaTemplate = '';
     let hasVideo = false;
@@ -287,6 +287,8 @@ const renderUploadMediaList = (medias, types) => {
       <audio class="w-100 my-3" id="audio-preview-audio-${i}" controls>
         <source src="" id="audio-preview-source-${i}" />
       </audio>`;
+    } else if (is3d) {
+      '<p>3d model</p>'
     }
 
     let mediaSize = media.size;
@@ -300,7 +302,7 @@ const renderUploadMediaList = (medias, types) => {
       j += 1;
     }
 
-    const metadataForm = templates.metadataForm(i, types, {media});
+    const metadataForm = templates.metadataForm(i, types, {media, is3d});
 
     mediasList.innerHTML += `
       <div class="card file-row" data-name="${media.name}">
@@ -852,7 +854,9 @@ const initUpload = prefix => {
   hiddenInput.addEventListener('change', () => {
     mediaList = [];
     hiddenInput.files.forEach(media => {
-      mediaList.push({ media, cropped: null });
+      const ext = media.name.split('.').pop();
+      const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];
+      mediaList.push({ media, cropped: null, is3d: ext3D.includes(ext) });
     });
     if (!modalShown) {
       uploadModal.modal('show');
@@ -881,7 +885,7 @@ const initMediaField = (medias, prefix, type) => {
     .querySelector(`${prefix} #filemanager-container`)
     .dispatchEvent(loadedEvent);
 
-  initTags(prefix, type);
+  // initTags(prefix, type);
   initRefresh(prefix, type);
   initUpload(prefix);
   initUploadModalHandler(prefix, type);
@@ -890,7 +894,7 @@ const initMediaField = (medias, prefix, type) => {
 
 const onMediaLoadedSingle = medias => {
   renderMediasTable(medias, '');
-  initTags();
+  // initTags();
   initRefresh();
   initUpload('');
   initUploadModalHandler();

@@ -103,8 +103,9 @@ const uploadPreview = (file, i, types) => {
   `;
 };
 
-const metadataForm = (i, types, {media}) => {
-  const { name, type } = media;
+const metadataForm = (i, types, {media, is3d}) => {
+  let { name, type } = media;
+  if (is3d) type = 'model';
   const typesListTemplate = typesList(types, type);
   const select = `
     <div id="select2-container-${i}" class="form-group">
@@ -128,6 +129,7 @@ const metadataForm = (i, types, {media}) => {
 };
 
 const typesList = (types, type) => {
+  console.log({type})
   let list = '';
   let selectedType;
 
@@ -137,6 +139,8 @@ const typesList = (types, type) => {
     [selectedType] = types.filter(type => type.name === 'Video');
   } else if (/^audio/.test(type)) {
     [selectedType] = types.filter(type => type.name === 'Audio');
+  } else if (/^model/.test(type)) {
+    [selectedType] = types.filter(type => type.name === '3D Model AR');
   }
 
   types.forEach(type => {

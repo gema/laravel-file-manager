@@ -60,7 +60,7 @@
                 </a>
 
             </li>
-            <li class="list-inline-item">
+            <!-- <li class="list-inline-item">
                 <a id="asign-tag-button">
                 <i class="las la-tag"></i>
                 {{__("file-manager::messages.asign_tag")}}
@@ -71,7 +71,7 @@
                 <i class="las la-trash"></i>
                 {{__("file-manager::messages.remove_tag")}}
                 </a>
-            </li>
+            </li> -->
             <li class="list-inline-item">
                 <a id="refreshBtn">
                     <i class="las la-sync"></i>
@@ -82,11 +82,11 @@
     </div>
     <div class="selection-area-container card-body">
     <div class="row">
-        <div class="tags-container col-sm-2">
+        <!-- <div class="tags-container col-sm-2">
             <ul class="list-group">
             </ul>
-        </div>
-        <div class="col-sm-10">
+        </div> -->
+        <div class="col-sm-12">
             <div class="col-sm-12 d-flex justify-content-center m-0">
                 <h4 class="media-loader d-none"><span class="la la-spinner la-spin mt-3"></span></h4>
             </div>
