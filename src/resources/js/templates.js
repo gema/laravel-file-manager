@@ -129,18 +129,17 @@ const metadataForm = (i, types, {media, is3d}) => {
 };
 
 const typesList = (types, type) => {
-  console.log({type})
   let list = '';
   let selectedType;
 
   if (/^image/.test(type)) {
-    [selectedType] = types.filter(type => type.name === 'Image');
+    [selectedType] = types.filter(type => type.key === 'image');
   } else if (/^video/.test(type)) {
-    [selectedType] = types.filter(type => type.name === 'Video');
+    [selectedType] = types.filter(type => type.key === 'video');
   } else if (/^audio/.test(type)) {
-    [selectedType] = types.filter(type => type.name === 'Audio');
+    [selectedType] = types.filter(type => type.key === 'audio');
   } else if (/^model/.test(type)) {
-    [selectedType] = types.filter(type => type.name === '3D Model AR');
+    [selectedType] = types.filter(type => type.key === '3d_model');
   }
 
   types.forEach(type => {
