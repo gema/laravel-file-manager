@@ -226,7 +226,7 @@ class MediaAPIController
         );
 
         // Make request to media cloud
-        $response = $client->post(env('MEDIA_CLOUD_ENDPOINT'), [
+        $response = $client->post(config('file-manager.media_cloud.endpoint'), [
             'decode_content' => false,
             'multipart' => [
                 [
@@ -235,15 +235,15 @@ class MediaAPIController
                 ],
                 [
                     'name' => 'defaults',
-                    'contents' => env('MEDIA_CLOUD_DEFAULTS'),
+                    'contents' => config('file-manager.media_cloud.defaults'),
                 ],
                 [
                     'name' => 'apikey',
-                    'contents' => env('API_KEY'),
+                    'contents' => config('file-manager.media_cloud.key'),
                 ],
                 [
                     'name' => 'path',
-                    'contents' => 'client',
+                    'contents' => config('file-manager.media_cloud.path'),
                 ],
             ],
         ]);

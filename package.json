@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "cropperjs": "^1.5.12",
+    "css-minimizer-webpack-plugin": "^3.3.0",
     "jquery": "^3.6.0",
     "jquery-ui": "github:jquery/jquery-ui#1.12.1"
   }
