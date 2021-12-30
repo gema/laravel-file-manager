@@ -15,11 +15,11 @@ return [
     }),
 
     // Use to filter the parents list
-    'parents_filter' => (function($query){
+    'parents_filter' => (function ($query) {
         // if(!admin()) {
         //     return $query->whereIn('id', backpack_user()->visitsIds());
         // }
-        
+
         return $query;
     }),
 
@@ -42,4 +42,15 @@ return [
 
     // Disk where to save the medias, set false to use media cloud
     'disk' => false,
+
+    // Temporary disk where to save the uploaded medias before sending them to media cloud
+    'tmp_disk' => 'uploads',
+
+    // Media cloud configuration
+    'media_cloud' => [
+        'key' => env('MEDIA_CLOUD_API_KEY', ''),
+        'endpoint' => env('MEDIA_CLOUD_ENDPOINT', 'localhost/media-cloud'),
+        'defaults' => env('MEDIA_CLOUD_DEFAULTS'),
+        'path' => env('MEDIA_CLOUD_PATH', 'uploads'),
+    ],
 ];
