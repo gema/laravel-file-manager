@@ -80,7 +80,7 @@ const initMediaField = ({ data, last_page }) => {
   customEvent(`loaded_${globalOptions.name}`, { medias: data });
   renderMediaList(data);
   initScroll(last_page);
-  initTags();
+  // initTags();
   initRefresh();
   initUpload();
   initSelectedMediaEdition();

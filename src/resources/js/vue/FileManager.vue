@@ -38,7 +38,7 @@
                                 </a>
 
                             </li>
-                            <li class="list-inline-item">
+                            <!-- <li class="list-inline-item">
                                 <a id="asign-tag-button">
                                     <i class="las la-tag"></i>
                                     Asign Tag
@@ -49,7 +49,7 @@
                                     <i class="las la-trash"></i>
                                     Remove Tag
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="list-inline-item">
                                 <a id="refreshBtn">
                                     <i class="las la-sync"></i>
@@ -60,11 +60,11 @@
                     </div>
                     <div class="selection-area-container card-body">
                         <div class="row">
-                            <div class="tags-container col-sm-2">
+                            <!-- <div class="tags-container col-sm-2">
                                 <ul class="list-group">
                                 </ul>
-                            </div>
-                            <div class="col-sm-10">
+                            </div> -->
+                            <div class="col-sm-12">
                                 <div class="loader-container col-sm-12 d-flex justify-content-center m-0">
                                     <h4 class="media-loader"><span class="la la-spinner la-spin mt-3"></span></h4>
                                 </div>
@@ -123,7 +123,7 @@ export default {
       const body = new FormData();
       body.append('medias', this.asignedMedias);
 
-      fetch('http://localhost:8000/admin/media/fetch/media', {
+      fetch(`${window.location.origin}/admin/media/fetch/media`, {
         method: 'POST',
         body,
         headers: {
