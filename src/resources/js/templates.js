@@ -7,7 +7,6 @@ const mediaItem = media => `
   class="ui-widget-content selectable col-md-2 col-sm-3 m-1" data-file="${media.id}"
 >
   <img src="${media.media_content.preview}">
-  <small>${truncate(media.media_content.title, 10)}</small>
 </div>
 `;
 
@@ -50,8 +49,12 @@ const uploadModalTitle = length => `
 
 const uploadPreview = (file, i, types) => {
   const { media } = file;
-  const mediaPreviewTemplate = mediaPreview(media, i);
-  const metadataFormTemplate = metadataForm(i, types, file);
+
+  const ext =  media.name.split('.').pop();
+  const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];
+  const is3d = ext3D.includes(ext);
+  const mediaPreviewTemplate = mediaPreview(media, i, is3d);
+  const metadataFormTemplate = metadataForm(i, types, {media, is3d});
 
   let mediaSize = media.size;
   let unit = '';
@@ -103,8 +106,9 @@ const uploadPreview = (file, i, types) => {
   `;
 };
 
-const metadataForm = (i, types, {media}) => {
-  const { name, type } = media;
+const metadataForm = (i, types, {media, is3d}) => {
+  let { name, type } = media;
+  if (is3d) type = 'model';
   const typesListTemplate = typesList(types, type);
   const select = `
     <div id="select2-container-${i}" class="form-group">
@@ -132,11 +136,13 @@ const typesList = (types, type) => {
   let selectedType;
 
   if (/^image/.test(type)) {
-    [selectedType] = types.filter(type => type.name === 'Image');
+    [selectedType] = types.filter(type => type.key === 'image');
   } else if (/^video/.test(type)) {
-    [selectedType] = types.filter(type => type.name === 'Video');
+    [selectedType] = types.filter(type => type.key === 'video');
   } else if (/^audio/.test(type)) {
-    [selectedType] = types.filter(type => type.name === 'Audio');
+    [selectedType] = types.filter(type => type.key === 'audio');
+  } else if (/^model/.test(type)) {
+    [selectedType] = types.filter(type => type.key === '3d_model');
   }
 
   types.forEach(type => {
@@ -153,13 +159,16 @@ const typesList = (types, type) => {
   </div>`;
 };
 
-const mediaPreview = (media, i) => {
+const mediaPreview = (media, i, is3d) => {
   const { type } = media;
   const typesWithoutPreview = ['video/avi'];
 
   let template = '';
 
-  if (typesWithoutPreview.includes(type)) {
+  if (is3d) {
+    template = model3dTemplate();
+  }
+  else if (typesWithoutPreview.includes(type)) {
     template = noPreview(type);
   } else if (/^image/.test(type)) {
     template = imagePreview(media, i);
@@ -175,6 +184,8 @@ const mediaPreview = (media, i) => {
 const noPreview = type => `
   <small>No preview available for type ${type}</small>
 `;
+
+const model3dTemplate = () => '3D Model Preview';
 
 const imagePreview = (media, i) => {
   const uncropableTypes = ['image/gif'];

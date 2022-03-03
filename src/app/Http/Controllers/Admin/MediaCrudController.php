@@ -46,7 +46,7 @@ class MediaCrudController extends CrudController
 
                 $ids = request()->medias;
 
-                if($ids !== null){
+                if ($ids !== null) {
                     $model = $model->whereIn('id', explode(',', $ids));
                 }
 
