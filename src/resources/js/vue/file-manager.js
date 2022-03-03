@@ -1,9 +1,4 @@
 /* eslint-disable no-use-before-define */
-import $ from 'jquery';
-import 'jquery-ui/ui/widgets/selectable';
-import Cropper from 'cropperjs';
-import 'cropperjs/dist/cropper.css';
-
 const { templates } = require('../templates');
 const Select2 = require('../select2');
 const { request, toast, customEvent } = require('../utils');

@@ -4,14 +4,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development';
 
-module.exports = {
-  mode,
-  entry : './src/resources/js/app.js',
-  output: {
-    path: path.resolve(__dirname, 'src/public'),
-    filename: 'js/bundle.js',
-    publicPath: 'src/public',
-  },
+const config = {
   module: {
     rules: [
       {
@@ -33,12 +26,36 @@ module.exports = {
       },
     ],
   },
-  // devtool: 'source-map',
-  plugins: [new MiniCssExtractPlugin({ filename: 'css/bundle.css' })],
   optimization: {
     minimize: true,
     minimizer: [
       new CssMinimizerPlugin(),
     ],
   },
-};
+}
+
+const mainConfig = Object.assign({}, config, {
+  mode,
+  entry: './src/resources/js/app.js',
+  output: {
+    path: path.resolve(__dirname, 'src/public'),
+    filename: 'js/bundle.js',
+    publicPath: 'src/public',
+  },
+  plugins: [new MiniCssExtractPlugin({ filename: 'css/bundle.css' })],
+})
+
+const vueConfig = Object.assign({}, config, {
+  mode,
+  entry : './src/resources/js/vue/entry.js',
+  output: {
+    path: path.resolve(__dirname, 'src/public'),
+    filename: 'js/vue_bundle.js',
+    publicPath: 'src/public',
+  },
+  plugins: [new MiniCssExtractPlugin({ filename: 'css/vue_bundle.css' })],
+})
+
+module.exports = [
+  mainConfig, vueConfig,
+];
