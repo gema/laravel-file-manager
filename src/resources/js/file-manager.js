@@ -1,25 +1,25 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
 const Select2 = require('./select2');
-const { request, truncate } = require('./utils');
+const { request, truncate, toast, arrayUniqueByKey } = require('./utils');
+const { templates } = require('./templates');
 
+let globalMedias = [];
 let globalTags = [];
+let globalTagsLastPage = 1;
 let globalMediaTypes = [];
 let modalShown = false;
 let mediaList = [];
 
-const toast = (text, type = 'success') => {
-  new Noty({
-    type,
-    text,
-  }).show();
-};
-
 const toggleLoader = (prefix, show = true) => {
-  document.querySelector(`${prefix}.selection-area`).innerHTML = '';
-  const loader = document.querySelector(`${prefix}.media-loader`);
-  loader.classList.toggle('d-none', !show);
+  const container = document.querySelector(`${prefix}.selection-area`);
+  if (container) {
+    container.innerHTML = '';
+    const loader = document.querySelector(`${prefix}.media-loader`);
+    loader.classList.toggle('d-none', !show);
+  }
 };
 
 const getSelectedTags = prefix => {
@@ -32,13 +32,13 @@ const getSelectedTags = prefix => {
 
 const toggleTagBtn = parent => {
   const isSelected = Object.values(parent.classList).includes('selected');
-  parent.classList.toggle('selected', isSelected);
+  parent.classList.toggle('selected', !isSelected);
 };
 
 const getSelectedMedias = prefix => {
   selectedMedias = [];
   document
-    .querySelectorAll(`${prefix}.selectable.selected`)
+    .querySelectorAll(`${prefix}.selectable.ui-selected`)
     .forEach(selectable => {
       selectedMedias.push(selectable.dataset.file);
     });
@@ -51,19 +51,18 @@ const initTagsModal = (prefix, title) => {
 
   if (selectedMedias.length) {
     modal.querySelector('.modal-title').textContent = title;
-    const options = globalTags.map(
-      tag => `
-      <option value="${tag.id}">
-        ${tag.name}
-      </option>
-    `
-    );
+    // modal.querySelector('.modal-body').innerHTML = templates.tagsSelect(globalTags);
+    
+    Select2.createAjaxField({
+      container: modal.querySelector('.modal-body'),
+      id: 'tags-modal-select',
+      name: 'tags',
+      label: 'tags',
+      url: '/admin/media/fetch/tags',
+      class: 'form-control tags-select',
+    });
 
-    modal.querySelector('.modal-body').innerHTML = `
-      <select name="tags" class="asign-tags-select form-control">
-        ${options}
-      </select>
-    `;
+    Select2.initAjaxField('tags-modal-select');
 
     $(modal).modal('show');
     return modal;
@@ -74,16 +73,15 @@ const initTagsModal = (prefix, title) => {
 };
 
 const initUnsignTag = prefix => {
-  // Asign Tag to medias
-  document
-    .querySelector(`${prefix}#unsign-tag-button`)
-    .addEventListener('click', () => {
+  $(`${prefix}#unsign-tag-button`)
+    .off('click')
+    .on('click', () => {
       const modal = initTagsModal(prefix, __('removeTag'));
 
       const saveBtn = $('#asign-tag-modal .modal-save');
-      saveBtn.unbind('click');
+      saveBtn.off('click');
       saveBtn.on('click', () => {
-        const tags = [modal.querySelector('.asign-tags-select').value];
+        const tags = [modal.querySelector('.tags-select').value];
         const unsignData = {
           tags,
           medias: selectedMedias,
@@ -111,16 +109,15 @@ const initUnsignTag = prefix => {
 };
 
 const initAsignTag = prefix => {
-  // Asign Tag to medias
-  document
-    .querySelector(`${prefix}#asign-tag-button`)
-    .addEventListener('click', () => {
+  $(`${prefix}#asign-tag-button`)
+    .off('click')
+    .on('click', () => {
       const modal = initTagsModal(prefix, __('asignTag'));
 
       const saveBtn = $('#asign-tag-modal .modal-save');
-      saveBtn.unbind('click');
+      saveBtn.off('click');
       saveBtn.on('click', () => {
-        const tags = [modal.querySelector('.asign-tags-select').value];
+        const tags = [modal.querySelector('.tags-select').value];
         const asignData = {
           tags,
           medias: selectedMedias,
@@ -144,7 +141,7 @@ const initAsignTag = prefix => {
           })
           .catch(e => console.log(e));
       });
-    });
+    })
 };
 
 const getMedias = (page = 1, tags = null, type = false, callback = false) => {
@@ -153,32 +150,6 @@ const getMedias = (page = 1, tags = null, type = false, callback = false) => {
     tags,
     type,
   });
-};
-
-const selectedMediaTemplate = media => {
-  const description = media.media_content
-    ? media.media_content.description
-    : __('noDescription');
-
-  return `
-  <a
-    href="#"
-    data-media="${media.id}"
-    class="selected-media list-group-item list-group-item-action flex-column align-items-start">
-    <div class="d-flex w-100 justify-content-between">
-      <div>
-        <b class="mb-1 m-0">
-          ${media.media_content ? media.media_content.title : media.name}
-        </b>
-        </br>
-        <small class="mb-1">${description}</small>
-      </div>
-      <div>
-        <img src="${media.media_content.preview}">
-      </div>
-    </div>
-  </a>
-`;
 };
 
 const mediaItemTemplate = media => `
@@ -321,13 +292,15 @@ const renderUploadMediaList = (medias, types) => {
     let mediaSize = media.size;
     let unit = '';
     let j = 0;
-    const units = ['KB', 'MB', 'GB']
+    const units = ['KB', 'MB', 'GB'];
 
     while (mediaSize > 1024 && j < units.length) {
       mediaSize = Math.round(mediaSize / 1024);
       unit = units[j];
-      j++;
+      j += 1;
     }
+
+    const metadataForm = templates.metadataForm(i, types, {media});
 
     mediasList.innerHTML += `
       <div class="card file-row" data-name="${media.name}">
@@ -343,6 +316,7 @@ const renderUploadMediaList = (medias, types) => {
             >
             <b>${truncate(media.name, 25)}</b> ${mediaSize} ${unit}
             <span class="loader-container"></span>
+            <p class="mt-2 mb-0 text-center"></p>
             </button>
             <a href="#" style="float:right" class="text-danger">
               <i
@@ -360,7 +334,7 @@ const renderUploadMediaList = (medias, types) => {
           data-parent="#accordion">   
           <div class="card-body">
             ${mediaTemplate}
-            ${metadataFormTemplate(types, i)}
+            ${metadataForm}
           </div>
         </div>
       </div>`;
@@ -376,7 +350,7 @@ const renderUploadMediaList = (medias, types) => {
       reader.readAsDataURL(media);
     }
 
-    if (hasAudio ) {
+    if (hasAudio) {
       document.querySelector(`#audio-preview-source-${i}`).src =
         URL.createObjectURL(media);
       document.querySelector(`#audio-preview-audio-${i}`).load();
@@ -386,7 +360,8 @@ const renderUploadMediaList = (medias, types) => {
       container: document.querySelector(`#select2-container-${i}`),
       name: 'parentId',
       label: 'Parent',
-      url: '/api/media/parent',
+      url: '/admin/media/fetch/parents',
+      class: 'form-control',
     });
 
     i += 1;
@@ -453,9 +428,9 @@ const initSelectedMediasEdition = (prefix, medias, type) => {
               .forEach(err => err.remove());
 
             if (!data.errors && data.data.updated) {
-              document(
+              document.querySelector(
                 `${prefix}.selected-media[data-media="${media.id}"]`
-              ).outerHTML = selectedMediaTemplate(data.data.media);
+              ).outerHTML = templates.selectedMedia(data.data.media);
 
               modal.querySelector('.modal-save').innerHTML =
                 '<span class="modal-loader la la-spinner la-spin"></span>';
@@ -487,43 +462,23 @@ const initSelectedMediasEdition = (prefix, medias, type) => {
 };
 
 const initSelection = (medias, prefix, type) => {
-  const selection = new SelectionArea({
-    boundaries: ['html'],
-    selectables: ['.selection-area > .selectable'],
-  })
-    .on('start', ({ store, event }) => {
-      if (!event.ctrlKey && !event.metaKey) {
-        for (const el of store.stored) {
-          el.classList.remove('selected');
-        }
-
-        selection.clearSelection();
-      }
-    })
-    .on(
-      'move',
-      ({
-        store: {
-          changed: { added, removed },
-        },
-      }) => {
-        for (const el of added) {
-          el.classList.add('selected');
-        }
-
-        for (const el of removed) {
-          el.classList.remove('selected');
-        }
-      }
-    );
+  $('.selection-area')
+    .selectable();
 
   if (prefix !== '') {
     document
       .querySelector(`${prefix}#selectFilesBtn`)
       .addEventListener('click', () => {
         const selectedMedias = getSelectedMedias(prefix);
-        document.querySelector(`${prefix} .selected-medias-input`).value =
-          JSON.stringify({ medias: selectedMedias });
+        let value;
+
+        if (selectedMedias.length) {
+          value = JSON.stringify({ medias: selectedMedias });
+        } else {
+          value = null
+        }
+        
+        document.querySelector(`${prefix} .selected-medias-input`).value = value;
 
         const selectedMediasContainer = document.querySelector(
           `${prefix}.selected-medias-list`
@@ -537,7 +492,7 @@ const initSelection = (medias, prefix, type) => {
         if (selectedMedias.length > 0) {
           medias.forEach(media => {
             if (selectedMedias.includes(String(media.id))) {
-              selectedMediasContainer.innerHTML += selectedMediaTemplate(media);
+              selectedMediasContainer.innerHTML += templates.selectedMedia(media);
             }
           });
 
@@ -557,7 +512,7 @@ const initScroll = (container, lastPage, prefix = '', type) => {
   let page = 1;
   let isLoading = false;
 
-  $(container).unbind('scroll');
+  $(container).off('scroll');
   $(container).on('scroll', () => {
     if (
       container.offsetHeight + container.scrollTop >=
@@ -579,15 +534,18 @@ const initScroll = (container, lastPage, prefix = '', type) => {
             container.innerHTML += mediaItemTemplate(media);
           });
 
+          globalMedias = arrayUniqueByKey(globalMedias.concat(medias), 'id');
+
           isLoading = false;
-          if (prefix !== '') initSelection(medias, prefix, type);
+          if (prefix !== '') initSelection(globalMedias, prefix, type);
         });
       }
     }
   });
 };
 
-const renderMediasTable = (medias, prefix, type) => {
+const renderMediasTable = (medias, prefix, type = false) => {
+  globalMedias = arrayUniqueByKey(globalMedias.concat(medias.data), 'id');
   toggleLoader(prefix, false);
   const container = document.querySelector(
     `${prefix} .custom-file-manager .list`
@@ -600,7 +558,7 @@ const renderMediasTable = (medias, prefix, type) => {
       container.innerHTML += mediaItemTemplate(media);
 
       initScroll(container, medias.last_page, prefix, type);
-      initSelection(medias.data, prefix, type);
+      initSelection(globalMedias, prefix, type);
     });
   } else {
     container.innerHTML = `
@@ -634,10 +592,14 @@ const initTags = (prefix = '', type = false) => {
     `;
   });
 
+  initTagsPagination(tagsContainer.parentElement, globalTagsLastPage, prefix, type);
+
   initAsignTag(prefix);
   initUnsignTag(prefix);
+  initTagsFilter(prefix, type);
+};
 
-  // Toggle and refresh media list (filter by tag)
+const initTagsFilter = (prefix, type) => {
   document.querySelectorAll(`${prefix}.select-tag`).forEach(tagBtn => {
     tagBtn.addEventListener('click', e => {
       toggleTagBtn(e.currentTarget.parentNode);
@@ -649,6 +611,46 @@ const initTags = (prefix = '', type = false) => {
         renderMediasTable(medias, prefix);
       });
     });
+  });
+}
+
+const initTagsPagination = (container, lastPage, prefix, type) => {
+  let page = 1;
+  let isLoading = false;
+
+  $(container).off('scroll');
+  $(container).on('scroll', () => {
+    if (
+      container.offsetHeight + container.scrollTop >=
+      container.scrollHeight - 1
+    ) {
+      if (!isLoading && page + 1 <= lastPage) {
+        page += 1;
+        isLoading = true;
+
+        container.innerHTML += '<span class="w-100 text-center tags-loader la la-spinner la-spin mt-3"></span>';
+        getTags(page, ({ data }) => {
+          document.querySelector('.tags-loader').remove();
+          data.forEach(tag => {
+            container.querySelector('ul').innerHTML += `
+              <li class="list-group-item">
+                <a href="#" title="${tag.name}" class="select-tag" data-tag="${tag.id}">
+                  ${truncate(tag.name, 10)}
+                </a>
+              </li>
+            `;
+          });
+          isLoading = false;
+          initTagsFilter(prefix, type)
+        });
+      }
+    }
+  });
+};
+
+const getTags = (page = 1, callback = false) => {
+  request(`/admin/media/fetch/tags?page=${page}`, callback, 'POST', {
+    _token: document.querySelector('meta[name=csrf-token]').content,
   });
 };
 
@@ -704,8 +706,8 @@ const initUploadModal = (medias, types) => {
   });
 
   $('#upload-modal .modal-save')
-    .unbind()
-    .click(e => {
+    .off('click')
+    .on('click', e => {
       e.currentTarget.classList.add('d-none');
       const promises = [];
       const promiseResponses = [];
@@ -771,12 +773,11 @@ const initUploadModal = (medias, types) => {
                 fileLoader.innerHTML = success ? '✅' : '❌';
 
                 const textClass = success ? 'success' : 'danger';
-                fileRow.querySelector('.card-header').innerHTML += `
-                  <p
-                    class="mt-2 mb-0 text-${textClass} text-center">
-                    ${msg}
-                  </p>
-                `;
+                const feedback = fileRow.querySelector('.card-header p')
+                feedback.textContent = msg;
+                feedback.classList.remove('text-danger');
+                feedback.classList.remove('text-success');
+                feedback.classList.add(`text-${textClass}`);
               } else if (fileRow) {
                 Object.entries(response.errors).forEach(([name, errors]) => {
                   const field = fileRow.querySelector(
@@ -792,22 +793,22 @@ const initUploadModal = (medias, types) => {
                 );
 
                 fileLoader.innerHTML = '❌';
-                fileRow.querySelector('.card-header').innerHTML += `
-                  <p class="mt-2 mb-0 text-danger text-center">
-                    ${__('invalidMetadata')}
-                  </p>
-                `;
+                const feedback = fileRow.querySelector('.card-header p')
+                feedback.innerHTML = __('invalidMetadata');
+                feedback.classList.add('text-danger');
+                feedback.classList.remove('text-success');
 
                 $(fileRow).find('.collapse').collapse('show');
+                e.currentTarget.classList.remove('d-none');
               }
             });
           });
         });
     });
-  
+
   $('.crop-btn')
-    .unbind()
-    .click(e1 => {
+    .off('click')
+    .on('click', e1 => {
       const i1 = e1.target.dataset.id;
       const imageCropper = document.querySelector(`#imageCropper_${i1}`);
       initCropper(i1);
@@ -845,7 +846,7 @@ const initUpload = prefix => {
     hiddenInput.click();
   };
 
-  $(uploadButton).unbind('click');
+  $(uploadButton).off('click');
   $(uploadButton).on('click', uploadClickListener);
 
   hiddenInput.addEventListener('change', () => {
@@ -895,11 +896,12 @@ const onMediaLoadedSingle = medias => {
   initUploadModalHandler();
 };
 
-const setGlobals = ({data}) => {
+const setGlobals = ({ data }) => {
   const { tags, types } = data;
   globalTags = tags.data;
+  globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
-}
+};
 
 const onGlobalsLoaded = response => {
   setGlobals(response);
@@ -930,7 +932,6 @@ const onGlobalsLoaded = response => {
   }
 };
 
-
 const init = () => {
   loadGlobals(onGlobalsLoaded);
 };
@@ -941,7 +942,7 @@ const loadGlobals = (callback = false) => {
     '/admin/media/fetch/global-data',
     callback,
     'POST'
-  )
+  );
 };
 
 module.exports = { init };

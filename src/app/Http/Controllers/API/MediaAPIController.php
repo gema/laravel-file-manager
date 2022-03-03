@@ -5,8 +5,10 @@ namespace GemaDigital\FileManager\app\Http\Controllers\API;
 use DB;
 use GemaDigital\FileManager\app\Models\Media;
 use GemaDigital\FileManager\app\Models\MediaContent;
-use GemaDigital\FileManager\app\Models\MediaVersion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -79,6 +81,7 @@ class MediaAPIController
 
     public function uploadMedia(Request $request)
     {
+        $preview;
         $validation = Validator::make($request->all(), [
             'media' => 'required',
             'name' => 'required',
@@ -102,25 +105,61 @@ class MediaAPIController
                 'type_id' => $request->type,
             ]);
 
-            $mediaCloudResponse = $this->mediaCloudRequest($request);
+            $disk = config('file-manager.disk');
+            if (!$disk) {
+                $mediaCloudResponse = $this->mediaCloudRequest($request);
+                $mediaContent = MediaContent::create([
+                    'media_cloud_id' => $mediaCloudResponse->id,
+                    'media_id' => $media->id,
+                    'title' => $request->title ?: '[No title provided]',
+                    'description' => $request->description ?: '[No description provided]',
+                    'preview' => $mediaCloudResponse->preview,
+                ]);
 
-            $mediaContent = MediaContent::create([
-                'uuid' => $mediaCloudResponse['uuid'], // get from media cloud
-                'media_id' => $media->id,
-                'title' => $request->title ?: '[No title provided]',
-                'description' => $request->description ?: '[No description provided]',
-                'preview' => $mediaCloudResponse['preview'], // get from media cloud
-            ]);
+                $preview = $mediaCloudResponse->preview !== null ?: '';
+            } else {
+                $parentFolder = '';
+                if ($request->get('parent_model')) {
+                    $parentClass = new $request->parent_model;
+                    $parent = $parentClass::find($request->parentId);
+                    $parentFolder = '';
+                    if (isset($parent->name)) {
+                        $parentName = $parent->name;
+                        if ($this->isJson($parentName)) {
+                            $parentFolder = json_decode($parentName)->en;
+                        } else {
+                            $parentFolder = $parentName;
+                        }
+                    }
+
+                    $parentFolder = Str::slug($parentFolder);
+                }
+
+                $fileName = $request->file('media')->store($parentFolder, $disk);
+                $path = Storage::disk($disk)->url($fileName);
+
+                $mediaContent = MediaContent::create([
+                    'media_cloud_id' => null,
+                    'media_id' => $media->id,
+                    'title' => $request->title ?: '[No title provided]',
+                    'description' => $request->description ?: '[No description provided]',
+                    'preview' => $path,
+                    'content' => '{"original" : "' . $path . '"}',
+                ]);
+
+                $preview = $path;
+            }
 
             DB::commit();
 
             return json_response([
-                'preview' => $mediaCloudResponse['preview'],
+                'id' => $media->id,
+                'preview' => $preview,
                 'filename' => $filename,
                 'success' => true,
                 'msg' => 'Media uploaded successfully.',
             ]);
-        } catch (\Exception$e) {
+        } catch (\Exception $e) {
             $response = [
                 'filename' => $filename,
                 'success' => false,
@@ -169,37 +208,88 @@ class MediaAPIController
         return json_response(['updated' => true, 'media' => $mediaData]);
     }
 
-    protected function mediaCloudRequest($request)
+    private function mediaCloudRequest(Request $request)
     {
-        $file = $request->media;
-        $type = $request->type;
 
-        $mediaVersions = MediaVersion::whereHas('mediaTypes', function ($query) use ($type) {
-            $query->where('id', $type);
-        })->pluck('label');
+        $client = new \GuzzleHttp\Client([
+            'headers' => [
+                'Content-Type' => 'multipart/form-data',
+            ],
+        ]);
 
-        $payload = [
-            'file' => $file,
-            'versions' => $mediaVersions,
-        ];
+        $tmpFilePath = 'tmp/' . $request->media->getClientOriginalName();
 
-        // Simulate media cloud response
-        return [
-            'uuid' => Str::uuid(),
-            'preview' => 'https://mcleansmartialarts.com/wp-content/uploads/2017/04/default-image-620x600.jpg',
-        ];
+        // Create Tmp File
+        Storage::disk(config('file-manager.disk'))->put(
+            $tmpFilePath,
+            file_get_contents($request->file('media'))
+        );
+
+        // Make request to media cloud
+        $response = $client->post(config('file-manager.media_cloud.endpoint'), [
+            'decode_content' => false,
+            'multipart' => [
+                [
+                    'name' => 'file',
+                    'contents' => fopen(base_path('storage/app/tmp/' . $request->media->getClientOriginalName()), 'r'),
+                ],
+                [
+                    'name' => 'defaults',
+                    'contents' => config('file-manager.media_cloud.defaults'),
+                ],
+                [
+                    'name' => 'apikey',
+                    'contents' => config('file-manager.media_cloud.key'),
+                ],
+                [
+                    'name' => 'path',
+                    'contents' => config('file-manager.media_cloud.path'),
+                ],
+            ],
+        ]);
+
+        $bodyResponse = $response->getBody();
+        $result = $bodyResponse->getContents();
+        $result = json_decode($result);
+
+        // Delete tmp file
+        Storage::disk('local')->delete($tmpFilePath);
+
+        return $result;
     }
 
-    public function getParents()
+    public function mediaCloudWebhook(Request $request)
     {
-        $data = [];
-        foreach (config('file-manager.parents') as $class) {
-            $object = new $class();
-            $result = $object->paginate(10);
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'id' => 'required',
+                'paths' => 'required|array',
+            ]);
 
-            $data[$class] = $result;
+            if ($validation->fails()) {
+                return json_response(null, 422, 200, $validation->errors());
+            }
+
+            $mediaContent = MediaContent::where('media_cloud_id', $request->id)->first();
+            if ($mediaContent) {
+                $mediaContent->content = $request->paths;
+                $mediaContent->save();
+                DB::commit();
+                return json_response('Transformations paths saved with success for media_cloud_id = ' . $request->id);
+            } else {
+                return json_response('No medias found with media_cloud_id = ' . $request->id);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return json_response('Something went wrong');
         }
+    }
 
-        return json_response($data);
+    private function isJson($string)
+    {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
     }
 }

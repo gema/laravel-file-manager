@@ -44,6 +44,12 @@ class MediaCrudController extends CrudController
                     $model = $model->where('type_id', $type);
                 }
 
+                $ids = request()->medias;
+
+                if($ids !== null){
+                    $model = $model->whereIn('id', explode(',', $ids));
+                }
+
                 $model = call_user_func_array(config('file-manager.filter'), [$model]);
 
                 return $model;
@@ -64,7 +70,7 @@ class MediaCrudController extends CrudController
     {
         return $this->fetch([
             'model' => 'GemaDigital\FileManager\app\Models\MediaTag',
-            'paginate' => 20,
+            'paginate' => 10,
         ]);
     }
 
@@ -74,5 +80,18 @@ class MediaCrudController extends CrudController
             'model' => 'GemaDigital\FileManager\app\Models\MediaType',
             'paginate' => 20,
         ]);
+    }
+
+    public function fetchParents()
+    {
+        $data = [];
+        foreach (config('file-manager.parents') as $class) {
+            $object = new $class();
+            $result = $object->paginate(10);
+
+            $data[$class] = $result;
+        }
+
+        return json_response($data);
     }
 }

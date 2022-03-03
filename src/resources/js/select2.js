@@ -1,42 +1,92 @@
-// const { executeFunctionByName } = require('./utils');
-
+/* eslint-disable no-use-before-define */
+const { getPossibleTranslation } = require('./utils')
 const createGroupedField = options => {
   const fieldHtml = generateFieldHtml(options, 'select2-grouped');
   options.container.innerHTML += fieldHtml;
+};
+
+const createAjaxField = options => {
+  const fieldHtml = generateFieldHtml(options, 'select2-ajax');
+  options.container.innerHTML = fieldHtml;
 }
 
 const generateFieldHtml = (options, fieldType) => {
-  return `
-        <label>${options.label}</label>
-        <select
-            name="${options.name}"
-            style="${options.style || 'width:100%'}"
-            class="${options.class || 'form-control'} ${fieldType}"
-            data-url="${options.url}"
-        >
-        </select>`;
+  const html = `
+    <label>${options.label}</label>
+    <select
+      ${options.id !== undefined ? `id="${options.id}"` : ''}
+      name="${options.name}"
+      style="${options.style || 'width:100%'}"
+      class="${options.class || 'form-control'} ${fieldType}"
+      data-url="${options.url}"
+    >
+    </select>`;
+
+  return html;
+};
+
+const initAjaxField = id => {
+  const field = document.querySelector(`#${id}`);
+  const { url } = field.dataset;
+  $(field).select2({
+    theme: 'bootstrap',
+    multiple: false,
+    ajax: {
+      url,
+      type: 'POST',
+      dataType: 'json',
+      data: params => {
+        const query = {
+          search: params.term,
+          page: params.page || 1,
+        };
+        return query;
+      },
+      processResults({ data, current_page, last_page }) {
+        const results = [];
+        Object.values(data).forEach(tag => {
+          // console.log(tag)
+          results.push({
+            id: tag.id,
+            text: getPossibleTranslation(JSON.stringify(tag.name)),
+          })
+        })
+
+        more = current_page < last_page;
+        console.log({
+          results,
+          pagination: {more},
+        })
+        return {
+          results,
+          pagination: {more},
+        }
+      },
+    },
+  })
 }
 
-const initGroupedFields = () => {
-  document.querySelectorAll('.select2-grouped').forEach(selectElement => {
+const initGroupedFields = (container = document) => {
+  container.querySelectorAll('.select2-grouped').forEach(selectElement => {
     const { url } = selectElement.dataset;
-    const finished= [];
+    const finished = [];
+    console.log(url);
     $(selectElement).select2({
       theme: 'bootstrap',
       multiple: false,
       ajax: {
         url,
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         data: params => {
           const query = {
             search: params.term,
             page: params.page || 1,
           };
-                
+
           return query;
         },
-        processResults({data}) {
+        processResults({ data }) {
           const parentsNumber = Object.keys(data).length;
           const results = [];
           let more;
@@ -51,7 +101,7 @@ const initGroupedFields = () => {
                   text: namespace.split('\\').pop(),
                   children: Object.values(response.data).map(entry => ({
                     id: entry.id,
-                    text: entry.name,
+                    text: getPossibleTranslation(JSON.stringify(entry.name)),
                     namespace,
                   })),
                 });
@@ -63,14 +113,15 @@ const initGroupedFields = () => {
               Object.values(response.data).forEach(entry => {
                 results.push({
                   id: entry.id,
-                  text: entry.name,
+                  text: getPossibleTranslation(JSON.stringify(entry.name)),
                   namespace,
                 });
               });
               more = response.current_page < response.last_page;
             });
           }
-            
+
+          console.log({results});
           return {
             results,
             pagination: { more },
@@ -81,10 +132,12 @@ const initGroupedFields = () => {
       const { data } = e.params;
       $(e.currentTarget).children()[0].dataset.namespace = data.namespace;
     });
-  })
-}
+  });
+};
 
 module.exports = {
   createGroupedField,
   initGroupedFields,
+  createAjaxField,
+  initAjaxField,
 };

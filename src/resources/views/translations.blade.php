@@ -3,6 +3,7 @@
 
   window.FileManager = {
     translations : {
+      mediaManager: '{{ucfirst(__("file-manager::messages.media_manager"))}}',
       selectMediasFirst : '{{__("file-manager::messages.select_medias_first")}}',
       tagsUnsigned : '{{__("file-manager::messages.tags_unsigned")}}',
       tagsUnsignedError : '{{__("file-manager::messages.tags_unsigned_error")}}',

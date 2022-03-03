@@ -3,14 +3,11 @@
 <link href="{{ asset('packages/select2/dist/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
 <link href="{{ asset('packages/select2-bootstrap-theme/dist/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
 
-<!-- include select2 js-->
-<script src="{{ asset('packages/select2/dist/js/select2.full.min.js') }}"></script>
 @if (app()->getLocale() !== 'en')
 <script src="{{ asset('packages/select2/dist/js/i18n/' . app()->getLocale() . '.js') }}"></script>
 @endif
 
-<!-- selection js -->
-<script src="https://cdn.jsdelivr.net/npm/@viselect/vanilla/lib/viselect.cjs.js"></script>
+<script src="{{ asset('packages/select2/dist/js/select2.min.js') }}"></script>
 
 <!-- Upload Modal -->
 <template class="upload-modal">
@@ -25,7 +22,7 @@
       </div>
       <div class="modal-body">
         <div id="accordion" class="medias-list">
-        
+
         </div>
       </div>
       <div class="modal-footer">
@@ -48,7 +45,7 @@
         </button>
       </div>
       <div class="modal-body">
-        
+
       </div>
       <div class="modal-footer">
         <button type="button" class="modal-close btn btn-secondary" data-dismiss="modal">{{__("file-manager::messages.close")}}</button>
@@ -69,7 +66,7 @@
         </button>
       </div>
       <div class="modal-body">
-        
+
       </div>
       <div class="modal-footer">
         <button type="button" class="modal-close btn btn-secondary" data-dismiss="modal">{{__("file-manager::messages.close")}}</button>

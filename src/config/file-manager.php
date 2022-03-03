@@ -14,6 +14,15 @@ return [
         return true;
     }),
 
+    // Use to filter the parents list
+    'parents_filter' => (function ($query) {
+        // if(!admin()) {
+        //     return $query->whereIn('id', backpack_user()->visitsIds());
+        // }
+
+        return $query;
+    }),
+
     // File Manager listing filters
     'filter' => (function ($query) {
         // return $query
@@ -29,5 +38,16 @@ return [
         'media-tag' => true,
         'media-type' => true,
         'media-version' => true,
+    ],
+
+    // Disk where to save the medias, set false to use media cloud
+    'disk' => false,
+
+    // Media cloud configuration
+    'media_cloud' => [
+        'key' => env('MEDIA_CLOUD_API_KEY'),
+        'endpoint' => env('MEDIA_CLOUD_ENDPOINT'),
+        'defaults' => env('MEDIA_CLOUD_DEFAULTS'),
+        'path' => env('MEDIA_CLOUD_PATH'),
     ],
 ];

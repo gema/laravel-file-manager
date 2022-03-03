@@ -22,9 +22,6 @@ Route::group(
                 Route::crud('media-type', 'MediaTypeCrudController');
                 Route::crud('media-version', 'MediaVersionCrudController');
                 Route::crud('media', 'MediaCrudController');
-
-                // API
-                Route::any('/file-manager/api/{entity}/ajax/{action}/{arg1?}/{arg2?}/{arg3?}', '\GemaDigital\FileManager\app\Http\Controllers\Admin\APICrudController@ajax');
             }
         );
     }
@@ -38,13 +35,13 @@ Route::group(
     ],
     function () {
         Route::group(['prefix' => 'media'], function () {
-            Route::get('/', [MediaAPIController::class, 'getMedias']);
             Route::get('/parent', [MediaAPIController::class, 'getParents']);
             Route::post('/tag', [MediaAPIController::class, 'addTags']);
             Route::post('/tag/unsign', [MediaAPIController::class, 'removeTags']);
             Route::post('/upload', [MediaAPIController::class, 'uploadMedia']);
             Route::post('/{id}/edit', [MediaAPIController::class, 'editMedia']);
             Route::post('/cloud', [MediaAPIController::class, 'mediaCloud'])->name('mediaCloud');
+            Route::post('/cloud/webhook', [MediaAPIController::class, 'mediaCloudWebhook']);
         });
     });
 
