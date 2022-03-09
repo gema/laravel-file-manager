@@ -1,7 +1,7 @@
 @php
     use Illuminate\Support\Facades\File;
 
-    $publicPath = '/vendor/gemadigital/file-manager/src/public';
+    $publicPath = '/vendor/gemadigital/file-manager/src/resources/bundles';
     $jsBundle = File::get(base_path() . $publicPath . '/js/bundle.js');
     $cssBundle = File::get(base_path() . $publicPath . '/css/bundle.css');
     $parentsField = call_user_func(config('file-manager.parents_field'));
