@@ -1,8 +1,9 @@
 const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
-const mode = 'development';
+const mode = 'production';
 
 const config = {
   module: {
@@ -30,6 +31,7 @@ const config = {
     minimize: true,
     minimizer: [
       new CssMinimizerPlugin(),
+      new UglifyJsPlugin({include: /.js$/}),
     ],
   },
 }
@@ -42,7 +44,9 @@ const mainConfig = Object.assign({}, config, {
     filename: 'js/bundle.js',
     publicPath: 'src/public',
   },
-  plugins: [new MiniCssExtractPlugin({ filename: 'css/bundle.css' })],
+  plugins: [
+    new MiniCssExtractPlugin({ filename: 'css/bundle.css' }),
+  ],
 })
 
 const vueConfig = Object.assign({}, config, {
@@ -53,7 +57,9 @@ const vueConfig = Object.assign({}, config, {
     filename: 'js/vue_bundle.js',
     publicPath: 'src/public',
   },
-  plugins: [new MiniCssExtractPlugin({ filename: 'css/vue_bundle.css' })],
+  plugins: [
+    new MiniCssExtractPlugin({ filename: 'css/vue_bundle.css' }),
+  ],
 })
 
 module.exports = [
