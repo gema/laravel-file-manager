@@ -9,7 +9,7 @@
     @endphp
 
 @if (isset($crud))
-    @if ($crud->checkIfFieldIsFirstOfItsType($field, $fields))
+    @if ($crud->checkIfFieldIsFirstOfItsType($field, $fields) || isset($field['first']))
         @push('after_styles')
             <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet"/>
             <style>{!! $cssBundle !!}</style>

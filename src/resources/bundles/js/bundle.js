@@ -1,243 +1,120 @@
-(()=>{var a={479:(e,t,a)=>{const g=a(693),{request:r,truncate:f,toast:d,arrayUniqueByKey:l}=a(287),y=a(838)["templates"];let s=[],o=null,n=1,m=[],i=!1,c=[];const u=(e,t=!0)=>{const a=document.querySelector(e+".selection-area");if(a){a.innerHTML="";const o=document.querySelector(e+".media-loader");o.classList.toggle("d-none",!t)}},p=e=>{const t=[];return document.querySelectorAll(e+" .selected .select-tag").forEach(e=>t.push(parseInt(e.dataset.tag,10))),t},v=e=>(selectedMedias=[],document.querySelectorAll(e+".selectable.ui-selected").forEach(e=>{selectedMedias.push(e.dataset.file)}),selectedMedias),b=(e=1,t=null,a=!1,o=!1)=>{r("/admin/media/fetch/media?page="+e,o,"POST",{_token:document.querySelector("meta[name=csrf-token]").content,tags:t,type:a})},h=e=>`
-  <div
-    title="${e.media_content.title}" 
-    class="selectable col-md-2 col-sm-3 m-1" data-file="${e.id}">
-    <img src="${e.media_content.preview}">
-  </div>
-`,S=(e,t)=>{return`
-  <form id="metadata-form-${t}">
-    ${`
-    <div id="select2-container-${t}" class="form-group">
-      
-    </div>
-  `}
-    <div class="form-group">
-      <label>${__("title")}</label>
-      <input name="title" type="text" class="form-control">
-    </div>
-    <div class="form-group">
-      <label>${__("description")}</label>
-      <textarea name="description" class="form-control"></textarea>
-    </div>
-    ${(e=>{let t="";return e.forEach(e=>{t+=`<option value="${e.id}">${e.name}</option>`}),`
-  <div class="form-group">
-    <label>${__("mediaType")}</label>
-    <select name="type" class="form-control">
-      ${t}
-    </select>
-  </div>`})(e)}
-  </form>`},_=(e,u)=>{console.log({medias:e,types:u});const p=document.querySelector("#upload-modal .medias-list");p.innerHTML="";let v=0;e.forEach(({media:e,is3d:t})=>{let a="",o=!1,r=!1;["video/avi"].includes(e.type)?a=`<small>${__("noPreview",[e.type])}</small>`:/^image/.test(e.type)?a="image/gif"!==e.type?(c=`
-          <button id="crop-btn-${v}" class="form-control btn btn-default btn-sm crop-btn" data-id="${v}">
-            ${__("crop")}
-          </button>`,`
-          <img
-            id="image-preview-${v}" 
-            class="w-100 my-3"
-            src="${URL.createObjectURL(e)}">
-          ${c}
-          <div class="mt-1" id="crop_image_${v}">
-            ${((e,t)=>{const a=document.createElement("img"),o=(a.classList.add("to_be_crop_"+t),a.style.maxWidth="100%",a.src=URL.createObjectURL(e),document.createElement("button"));return o.textContent="Confirm",o.classList="confirm-crop btn btn-default btn-sm",o.id="crop_btn_"+t,`
-  <div class="d-none" id="imageCropper_${o.dataset.id=t}">
-    ${o.outerHTML}
-    ${a.outerHTML}
-  </div>`})(e,v)}
-          </div>
-        `):`
-          <img
-            id="image-preview-${v}" 
-            class="w-100 my-3"
-            src="${URL.createObjectURL(e)}">
-        `:/^video/.test(e.type)?(o=!0,a=`
-        <video controls id="video-preview-video-${v}" class="w-100 my-3">
-          <source id="video-preview-source-${v}" src="">
-          Your browser does not support the video tag.
-        </video>`):/^audio/.test(e.type)&&(r=!0,a=`
-      <audio class="w-100 my-3" id="audio-preview-audio-${v}" controls>
-        <source src="" id="audio-preview-source-${v}" />
-      </audio>`);let n=e.size,l="",s=0;for(var i=["KB","MB","GB"];1024<n&&s<i.length;)n=Math.round(n/1024),l=i[s],s+=1;var c=y.metadataForm(v,u,{media:e,is3d:t});if(p.innerHTML+=`
-      <div class="card file-row" data-name="${e.name}">
-        <div class="card-header" id="heading_${v}">
-          <h5 class="mb-0" style="text-align:center">
-            <button
-              class="btn btn-link"
-              data-toggle="collapse"
-              data-target="#collapse_${v}"
-              aria-expanded="true"
-              aria-controls="collapse_${v}"
-              title="${e.name}"
-            >
-            <b>${f(e.name,25)}</b> ${n} ${l}
-            <span class="loader-container"></span>
-            <p class="mt-2 mb-0 text-center"></p>
-            </button>
-            <a href="#" style="float:right" class="text-danger">
-              <i
-                style="vertical-align:middle"
-                data-name="${e.name}"
-                class="remove-media-btn las la-trash-alt">
-              </i>
-            </a>
-          </h5>
-        </div>
-        <div
-          id="collapse_${v}" 
-          class="collapse ${0===v?"show":""}"
-          aria-labelledby="heading_${v}"
-          data-parent="#accordion">   
-          <div class="card-body">
-            ${a}
-            ${c}
-          </div>
-        </div>
-      </div>`,o){const d=new FileReader,m=v;d.onloadend=()=>{const e=document.querySelector("#video-preview-video-"+m);e.src=d.result},d.readAsDataURL(e)}r&&(document.querySelector("#audio-preview-source-"+v).src=URL.createObjectURL(e),document.querySelector("#audio-preview-audio-"+v).load()),g.createGroupedField({container:document.querySelector("#select2-container-"+v),name:"parentId",label:"Parent",url:"/admin/media/fetch/parents",class:"form-control"}),v+=1}),g.initGroupedFields()},w=(s,i,c)=>{document.querySelectorAll(s+".selected-media").forEach(e=>{e.addEventListener("click",e=>{const t=e.currentTarget.dataset.media,[o]=i.filter(e=>String(e.id)===t),r=document.querySelector("#edit-media-modal"),n=(r.querySelector(".modal-body").innerHTML=S(m,o.id),r.querySelector(".modal-save").innerHTML="Save",r.querySelector('select[name="parentId"]')),a=(null!==n&&(n.value=o?o.parent_id:""),r.querySelector('input[name="title"]')),l=(a.value=o.media_content?o.media_content.title:"",r.querySelector('textarea[name="description"]'));l.value=o.media_content?o.media_content.description:"",r.querySelector(".modal-save").addEventListener("click",()=>{const e={title:r.querySelector('input[name="title"]').value,description:r.querySelector('textarea[name="description"]').value},a=(null!==n&&(e.parent=r.querySelector('select[name="parentId"]').value),new FormData);Object.entries(e).forEach(([e,t])=>{a.append(e,t)}),fetch(`/api/media/${o.media_content.id}/edit`,{method:"POST",body:a}).then(e=>e.json()).then(e=>{r.querySelectorAll("small.text-danger").forEach(e=>e.remove()),!e.errors&&e.data.updated?(document.querySelector(`${s}.selected-media[data-media="${o.id}"]`).outerHTML=y.selectedMedia(e.data.media),r.querySelector(".modal-save").innerHTML='<span class="modal-loader la la-spinner la-spin"></span>',u(s,!0),b(1,"",c,e=>{w(s,e.data,c),x(e,s,c),$(r).modal("hide"),d(__("mediaUpdated"))})):Object.entries(e.errors).forEach(([e,t])=>{const a=r.querySelector(`input[name="${e}"], textarea[name="${e}"], select[name="${e}"]`);t.forEach(e=>{a.parentElement.innerHTML+=`<small class="text-danger">${e}</small>`})})})}),$(r).modal("show")})})},L=(o,r,n)=>{$(".selection-area").selectable(),""!==r&&document.querySelector(r+"#selectFilesBtn").addEventListener("click",()=>{const t=v(r);let e;e=t.length?JSON.stringify({medias:t}):null,document.querySelector(r+" .selected-medias-input").value=e;const a=document.querySelector(r+".selected-medias-list");a.innerHTML="",document.querySelector(r+".selected-medias-number").innerHTML=""+t.length,0<t.length?(o.forEach(e=>{t.includes(String(e.id))&&(a.innerHTML+=y.selectedMedia(e))}),w(r,o,n)):a.innerHTML=`
-            <li class="list-group-item">
-              <small>${__("noMediasSelected")}</small>
-            </li>
-          `})},q=(a,e,o="",r)=>{let t=1,n=!1;$(a).off("scroll"),$(a).on("scroll",()=>{a.offsetHeight+a.scrollTop>=a.scrollHeight-1&&!n&&t+1<=e&&(t+=1,n=!0,a.innerHTML+=`
-        <div class="pagination-loader col-sm-12 d-flex justify-content-center m-0">
-          <h4><span class="la la-spinner la-spin mt-3"></span></h4>
-        </div>`,b(t,p(o),r,e=>{a.querySelector(".pagination-loader").remove();const t=e.data;t.forEach(e=>{a.innerHTML+=h(e)}),s=l(s.concat(t),"id"),n=!1,""!==o&&L(s,o,r)}))})},x=(t,a,o=!1)=>{s=l(s.concat(t.data),"id"),u(a,!1);const r=document.querySelector(a+" .custom-file-manager .list");r.innerHTML="",t.data.length?t.data.forEach(e=>{r.innerHTML+=h(e),q(r,t.last_page,a,o),L(s,a,o)}):r.innerHTML=`
-    <tr>
-      <td class="empty" colspan="6">${__("noMediasFound")}</td>
-    </tr>`},T=(t="",a=!1)=>{document.querySelector(t+"#refreshBtn").addEventListener("click",()=>{u(t,!0),b(1,"",a,e=>{x(e,t,a)})})};const M=(a,o)=>{const e=document.querySelector("#upload-modal .modal-title span"),t=document.querySelector("#upload-modal .modal-save"),r=t.querySelector("span");var n=a.length;_(a,o),t.classList.remove("d-none"),e.innerHTML=n,r.innerHTML=n;const l=document.querySelectorAll(".remove-media-btn");l.forEach(e=>{e.addEventListener("click",e=>{const t=e.target.dataset.name;a=a.filter(e=>e.media.name!==t),M(a,o)})}),$("#upload-modal .modal-save").off("click").on("click",s=>{s.currentTarget.classList.add("d-none");const n=[],t=[];let l=0;const e=document.querySelectorAll("span.loader-container");e.forEach(e=>{e.innerHTML+='<span class="ml-2 la la-spinner la-spin"></span>'}),a.forEach(e=>{const t=document.querySelectorAll(`#metadata-form-${l} .form-control`),a={};t.forEach(e=>a[e.name]=e.value);var o,r=document.querySelector(`#metadata-form-${l} select[name="parentId"]`);null!==r&&void 0!==(o=$(r).find(":selected").data())&&(a.parent_model=o.namespace,a.parent_id=r.value),n.push(((e,t)=>{const a=new FormData;return a.append("media",e.media),a.append("cropped",e.cropped||null),a.append("name",e.media.name),Object.entries(t).forEach(([e,t])=>{a.append(e,t)}),fetch("/api/media/upload",{method:"POST",body:a})})(e,a)),l+=1}),Promise.all(n).then(e=>{e.forEach(e=>{e.ok&&t.push(e.json())})},e=>console.log(e)).then(()=>{Promise.all(t).then(e=>{e.forEach(e=>{const o=document.querySelector(`.file-row[data-name="${e.data.filename}"]`);if(document.querySelectorAll("small.text-danger").forEach(e=>e.remove()),e.errors){if(o){Object.entries(e.errors).forEach(([e,t])=>{const a=o.querySelector(`input[name="${e}"], select[name="${e}"]`);t.forEach(e=>{a.parentElement.innerHTML+=`<small class="text-danger">${e}</small>`})});const a=o.querySelector("span.loader-container"),r=(a.innerHTML="❌",o.querySelector(".card-header p"));r.innerHTML=__("invalidMetadata"),r.classList.add("text-danger"),r.classList.remove("text-success"),$(o).find(".collapse").collapse("show"),s.currentTarget.classList.remove("d-none")}}else{var{msg:e,success:t}=e.data;const n=o.querySelector("span.loader-container");n.classList.value="ml-2",n.innerHTML=t?"✅":"❌";t=t?"success":"danger";const l=o.querySelector(".card-header p");l.textContent=e,l.classList.remove("text-danger"),l.classList.remove("text-success"),l.classList.add("text-"+t)}})})})}),$(".crop-btn").off("click").on("click",e=>{e=e.target.dataset.id;const t=document.querySelector("#imageCropper_"+e);{var a=e;e=document.querySelector(".to_be_crop_"+a);const o=new Cropper(e,{aspectRatio:"1/1"}),r=document.querySelector("#crop_btn_"+a);r.addEventListener("click",()=>{const e=o.getCroppedCanvas();null!==e&&e.toBlob(e=>{e.lastModifiedDate=new Date,e.lastModified=new Date;e=new File([e],c[a].media.name,{type:e.type});c[a].media=e,document.querySelector("#image-preview-"+a).src=URL.createObjectURL(e),$("#crop-btn-"+a).click(),d(__("imageCropped"))})})}Object.values(t.classList).includes("d-none")?t.classList.remove("d-none"):t.classList.add("d-none")})},E=(t="",a=!1)=>{const e=$("#upload-modal");e.on("shown.bs.modal",()=>{M(c,m)}),e.on("hidden.bs.modal",()=>{i=!1,u(t,!0),b(1,"",a,e=>{x(e,t,a)})})},j=e=>{const t=document.querySelector(e+" #upload-field");e=document.querySelector(e+" #upload-button");const a=$("#upload-modal");$(e).off("click"),$(e).on("click",()=>{t.value="",t.click()}),t.addEventListener("change",()=>{c=[],t.files.forEach(e=>{var t=e.name.split(".").pop();c.push({media:e,cropped:null,is3d:["dae","abc","usd","usdc","usda","ply","stl","fbx","glb","gltf","obj","x3d"].includes(t)})}),i||(a.modal("show"),i=!0)})},O=(e,t,a)=>{x(e,t,a),w(t,e.data,a);e=new Event("medias-loaded");document.querySelector(t+" #filemanager-container").dispatchEvent(e),T(t,a),j(t),E(t,a);{e=t;const o=document.querySelector(e+".browse-media-btn-container"),r=o.querySelector(".filemanager-toggle"),n=o.querySelector(".la-spinner");return r.disabled=!1,void n.remove()}},H=e=>{x(e,""),T(),j(""),E()},k=({data:e})=>{var{tags:e,types:t}=e;o=e.data,n=e.last_page,m=t.data},F=e=>{k(e);const t=document.querySelector("template.upload-modal");e=t.content.cloneNode(!0);document.body.appendChild(e);const a=document.querySelectorAll(".filemanager-field.modal-dialog");a.length?a.forEach(e=>{var t=null!==e&&e.getAttribute("name");const a=t?`.filemanager-field[name="${t}"] `:"",o=e.dataset["type"];b(1,"",o,e=>{O(e,a,o)})}):b(1,"",!1,e=>{H(e)})};e.exports={init:()=>{var e;e=F,u("",!0),r("/admin/media/fetch/global-data",e,"POST")}}},693:(e,t,a)=>{const n=a(287)["getPossibleTranslation"];const o=(e,t)=>{return`
-    <label>${e.label}</label>
-    <select
-      ${void 0!==e.id?`id="${e.id}"`:""}
-      name="${e.name}"
-      style="${e.style||"width:100%"}"
-      class="${e.class||"form-control"} ${t}"
-      data-url="${e.url}"
-    >
-    </select>`};e.exports={createGroupedField:e=>{var t=o(e,"select2-grouped");e.container.innerHTML+=t},initGroupedFields:(e=document)=>{e.querySelectorAll(".select2-grouped").forEach(e=>{var t=e.dataset["url"];const r=[];console.log(t),$(e).select2({theme:"bootstrap",multiple:!1,ajax:{url:t,type:"POST",dataType:"json",data:e=>{return{search:e.term,page:e.page||1}},processResults({data:e}){var t=Object.keys(e).length;const a=[];let o;return 1<t?(Object.entries(e).forEach(([t,e])=>{e.current_page===e.last_page&&r.push(t),e.data.length&&a.push({text:t.split("\\").pop(),children:Object.values(e.data).map(e=>({id:e.id,text:n(JSON.stringify(e.name)),namespace:t}))})}),o=r.length<t):Object.entries(e).forEach(([t,e])=>{Object.values(e.data).forEach(e=>{a.push({id:e.id,text:n(JSON.stringify(e.name)),namespace:t})}),o=e.current_page<e.last_page}),console.log({results:a}),{results:a,pagination:{more:o}}}}}).on("select2:select",e=>{var t=e.params["data"];$(e.currentTarget).children()[0].dataset.namespace=t.namespace})})},createAjaxField:e=>{var t=o(e,"select2-ajax");e.container.innerHTML=t},initAjaxField:e=>{var e=document.querySelector("#"+e),t=e.dataset["url"];$(e).select2({theme:"bootstrap",multiple:!1,ajax:{url:t,type:"POST",dataType:"json",data:e=>{return{search:e.term,page:e.page||1}},processResults({data:e,current_page:t,last_page:a}){const o=[];return Object.values(e).forEach(e=>{o.push({id:e.id,text:n(JSON.stringify(e.name))})}),more=t<a,console.log({results:o,pagination:{more:more}}),{results:o,pagination:{more:more}}}}})}}},838:(e,t,a)=>{const c=a(287)["truncate"];const o=e=>e.map(e=>`
-  <option value="${e.id}">
-    ${e.name}
-  </option>
-`);const d=(e,t,{media:a,is3d:o})=>{let{name:r,type:n}=a;o&&(n="model");a=l(t,n);return`
-    <form id="metadata-form-${e}">
-      ${`
-    <div id="select2-container-${e}" class="form-group">
-      
-    </div>
-  `}
-      <div class="form-group">
-        <label>Title</label>
-        <input name="title" type="text" class="form-control" value="${r.split(".").shift()}">
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea name="description" class="form-control"></textarea>
-      </div>
-      ${a}
-    </form>`},l=(e,t)=>{let a="",o;return/^image/.test(t)?[o]=e.filter(e=>"image"===e.key):/^video/.test(t)?[o]=e.filter(e=>"video"===e.key):/^audio/.test(t)?[o]=e.filter(e=>"audio"===e.key):/^model/.test(t)&&([o]=e.filter(e=>"3d_model"===e.key)),e.forEach(e=>{a+=`<option ${o.id===e.id?"selected":""} value="${e.id}">${e.name}</option>`}),`
-  <div class="form-group">
-    <label>Media Type</label>
-    <select name="type" class="form-control">
-      ${a}
-    </select>
-  </div>`},m=(e,t,a)=>{var o=e["type"];let r="";return a?r="3D Model Preview":["video/avi"].includes(o)?r=n(o):/^image/.test(o)?r=s(e,t):/^video/.test(o)?r=i(t):/^audio/.test(o)&&(r=u(t)),r},n=e=>`
-  <small>No preview available for type ${e}</small>
-`,s=(e,t)=>{let a="";return["image/gif"].includes(e.type)||(a=`
-    <button id="crop-btn-${t}" class="form-control btn btn-default btn-sm crop-btn" data-id="${t}">
-      Crop
-    </button>
-    <div class="mt-1" id="crop_image_${t}">
-      ${r(e,t)}
-    </div>
-    `),`
-    <img
-      id="image-preview-${t}" 
-      class="w-100 my-3"
-      src="${URL.createObjectURL(e)}"
-    >
-    ${a}
-  `},r=(e,t)=>{const a=document.createElement("img"),o=(a.classList.add("to_be_crop_"+t),a.style.maxWidth="100%",a.src=URL.createObjectURL(e),document.createElement("button"));return o.textContent="Confirm",o.classList="confirm-crop btn btn-default btn-sm",o.id="crop_btn_"+t,`
-  <div class="d-none" id="imageCropper_${o.dataset.id=t}">
-    ${o.outerHTML}
-    ${a.outerHTML}
-  </div>`},i=e=>`
-<video controls id="video-preview-video-${e}" class="w-100 my-3">
-  <source id="video-preview-source-${e}" src="">
-  Your browser does not support the video tag.
-</video>`,u=e=>`
-<audio class="w-100 my-3" id="audio-preview-audio-${e}" controls>
-  <source src="" id="audio-preview-source-${e}" />
-</audio>`;e.exports={templates:{mediaItem:e=>`
-<div
-  title="${e.media_content.title}" 
-  class="ui-widget-content selectable col-md-2 col-sm-3 m-1" data-file="${e.id}"
->
-  <img src="${e.media_content.preview}">
-</div>
-`,paginationLoader:()=>`
-<div class="pagination-loader col-sm-12 d-flex justify-content-center m-0">
-  <h4><span class="la la-spinner la-spin mt-3"></span></h4>
-</div>`,noMediasFound:()=>"<p>No Medias Found<p>",tagItem:e=>`
-<li class="list-group-item">
-  <a href="#" title="${e.name}" class="select-tag" data-tag="${e.id}">
-    ${c(e.name,10)}
-  </a>
-</li>
-`,noTagsFound:()=>'<li  class="list-group-item">No Tags</li>',tagsSelectOptions:o,tagsSelect:e=>{return`
-  <select name="tags" class="tags-select form-control">
-  ${o(e)}
-  </select>`},tagsLoader:()=>'<span class="w-100 text-center tags-loader la la-spinner la-spin mt-3"></span>',uploadModalTitle:e=>`
-  Uploading <span class="medias-count">${e}</span> medias
-`,mediaPreview:m,noPreview:n,imagePreview:s,videoPreview:i,audioPreview:u,uploadPreview:(e,t,a)=>{const o=e["media"];var e=o.name.split(".").pop(),e=["dae","abc","usd","usdc","usda","ply","stl","fbx","glb","gltf","obj","x3d"].includes(e),r=m(o,t,e),a=d(t,a,{media:o,is3d:e});let n=o.size,l="",s=0;for(var i=["KB","MB","GB"];1024<n&&s<i.length;)n=Math.round(n/1024),l=i[s],s+=1;return`
-    <div class="card file-row" data-name="${o.name}">
-      <div class="card-header" id="heading_${t}">
-        <h5 class="mb-0" style="text-align:center">
-          <button
-            class="btn btn-link"
-            data-toggle="collapse"
-            data-target="#collapse_${t}"
-            aria-expanded="true"
-            aria-controls="collapse_${t}"
-            title="${o.name}"
-          >
-          <b>${c(o.name,25)}</b> ${n} ${l}
-          <span class="loader-container"></span>
-          <p class="mt-2 mb-0 text-center"></p>
-          </button>
-          <a href="#" style="float:right" class="text-danger">
-            <i
-              style="vertical-align:middle"
-              data-name="${o.name}"
-              class="remove-media-btn las la-trash-alt">
-            </i>
-          </a>
-        </h5>
-      </div>
-      <div
-        id="collapse_${t}" 
-        class="collapse ${0===t?"show":""}"
-        aria-labelledby="heading_${t}"
-        data-parent="#accordion">   
-        <div class="card-body">
-          ${r}
-          ${a}
-        </div>
-      </div>
-    </div>
-  `},uploadFeedback:(e,t)=>`
-<p
-  class="mt-2 mb-0 text-${t} text-center">
-  ${e}
-</p>`,metadataForm:d,selectedMedia:({media_content:e,name:t,id:a})=>{var o=e?e.description:__("noDescription");return`
-  <a
-    href="#"
-    data-media="${a}"
-    class="selected-media list-group-item list-group-item-action flex-column align-items-start">
-    <div class="d-flex w-100 justify-content-between">
-      <div>
-        <b class="mb-1 m-0">
-          ${e?e.title:t}
-        </b>
-        </br>
-        <small class="mb-1">${o}</small>
-      </div>
-      <div class="selected-media-preview">
-        <img src="${e.preview}">
-      </div>
-    </div>
-  </a>
-`}}}},287:e=>{e.exports={request:(e,t,a="GET",o=!1,r=!1,n=!1)=>{const l=new Headers;r?Object.entries(r).forEach(([e,t])=>l.append(e,t)):l.append("Accept","application/json");let s=null;if(o){s=new FormData;for(var[i,c]of Object.entries(o))if(i&&c)if("object"==typeof c)if(Array.isArray(c))for(var[,d]of Object.entries(c))s.append(i+"[]",d);else c instanceof File?s.append(i,c):s.append(i,JSON.stringify(c));else s.append(i,c)}if("post"===a.toLowerCase()){let e=!1;r=document.querySelector("meta[name=csrf-token]");(e=void 0!==r?r.content:e)&&(s=null===s?new FormData:s).append("_token",e)}fetch(document.location.origin+e,{method:a,headers:l,body:s}).then(e=>e.json()).then(e=>t(e)).catch(e=>n?n(e):console.error(e))},truncate:(e,t,a="...")=>e.length>t?e.substring(0,t-a.length)+a:e,toast:(e,t="success")=>{new Noty({type:t,text:e}).show()},customEvent:(e,t={},a=window)=>{e=new CustomEvent(e,{detail:t});a.dispatchEvent(e)},arrayUniqueByKey:(e,t)=>[...new Map(e.map(e=>[e[t],e])).values()],getPossibleTranslation:e=>{var t=(e=>{try{return JSON.parse(e)}catch(e){return!1}})(e);return"string"==typeof t?t:t?void 0!==t.en?t.en:t[Object.keys(t).shift()]:e}}}},o={};function r(e){var t=o[e];if(void 0!==t)return t.exports;t=o[e]={exports:{}};return a[e](t,t.exports,r),t.exports}(()=>{"use strict";var e=r(479)["init"];window.onload=e})()})();
+/*
+ * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/resources/js/app.js":
+/*!*********************************!*\
+  !*** ./src/resources/js/app.js ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _sass_style_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../sass/style.scss */ \"./src/resources/sass/style.scss\");\n\n\nconst {\n  init\n} = __webpack_require__(/*! ./file-manager */ \"./src/resources/js/file-manager.js\");\n\nconst {\n  templates\n} = __webpack_require__(/*! ./templates */ \"./src/resources/js/templates.js\");\n\nwindow.onload = init;\nwindow.FileManagerAPI = {\n  renderSelectedMedias: (fieldName, selectedMedias) => {\n    const baseField = document.querySelector(`.filemanager-field[name=\"${fieldName}\"]`);\n    const container = baseField.querySelector('.selected-medias-list');\n    const totalMediasSelectedField = baseField.querySelector('.selected-medias-number');\n    totalMediasSelectedField.textContent = selectedMedias.length;\n    container.innerHTML = '';\n    selectedMedias.forEach(media => {\n      container.innerHTML += templates.selectedMedia(media);\n    });\n    const input = baseField.querySelector('.selected-medias-input');\n    input.value = JSON.stringify({\n      medias: selectedMedias.map(m => m.id)\n    });\n  },\n  oi: 'oi'\n};\n\n//# sourceURL=webpack://file-manager/./src/resources/js/app.js?");
+
+/***/ }),
+
+/***/ "./src/resources/js/file-manager.js":
+/*!******************************************!*\
+  !*** ./src/resources/js/file-manager.js ***!
+  \******************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("/* eslint-disable no-use-before-define */\n\n/* eslint-disable operator-linebreak */\n\n/* eslint-disable no-restricted-syntax */\n\n/* eslint-disable no-console */\nconst Select2 = __webpack_require__(/*! ./select2 */ \"./src/resources/js/select2.js\");\n\nconst {\n  request,\n  truncate,\n  toast,\n  arrayUniqueByKey\n} = __webpack_require__(/*! ./utils */ \"./src/resources/js/utils.js\");\n\nconst {\n  templates\n} = __webpack_require__(/*! ./templates */ \"./src/resources/js/templates.js\");\n\nlet globalMedias = [];\nlet globalTags = [];\nlet globalTagsLastPage = 1;\nlet globalMediaTypes = [];\nlet modalShown = false;\nlet mediaList = [];\n\nconst toggleLoader = (prefix, show = true) => {\n  const container = document.querySelector(`${prefix}.selection-area`);\n\n  if (container) {\n    container.innerHTML = '';\n    const loader = document.querySelector(`${prefix}.media-loader`);\n    loader.classList.toggle('d-none', !show);\n  }\n};\n\nconst getSelectedTags = prefix => {\n  const tagsIds = [];\n  document.querySelectorAll(`${prefix} .selected .select-tag`).forEach(tagBtn => tagsIds.push(parseInt(tagBtn.dataset.tag, 10)));\n  return tagsIds;\n};\n\nconst toggleTagBtn = parent => {\n  const isSelected = Object.values(parent.classList).includes('selected');\n  parent.classList.toggle('selected', !isSelected);\n};\n\nconst getSelectedMedias = prefix => {\n  selectedMedias = [];\n  document.querySelectorAll(`${prefix}.selectable.ui-selected`).forEach(selectable => {\n    selectedMedias.push(selectable.dataset.file);\n  });\n  return selectedMedias;\n};\n\nconst initTagsModal = (prefix, title) => {\n  const modal = document.querySelector('#asign-tag-modal');\n  const selectedMedias = getSelectedMedias(prefix);\n\n  if (selectedMedias.length) {\n    modal.querySelector('.modal-title').textContent = title; // modal.querySelector('.modal-body').innerHTML = templates.tagsSelect(globalTags);\n\n    Select2.createAjaxField({\n      container: modal.querySelector('.modal-body'),\n      id: 'tags-modal-select',\n      name: 'tags',\n      label: 'tags',\n      url: '/admin/media/fetch/tags',\n      class: 'form-control tags-select'\n    });\n    Select2.initAjaxField('tags-modal-select');\n    $(modal).modal('show');\n    return modal;\n  }\n\n  toast(__('selectMediasFirst'), 'danger');\n  return modal;\n};\n\nconst initUnsignTag = prefix => {\n  $(`${prefix}#unsign-tag-button`).off('click').on('click', () => {\n    const modal = initTagsModal(prefix, __('removeTag'));\n    const saveBtn = $('#asign-tag-modal .modal-save');\n    saveBtn.off('click');\n    saveBtn.on('click', () => {\n      const tags = [modal.querySelector('.tags-select').value];\n      const unsignData = {\n        tags,\n        medias: selectedMedias\n      };\n      const formData = new FormData();\n      Object.entries(unsignData).forEach(([key, value]) => {\n        formData.append(key, value);\n      });\n      fetch('/api/media/tag/unsign', {\n        method: 'POST',\n        body: formData\n      }).then(r => r.json()).then(response => {\n        if (response.data > 0) {\n          toast(__('tagsUnsigned'));\n          $(modal).modal('hide');\n        } else toast(__('tagsUnsignedError'), 'danger');\n      }).catch(e => console.log(e));\n    });\n  });\n};\n\nconst initAsignTag = prefix => {\n  $(`${prefix}#asign-tag-button`).off('click').on('click', () => {\n    const modal = initTagsModal(prefix, __('asignTag'));\n    const saveBtn = $('#asign-tag-modal .modal-save');\n    saveBtn.off('click');\n    saveBtn.on('click', () => {\n      const tags = [modal.querySelector('.tags-select').value];\n      const asignData = {\n        tags,\n        medias: selectedMedias\n      };\n      const formData = new FormData();\n      Object.entries(asignData).forEach(([key, value]) => {\n        formData.append(key, value);\n      });\n      fetch('/api/media/tag', {\n        method: 'POST',\n        body: formData\n      }).then(r => r.json()).then(response => {\n        if (response.data) {\n          toast(__('tagsAsigned'));\n          $(modal).modal('hide');\n        } else toast(__('tagsAsignedError'), 'danger');\n      }).catch(e => console.log(e));\n    });\n  });\n};\n\nconst getMedias = (page = 1, tags = null, type = false, callback = false) => {\n  request(`/admin/media/fetch/media?page=${page}`, callback, 'POST', {\n    _token: document.querySelector('meta[name=csrf-token]').content,\n    tags,\n    type\n  });\n};\n\nconst mediaItemTemplate = media => `\n  <div\n    title=\"${media.media_content.title}\" \n    class=\"selectable col-md-2 col-sm-3 m-1\" data-file=\"${media.id}\">\n    <img src=\"${media.media_content.preview}\">\n  </div>\n`;\n\nconst mediaUploadPromise = (media, metadata) => {\n  const formData = new FormData();\n  formData.append('media', media.media);\n  formData.append('cropped', media.cropped ? media.cropped : null);\n  formData.append('name', media.media.name);\n  Object.entries(metadata).forEach(([key, value]) => {\n    formData.append(key, value);\n  });\n  return fetch('/api/media/upload', {\n    method: 'POST',\n    body: formData\n  });\n};\n\nconst typesListTemplate = types => {\n  let typesList = '';\n  types.forEach(type => {\n    typesList += `<option value=\"${type.id}\">${type.name}</option>`;\n  });\n  return `\n  <div class=\"form-group\">\n    <label>${__('mediaType')}</label>\n    <select name=\"type\" class=\"form-control\">\n      ${typesList}\n    </select>\n  </div>`;\n};\n\nconst metadataFormTemplate = (types, i) => {\n  const select = `\n    <div id=\"select2-container-${i}\" class=\"form-group\">\n      \n    </div>\n  `;\n  return `\n  <form id=\"metadata-form-${i}\">\n    ${select}\n    <div class=\"form-group\">\n      <label>${__('title')}</label>\n      <input name=\"title\" type=\"text\" class=\"form-control\">\n    </div>\n    <div class=\"form-group\">\n      <label>${__('description')}</label>\n      <textarea name=\"description\" class=\"form-control\"></textarea>\n    </div>\n    ${typesListTemplate(types)}\n  </form>`;\n};\n\nconst cropImageTemplate = (media, i) => {\n  const tmpImg = document.createElement('img');\n  tmpImg.classList.add(`to_be_crop_${i}`);\n  tmpImg.style.maxWidth = '100%';\n  tmpImg.src = URL.createObjectURL(media);\n  const buttonConfirm = document.createElement('button');\n  buttonConfirm.textContent = 'Confirm';\n  buttonConfirm.classList = 'confirm-crop btn btn-default btn-sm';\n  buttonConfirm.id = `crop_btn_${i}`;\n  buttonConfirm.dataset.id = i;\n  return `\n  <div class=\"d-none\" id=\"imageCropper_${i}\">\n    ${buttonConfirm.outerHTML}\n    ${tmpImg.outerHTML}\n  </div>`;\n};\n\nconst renderUploadMediaList = (medias, types) => {\n  console.log({\n    medias,\n    types\n  });\n  const mediasList = document.querySelector('#upload-modal .medias-list');\n  mediasList.innerHTML = '';\n  let i = 0;\n  medias.forEach(({\n    media,\n    is3d\n  }) => {\n    // media = media.media;\n    let mediaTemplate = '';\n    let hasVideo = false;\n    let hasAudio = false;\n    const typesWithoutPreview = ['video/avi'];\n\n    if (typesWithoutPreview.includes(media.type)) {\n      mediaTemplate = `<small>${__('noPreview', [media.type])}</small>`;\n    } else if (/^image/.test(media.type)) {\n      if (media.type !== 'image/gif') {\n        const cropBtn = `\n          <button id=\"crop-btn-${i}\" class=\"form-control btn btn-default btn-sm crop-btn\" data-id=\"${i}\">\n            ${__('crop')}\n          </button>`;\n        mediaTemplate = `\n          <img\n            id=\"image-preview-${i}\" \n            class=\"w-100 my-3\"\n            src=\"${URL.createObjectURL(media)}\">\n          ${cropBtn}\n          <div class=\"mt-1\" id=\"crop_image_${i}\">\n            ${cropImageTemplate(media, i)}\n          </div>\n        `;\n      } else {\n        mediaTemplate = `\n          <img\n            id=\"image-preview-${i}\" \n            class=\"w-100 my-3\"\n            src=\"${URL.createObjectURL(media)}\">\n        `;\n      }\n    } else if (/^video/.test(media.type)) {\n      hasVideo = true;\n      mediaTemplate = `\n        <video controls id=\"video-preview-video-${i}\" class=\"w-100 my-3\">\n          <source id=\"video-preview-source-${i}\" src=\"\">\n          Your browser does not support the video tag.\n        </video>`;\n    } else if (/^audio/.test(media.type)) {\n      hasAudio = true;\n      mediaTemplate = `\n      <audio class=\"w-100 my-3\" id=\"audio-preview-audio-${i}\" controls>\n        <source src=\"\" id=\"audio-preview-source-${i}\" />\n      </audio>`;\n    } else if (is3d) {\n      '<p>3d model</p>';\n    }\n\n    let mediaSize = media.size;\n    let unit = '';\n    let j = 0;\n    const units = ['KB', 'MB', 'GB'];\n\n    while (mediaSize > 1024 && j < units.length) {\n      mediaSize = Math.round(mediaSize / 1024);\n      unit = units[j];\n      j += 1;\n    }\n\n    const metadataForm = templates.metadataForm(i, types, {\n      media,\n      is3d\n    });\n    mediasList.innerHTML += `\n      <div class=\"card file-row\" data-name=\"${media.name}\">\n        <div class=\"card-header\" id=\"heading_${i}\">\n          <h5 class=\"mb-0\" style=\"text-align:center\">\n            <button\n              class=\"btn btn-link\"\n              data-toggle=\"collapse\"\n              data-target=\"#collapse_${i}\"\n              aria-expanded=\"true\"\n              aria-controls=\"collapse_${i}\"\n              title=\"${media.name}\"\n            >\n            <b>${truncate(media.name, 25)}</b> ${mediaSize} ${unit}\n            <span class=\"loader-container\"></span>\n            <p class=\"mt-2 mb-0 text-center\"></p>\n            </button>\n            <a href=\"#\" style=\"float:right\" class=\"text-danger\">\n              <i\n                style=\"vertical-align:middle\"\n                data-name=\"${media.name}\"\n                class=\"remove-media-btn las la-trash-alt\">\n              </i>\n            </a>\n          </h5>\n        </div>\n        <div\n          id=\"collapse_${i}\" \n          class=\"collapse ${i === 0 ? 'show' : ''}\"\n          aria-labelledby=\"heading_${i}\"\n          data-parent=\"#accordion\">   \n          <div class=\"card-body\">\n            ${mediaTemplate}\n            ${metadataForm}\n          </div>\n        </div>\n      </div>`;\n\n    if (hasVideo) {\n      const reader = new FileReader();\n      const x = i;\n\n      reader.onloadend = () => {\n        const video = document.querySelector(`#video-preview-video-${x}`);\n        video.src = reader.result;\n      };\n\n      reader.readAsDataURL(media);\n    }\n\n    if (hasAudio) {\n      document.querySelector(`#audio-preview-source-${i}`).src = URL.createObjectURL(media);\n      document.querySelector(`#audio-preview-audio-${i}`).load();\n    }\n\n    Select2.createGroupedField({\n      container: document.querySelector(`#select2-container-${i}`),\n      name: 'parentId',\n      label: 'Parent',\n      url: '/admin/media/fetch/parents',\n      class: 'form-control'\n    });\n    i += 1;\n  });\n  Select2.initGroupedFields();\n};\n\nconst initSelectedMediasEdition = (prefix, medias, type) => {\n  document.querySelectorAll(`${prefix}.selected-media`).forEach(element => {\n    element.addEventListener('click', e => {\n      const mediaId = e.currentTarget.dataset.media;\n      const [media] = medias.filter(m => String(m.id) === mediaId);\n      const modal = document.querySelector('#edit-media-modal');\n      modal.querySelector('.modal-body').innerHTML = metadataFormTemplate(globalMediaTypes, media.id);\n      modal.querySelector('.modal-save').innerHTML = 'Save';\n      const parentField = modal.querySelector('select[name=\"parentId\"]');\n\n      if (parentField !== null) {\n        parentField.value = media ? media.parent_id : '';\n      }\n\n      const titleField = modal.querySelector('input[name=\"title\"]');\n      titleField.value = media.media_content ? media.media_content.title : '';\n      const descriptionField = modal.querySelector('textarea[name=\"description\"]');\n      descriptionField.value = media.media_content ? media.media_content.description : '';\n      modal.querySelector('.modal-save').addEventListener('click', () => {\n        const mediaData = {\n          title: modal.querySelector('input[name=\"title\"]').value,\n          description: modal.querySelector('textarea[name=\"description\"]').value\n        };\n\n        if (parentField !== null) {\n          mediaData.parent = modal.querySelector('select[name=\"parentId\"]').value;\n        }\n\n        const formData = new FormData();\n        Object.entries(mediaData).forEach(([key, value]) => {\n          formData.append(key, value);\n        });\n        fetch(`/api/media/${media.media_content.id}/edit`, {\n          method: 'POST',\n          body: formData\n        }).then(r => r.json()).then(data => {\n          modal.querySelectorAll('small.text-danger').forEach(err => err.remove());\n\n          if (!data.errors && data.data.updated) {\n            document.querySelector(`${prefix}.selected-media[data-media=\"${media.id}\"]`).outerHTML = templates.selectedMedia(data.data.media);\n            modal.querySelector('.modal-save').innerHTML = '<span class=\"modal-loader la la-spinner la-spin\"></span>';\n            toggleLoader(prefix, true);\n            getMedias(1, '', type, medias1 => {\n              initSelectedMediasEdition(prefix, medias1.data, type); // eslint-disable-next-line no-use-before-define\n\n              renderMediasTable(medias1, prefix, type);\n              $(modal).modal('hide');\n              toast(__('mediaUpdated'));\n            });\n          } else {\n            Object.entries(data.errors).forEach(([name, errors]) => {\n              const field = modal.querySelector(`input[name=\"${name}\"], textarea[name=\"${name}\"], select[name=\"${name}\"]`);\n              errors.forEach(error => {\n                field.parentElement.innerHTML += `<small class=\"text-danger\">${error}</small>`;\n              });\n            });\n          }\n        });\n      });\n      $(modal).modal('show');\n    });\n  });\n};\n\nconst initSelection = (medias, prefix, type) => {\n  $('.selection-area').selectable();\n\n  if (prefix !== '') {\n    document.querySelector(`${prefix}#selectFilesBtn`).addEventListener('click', () => {\n      const selectedMedias = getSelectedMedias(prefix);\n      let value;\n\n      if (selectedMedias.length) {\n        value = JSON.stringify({\n          medias: selectedMedias\n        });\n      } else {\n        value = null;\n      }\n\n      document.querySelector(`${prefix} .selected-medias-input`).value = value;\n      const selectedMediasContainer = document.querySelector(`${prefix}.selected-medias-list`);\n      selectedMediasContainer.innerHTML = '';\n      document.querySelector(`${prefix}.selected-medias-number`).innerHTML = `${selectedMedias.length}`;\n\n      if (selectedMedias.length > 0) {\n        medias.forEach(media => {\n          if (selectedMedias.includes(String(media.id))) {\n            selectedMediasContainer.innerHTML += templates.selectedMedia(media);\n          }\n        });\n        initSelectedMediasEdition(prefix, medias, type);\n      } else {\n        selectedMediasContainer.innerHTML = `\n            <li class=\"list-group-item\">\n              <small>${__('noMediasSelected')}</small>\n            </li>\n          `;\n      }\n    });\n  }\n};\n\nconst initScroll = (container, lastPage, prefix = '', type) => {\n  let page = 1;\n  let isLoading = false;\n  $(container).off('scroll');\n  $(container).on('scroll', () => {\n    if (container.offsetHeight + container.scrollTop >= container.scrollHeight - 1) {\n      if (!isLoading && page + 1 <= lastPage) {\n        page += 1;\n        isLoading = true;\n        container.innerHTML += `\n        <div class=\"pagination-loader col-sm-12 d-flex justify-content-center m-0\">\n          <h4><span class=\"la la-spinner la-spin mt-3\"></span></h4>\n        </div>`;\n        getMedias(page, getSelectedTags(prefix), type, mediasResponse => {\n          container.querySelector('.pagination-loader').remove();\n          const medias = mediasResponse.data;\n          medias.forEach(media => {\n            container.innerHTML += mediaItemTemplate(media);\n          });\n          globalMedias = arrayUniqueByKey(globalMedias.concat(medias), 'id');\n          isLoading = false;\n          if (prefix !== '') initSelection(globalMedias, prefix, type);\n        });\n      }\n    }\n  });\n};\n\nconst renderMediasTable = (medias, prefix, type = false) => {\n  globalMedias = arrayUniqueByKey(globalMedias.concat(medias.data), 'id');\n  toggleLoader(prefix, false);\n  const container = document.querySelector(`${prefix} .custom-file-manager .list`);\n  container.innerHTML = '';\n\n  if (medias.data.length) {\n    medias.data.forEach(media => {\n      // const tags = globalTags.filter(tag => media.tags.includes(tag.id));\n      container.innerHTML += mediaItemTemplate(media);\n      initScroll(container, medias.last_page, prefix, type);\n      initSelection(globalMedias, prefix, type);\n    });\n  } else {\n    container.innerHTML = `\n    <tr>\n      <td class=\"empty\" colspan=\"6\">${__('noMediasFound')}</td>\n    </tr>`;\n  }\n};\n\nconst initRefresh = (prefix = '', type = false) => {\n  document.querySelector(`${prefix}#refreshBtn`).addEventListener('click', () => {\n    toggleLoader(prefix, true);\n    getMedias(1, '', type, medias => {\n      renderMediasTable(medias, prefix, type);\n    });\n  });\n};\n\nconst initTags = (prefix = '', type = false) => {\n  const tagsContainer = document.querySelector(`${prefix}.tags-container ul`);\n  tagsContainer.innerHTML = '';\n  globalTags.forEach(tag => {\n    tagsContainer.innerHTML += `\n      <li class=\"list-group-item\">\n        <a href=\"#\" title=\"${tag.name}\" class=\"select-tag\" data-tag=\"${tag.id}\">\n          ${truncate(tag.name, 10)}\n        </a>\n      </li>\n    `;\n  });\n  initTagsPagination(tagsContainer.parentElement, globalTagsLastPage, prefix, type);\n  initAsignTag(prefix);\n  initUnsignTag(prefix);\n  initTagsFilter(prefix, type);\n};\n\nconst initTagsFilter = (prefix, type) => {\n  document.querySelectorAll(`${prefix}.select-tag`).forEach(tagBtn => {\n    tagBtn.addEventListener('click', e => {\n      toggleTagBtn(e.currentTarget.parentNode);\n      const selectedTags = getSelectedTags(prefix);\n      toggleLoader(prefix, true);\n      getMedias(1, selectedTags, type, medias => {\n        renderMediasTable(medias, prefix);\n      });\n    });\n  });\n};\n\nconst initTagsPagination = (container, lastPage, prefix, type) => {\n  let page = 1;\n  let isLoading = false;\n  $(container).off('scroll');\n  $(container).on('scroll', () => {\n    if (container.offsetHeight + container.scrollTop >= container.scrollHeight - 1) {\n      if (!isLoading && page + 1 <= lastPage) {\n        page += 1;\n        isLoading = true;\n        container.innerHTML += '<span class=\"w-100 text-center tags-loader la la-spinner la-spin mt-3\"></span>';\n        getTags(page, ({\n          data\n        }) => {\n          document.querySelector('.tags-loader').remove();\n          data.forEach(tag => {\n            container.querySelector('ul').innerHTML += `\n              <li class=\"list-group-item\">\n                <a href=\"#\" title=\"${tag.name}\" class=\"select-tag\" data-tag=\"${tag.id}\">\n                  ${truncate(tag.name, 10)}\n                </a>\n              </li>\n            `;\n          });\n          isLoading = false;\n          initTagsFilter(prefix, type);\n        });\n      }\n    }\n  });\n};\n\nconst getTags = (page = 1, callback = false) => {\n  request(`/admin/media/fetch/tags?page=${page}`, callback, 'POST', {\n    _token: document.querySelector('meta[name=csrf-token]').content\n  });\n};\n\nconst initCropper = i => {\n  const imgTobeCrop = document.querySelector(`.to_be_crop_${i}`);\n  const ImgCrop = new Cropper(imgTobeCrop, {\n    aspectRatio: '1/1'\n  });\n  const buttonConfirm = document.querySelector(`#crop_btn_${i}`);\n  buttonConfirm.addEventListener('click', () => {\n    const canvas = ImgCrop.getCroppedCanvas();\n\n    if (canvas !== null) {\n      canvas.toBlob(blob => {\n        blob.lastModifiedDate = new Date();\n        blob.lastModified = new Date();\n        const croppedImage = new File([blob], mediaList[i].media.name, {\n          type: blob.type\n        });\n        mediaList[i].media = croppedImage;\n        document.querySelector(`#image-preview-${i}`).src = URL.createObjectURL(croppedImage);\n        $(`#crop-btn-${i}`).click();\n        toast(__('imageCropped'));\n      });\n    }\n  });\n};\n\nconst initUploadModal = (medias, types) => {\n  const titleSpan = document.querySelector('#upload-modal .modal-title span');\n  const button = document.querySelector('#upload-modal .modal-save');\n  const buttonSpan = button.querySelector('span');\n  const totalMedias = medias.length;\n  renderUploadMediaList(medias, types);\n  button.classList.remove('d-none');\n  titleSpan.innerHTML = totalMedias;\n  buttonSpan.innerHTML = totalMedias;\n  const removeMediaBtns = document.querySelectorAll('.remove-media-btn');\n  removeMediaBtns.forEach(removeBtn => {\n    removeBtn.addEventListener('click', e => {\n      const mediaName = e.target.dataset.name;\n      medias = medias.filter(media => media.media.name !== mediaName);\n      initUploadModal(medias, types);\n    });\n  });\n  $('#upload-modal .modal-save').off('click').on('click', e => {\n    e.currentTarget.classList.add('d-none');\n    const promises = [];\n    const promiseResponses = [];\n    let i = 0;\n    const fileNames = document.querySelectorAll('span.loader-container');\n    fileNames.forEach(fileName => {\n      fileName.innerHTML += '<span class=\"ml-2 la la-spinner la-spin\"></span>';\n    });\n    medias.forEach(media => {\n      const metadataFields = document.querySelectorAll(`#metadata-form-${i} .form-control`);\n      const metadata = {};\n      metadataFields.forEach(field => metadata[field.name] = field.value);\n      const parentSelect = document.querySelector(`#metadata-form-${i} select[name=\"parentId\"]`);\n\n      if (parentSelect !== null) {\n        const dataAttrs = $(parentSelect).find(':selected').data();\n\n        if (dataAttrs !== undefined) {\n          metadata.parent_model = dataAttrs.namespace;\n          metadata.parent_id = parentSelect.value;\n        }\n      }\n\n      promises.push(mediaUploadPromise(media, metadata));\n      i += 1;\n    });\n    Promise.all(promises).then(responses => {\n      responses.forEach(response => {\n        if (response.ok) {\n          promiseResponses.push(response.json());\n        }\n      });\n    }, e1 => console.log(e1)).then(() => {\n      Promise.all(promiseResponses).then(responses => {\n        responses.forEach(response => {\n          const fileRow = document.querySelector(`.file-row[data-name=\"${response.data.filename}\"]`);\n          document.querySelectorAll('small.text-danger').forEach(err => err.remove());\n\n          if (!response.errors) {\n            const {\n              msg,\n              success\n            } = response.data;\n            const fileLoader = fileRow.querySelector('span.loader-container');\n            fileLoader.classList.value = 'ml-2';\n            fileLoader.innerHTML = success ? '✅' : '❌';\n            const textClass = success ? 'success' : 'danger';\n            const feedback = fileRow.querySelector('.card-header p');\n            feedback.textContent = msg;\n            feedback.classList.remove('text-danger');\n            feedback.classList.remove('text-success');\n            feedback.classList.add(`text-${textClass}`);\n          } else if (fileRow) {\n            Object.entries(response.errors).forEach(([name, errors]) => {\n              const field = fileRow.querySelector(`input[name=\"${name}\"], select[name=\"${name}\"]`);\n              errors.forEach(error => {\n                field.parentElement.innerHTML += `<small class=\"text-danger\">${error}</small>`;\n              });\n            });\n            const fileLoader = fileRow.querySelector('span.loader-container');\n            fileLoader.innerHTML = '❌';\n            const feedback = fileRow.querySelector('.card-header p');\n            feedback.innerHTML = __('invalidMetadata');\n            feedback.classList.add('text-danger');\n            feedback.classList.remove('text-success');\n            $(fileRow).find('.collapse').collapse('show');\n            e.currentTarget.classList.remove('d-none');\n          }\n        });\n      });\n    });\n  });\n  $('.crop-btn').off('click').on('click', e1 => {\n    const i1 = e1.target.dataset.id;\n    const imageCropper = document.querySelector(`#imageCropper_${i1}`);\n    initCropper(i1);\n\n    if (Object.values(imageCropper.classList).includes('d-none')) {\n      imageCropper.classList.remove('d-none');\n    } else {\n      imageCropper.classList.add('d-none');\n    }\n  });\n};\n\nconst initUploadModalHandler = (prefix = '', type = false) => {\n  const uploadModal = $('#upload-modal');\n  uploadModal.on('shown.bs.modal', () => {\n    initUploadModal(mediaList, globalMediaTypes);\n  });\n  uploadModal.on('hidden.bs.modal', () => {\n    modalShown = false; // Refresh After Upload\n\n    toggleLoader(prefix, true);\n    getMedias(1, '', type, medias => {\n      renderMediasTable(medias, prefix, type);\n    });\n  });\n};\n\nconst initUpload = prefix => {\n  const hiddenInput = document.querySelector(`${prefix} #upload-field`);\n  const uploadButton = document.querySelector(`${prefix} #upload-button`);\n  const uploadModal = $('#upload-modal');\n\n  const uploadClickListener = () => {\n    hiddenInput.value = '';\n    hiddenInput.click();\n  };\n\n  $(uploadButton).off('click');\n  $(uploadButton).on('click', uploadClickListener);\n  hiddenInput.addEventListener('change', () => {\n    mediaList = [];\n    hiddenInput.files.forEach(media => {\n      const ext = media.name.split('.').pop();\n      const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];\n      mediaList.push({\n        media,\n        cropped: null,\n        is3d: ext3D.includes(ext)\n      });\n    });\n\n    if (!modalShown) {\n      uploadModal.modal('show');\n      modalShown = true;\n    }\n  });\n};\n\nconst initMediaButton = prefix => {\n  const buttonContainer = document.querySelector(`${prefix}.browse-media-btn-container`);\n  const button = buttonContainer.querySelector('.filemanager-toggle');\n  const loader = buttonContainer.querySelector('.la-spinner');\n  button.disabled = false;\n  loader.remove();\n};\n\nconst initMediaField = (medias, prefix, type) => {\n  renderMediasTable(medias, prefix, type);\n  initSelectedMediasEdition(prefix, medias.data, type);\n  const loadedEvent = new Event('medias-loaded');\n  document.querySelector(`${prefix} #filemanager-container`).dispatchEvent(loadedEvent); // initTags(prefix, type);\n\n  initRefresh(prefix, type);\n  initUpload(prefix);\n  initUploadModalHandler(prefix, type);\n  initMediaButton(prefix);\n};\n\nconst onMediaLoadedSingle = medias => {\n  renderMediasTable(medias, ''); // initTags();\n\n  initRefresh();\n  initUpload('');\n  initUploadModalHandler();\n};\n\nconst setGlobals = ({\n  data\n}) => {\n  const {\n    tags,\n    types\n  } = data;\n  globalTags = tags.data;\n  globalTagsLastPage = tags.last_page;\n  globalMediaTypes = types.data;\n};\n\nconst onGlobalsLoaded = response => {\n  setGlobals(response); // Render upload modal\n\n  const modalTemplate = document.querySelector('template.upload-modal');\n  const node = modalTemplate.content.cloneNode(true);\n  document.body.appendChild(node); // Init each field\n\n  const fileManagerFields = document.querySelectorAll('.filemanager-field.modal-dialog');\n\n  if (fileManagerFields.length) {\n    fileManagerFields.forEach(fileManagerField => {\n      const name = fileManagerField !== null ? fileManagerField.getAttribute('name') : false;\n      const prefix = name ? `.filemanager-field[name=\"${name}\"] ` : '';\n      const {\n        type\n      } = fileManagerField.dataset;\n      getMedias(1, '', type, medias => {\n        initMediaField(medias, prefix, type);\n      });\n    });\n  } else {\n    getMedias(1, '', false, medias => {\n      onMediaLoadedSingle(medias);\n    });\n  }\n};\n\nconst init = () => {\n  loadGlobals(onGlobalsLoaded);\n};\n\nconst loadGlobals = (callback = false) => {\n  toggleLoader('', true);\n  request('/admin/media/fetch/global-data', callback, 'POST');\n};\n\nmodule.exports = {\n  init\n};\n\n//# sourceURL=webpack://file-manager/./src/resources/js/file-manager.js?");
+
+/***/ }),
+
+/***/ "./src/resources/js/select2.js":
+/*!*************************************!*\
+  !*** ./src/resources/js/select2.js ***!
+  \*************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("/* eslint-disable no-use-before-define */\nconst {\n  getPossibleTranslation\n} = __webpack_require__(/*! ./utils */ \"./src/resources/js/utils.js\");\n\nconst createGroupedField = options => {\n  const fieldHtml = generateFieldHtml(options, 'select2-grouped');\n  options.container.innerHTML += fieldHtml;\n};\n\nconst createAjaxField = options => {\n  const fieldHtml = generateFieldHtml(options, 'select2-ajax');\n  options.container.innerHTML = fieldHtml;\n};\n\nconst generateFieldHtml = (options, fieldType) => {\n  const html = `\n    <label>${options.label}</label>\n    <select\n      ${options.id !== undefined ? `id=\"${options.id}\"` : ''}\n      name=\"${options.name}\"\n      style=\"${options.style || 'width:100%'}\"\n      class=\"${options.class || 'form-control'} ${fieldType}\"\n      data-url=\"${options.url}\"\n    >\n    </select>`;\n  return html;\n};\n\nconst initAjaxField = id => {\n  const field = document.querySelector(`#${id}`);\n  const {\n    url\n  } = field.dataset;\n  $(field).select2({\n    theme: 'bootstrap',\n    multiple: false,\n    ajax: {\n      url,\n      type: 'POST',\n      dataType: 'json',\n      data: params => {\n        const query = {\n          search: params.term,\n          page: params.page || 1\n        };\n        return query;\n      },\n\n      processResults({\n        data,\n        current_page,\n        last_page\n      }) {\n        const results = [];\n        Object.values(data).forEach(tag => {\n          // console.log(tag)\n          results.push({\n            id: tag.id,\n            text: getPossibleTranslation(JSON.stringify(tag.name))\n          });\n        });\n        more = current_page < last_page;\n        console.log({\n          results,\n          pagination: {\n            more\n          }\n        });\n        return {\n          results,\n          pagination: {\n            more\n          }\n        };\n      }\n\n    }\n  });\n};\n\nconst initGroupedFields = (container = document) => {\n  container.querySelectorAll('.select2-grouped').forEach(selectElement => {\n    const {\n      url\n    } = selectElement.dataset;\n    const finished = [];\n    console.log(url);\n    $(selectElement).select2({\n      theme: 'bootstrap',\n      multiple: false,\n      ajax: {\n        url,\n        type: 'POST',\n        dataType: 'json',\n        data: params => {\n          const query = {\n            search: params.term,\n            page: params.page || 1\n          };\n          return query;\n        },\n\n        processResults({\n          data\n        }) {\n          const parentsNumber = Object.keys(data).length;\n          const results = [];\n          let more;\n\n          if (parentsNumber > 1) {\n            Object.entries(data).forEach(([namespace, response]) => {\n              if (response.current_page === response.last_page) {\n                finished.push(namespace);\n              }\n\n              if (response.data.length) {\n                results.push({\n                  text: namespace.split('\\\\').pop(),\n                  children: Object.values(response.data).map(entry => ({\n                    id: entry.id,\n                    text: getPossibleTranslation(JSON.stringify(entry.name)),\n                    namespace\n                  }))\n                });\n              }\n            });\n            more = finished.length < parentsNumber;\n          } else {\n            Object.entries(data).forEach(([namespace, response]) => {\n              Object.values(response.data).forEach(entry => {\n                results.push({\n                  id: entry.id,\n                  text: getPossibleTranslation(JSON.stringify(entry.name)),\n                  namespace\n                });\n              });\n              more = response.current_page < response.last_page;\n            });\n          }\n\n          console.log({\n            results\n          });\n          return {\n            results,\n            pagination: {\n              more\n            }\n          };\n        }\n\n      }\n    }).on('select2:select', e => {\n      const {\n        data\n      } = e.params;\n      $(e.currentTarget).children()[0].dataset.namespace = data.namespace;\n    });\n  });\n};\n\nmodule.exports = {\n  createGroupedField,\n  initGroupedFields,\n  createAjaxField,\n  initAjaxField\n};\n\n//# sourceURL=webpack://file-manager/./src/resources/js/select2.js?");
+
+/***/ }),
+
+/***/ "./src/resources/js/templates.js":
+/*!***************************************!*\
+  !*** ./src/resources/js/templates.js ***!
+  \***************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("/* eslint-disable no-use-before-define */\nconst {\n  truncate\n} = __webpack_require__(/*! ./utils */ \"./src/resources/js/utils.js\");\n\nconst mediaItem = media => `\n<div\n  title=\"${media.media_content.title}\" \n  class=\"ui-widget-content selectable col-md-2 col-sm-3 m-1\" data-file=\"${media.id}\"\n>\n  <img src=\"${media.media_content.preview}\">\n</div>\n`;\n\nconst paginationLoader = () => `\n<div class=\"pagination-loader col-sm-12 d-flex justify-content-center m-0\">\n  <h4><span class=\"la la-spinner la-spin mt-3\"></span></h4>\n</div>`;\n\nconst noMediasFound = () => '<p>No Medias Found<p>';\n\nconst tagItem = tag => `\n<li class=\"list-group-item\">\n  <a href=\"#\" title=\"${tag.name}\" class=\"select-tag\" data-tag=\"${tag.id}\">\n    ${truncate(tag.name, 10)}\n  </a>\n</li>\n`;\n\nconst noTagsFound = () => '<li  class=\"list-group-item\">No Tags</li>';\n\nconst tagsSelectOptions = tags => tags.map(tag => `\n  <option value=\"${tag.id}\">\n    ${tag.name}\n  </option>\n`);\n\nconst tagsSelect = tags => {\n  const options = tagsSelectOptions(tags);\n  return `\n  <select name=\"tags\" class=\"tags-select form-control\">\n  ${options}\n  </select>`;\n};\n\nconst tagsLoader = () => '<span class=\"w-100 text-center tags-loader la la-spinner la-spin mt-3\"></span>';\n\nconst uploadModalTitle = length => `\n  Uploading <span class=\"medias-count\">${length}</span> medias\n`;\n\nconst uploadPreview = (file, i, types) => {\n  const {\n    media\n  } = file;\n  const ext = media.name.split('.').pop();\n  const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];\n  const is3d = ext3D.includes(ext);\n  const mediaPreviewTemplate = mediaPreview(media, i, is3d);\n  const metadataFormTemplate = metadataForm(i, types, {\n    media,\n    is3d\n  });\n  let mediaSize = media.size;\n  let unit = '';\n  let j = 0;\n  const units = ['KB', 'MB', 'GB'];\n\n  while (mediaSize > 1024 && j < units.length) {\n    mediaSize = Math.round(mediaSize / 1024);\n    unit = units[j];\n    j += 1;\n  }\n\n  return `\n    <div class=\"card file-row\" data-name=\"${media.name}\">\n      <div class=\"card-header\" id=\"heading_${i}\">\n        <h5 class=\"mb-0\" style=\"text-align:center\">\n          <button\n            class=\"btn btn-link\"\n            data-toggle=\"collapse\"\n            data-target=\"#collapse_${i}\"\n            aria-expanded=\"true\"\n            aria-controls=\"collapse_${i}\"\n            title=\"${media.name}\"\n          >\n          <b>${truncate(media.name, 25)}</b> ${mediaSize} ${unit}\n          <span class=\"loader-container\"></span>\n          <p class=\"mt-2 mb-0 text-center\"></p>\n          </button>\n          <a href=\"#\" style=\"float:right\" class=\"text-danger\">\n            <i\n              style=\"vertical-align:middle\"\n              data-name=\"${media.name}\"\n              class=\"remove-media-btn las la-trash-alt\">\n            </i>\n          </a>\n        </h5>\n      </div>\n      <div\n        id=\"collapse_${i}\" \n        class=\"collapse ${i === 0 ? 'show' : ''}\"\n        aria-labelledby=\"heading_${i}\"\n        data-parent=\"#accordion\">   \n        <div class=\"card-body\">\n          ${mediaPreviewTemplate}\n          ${metadataFormTemplate}\n        </div>\n      </div>\n    </div>\n  `;\n};\n\nconst metadataForm = (i, types, {\n  media,\n  is3d\n}) => {\n  let {\n    name,\n    type\n  } = media;\n  if (is3d) type = 'model';\n  const typesListTemplate = typesList(types, type);\n  const select = `\n    <div id=\"select2-container-${i}\" class=\"form-group\">\n      \n    </div>\n  `;\n  return `\n    <form id=\"metadata-form-${i}\">\n      ${select}\n      <div class=\"form-group\">\n        <label>Title</label>\n        <input name=\"title\" type=\"text\" class=\"form-control\" value=\"${name.split('.').shift()}\">\n      </div>\n      <div class=\"form-group\">\n        <label>Description</label>\n        <textarea name=\"description\" class=\"form-control\"></textarea>\n      </div>\n      ${typesListTemplate}\n    </form>`;\n};\n\nconst typesList = (types, type) => {\n  let list = '';\n  let selectedType;\n\n  if (/^image/.test(type)) {\n    [selectedType] = types.filter(type => type.key === 'image');\n  } else if (/^video/.test(type)) {\n    [selectedType] = types.filter(type => type.key === 'video');\n  } else if (/^audio/.test(type)) {\n    [selectedType] = types.filter(type => type.key === 'audio');\n  } else if (/^model/.test(type)) {\n    [selectedType] = types.filter(type => type.key === '3d_model');\n  }\n\n  types.forEach(type => {\n    list += `<option ${selectedType.id === type.id ? 'selected' : ''} value=\"${type.id}\">${type.name}</option>`;\n  });\n  return `\n  <div class=\"form-group\">\n    <label>Media Type</label>\n    <select name=\"type\" class=\"form-control\">\n      ${list}\n    </select>\n  </div>`;\n};\n\nconst mediaPreview = (media, i, is3d) => {\n  const {\n    type\n  } = media;\n  const typesWithoutPreview = ['video/avi'];\n  let template = '';\n\n  if (is3d) {\n    template = model3dTemplate();\n  } else if (typesWithoutPreview.includes(type)) {\n    template = noPreview(type);\n  } else if (/^image/.test(type)) {\n    template = imagePreview(media, i);\n  } else if (/^video/.test(type)) {\n    template = videoPreview(i);\n  } else if (/^audio/.test(type)) {\n    template = audioPreview(i);\n  }\n\n  return template;\n};\n\nconst noPreview = type => `\n  <small>No preview available for type ${type}</small>\n`;\n\nconst model3dTemplate = () => '3D Model Preview';\n\nconst imagePreview = (media, i) => {\n  const uncropableTypes = ['image/gif'];\n  let cropTemplate = '';\n\n  if (!uncropableTypes.includes(media.type)) {\n    cropTemplate = `\n    <button id=\"crop-btn-${i}\" class=\"form-control btn btn-default btn-sm crop-btn\" data-id=\"${i}\">\n      Crop\n    </button>\n    <div class=\"mt-1\" id=\"crop_image_${i}\">\n      ${cropImageTemplate(media, i)}\n    </div>\n    `;\n  }\n\n  return `\n    <img\n      id=\"image-preview-${i}\" \n      class=\"w-100 my-3\"\n      src=\"${URL.createObjectURL(media)}\"\n    >\n    ${cropTemplate}\n  `;\n};\n\nconst cropImageTemplate = (media, i) => {\n  const tmpImg = document.createElement('img');\n  tmpImg.classList.add(`to_be_crop_${i}`);\n  tmpImg.style.maxWidth = '100%';\n  tmpImg.src = URL.createObjectURL(media);\n  const buttonConfirm = document.createElement('button');\n  buttonConfirm.textContent = 'Confirm';\n  buttonConfirm.classList = 'confirm-crop btn btn-default btn-sm';\n  buttonConfirm.id = `crop_btn_${i}`;\n  buttonConfirm.dataset.id = i;\n  return `\n  <div class=\"d-none\" id=\"imageCropper_${i}\">\n    ${buttonConfirm.outerHTML}\n    ${tmpImg.outerHTML}\n  </div>`;\n};\n\nconst videoPreview = i => `\n<video controls id=\"video-preview-video-${i}\" class=\"w-100 my-3\">\n  <source id=\"video-preview-source-${i}\" src=\"\">\n  Your browser does not support the video tag.\n</video>`;\n\nconst audioPreview = i => `\n<audio class=\"w-100 my-3\" id=\"audio-preview-audio-${i}\" controls>\n  <source src=\"\" id=\"audio-preview-source-${i}\" />\n</audio>`;\n\nconst uploadFeedback = (msg, textClass) => `\n<p\n  class=\"mt-2 mb-0 text-${textClass} text-center\">\n  ${msg}\n</p>`;\n\nconst selectedMedia = ({\n  media_content,\n  name,\n  id\n}) => {\n  const description = media_content ? media_content.description : __('noDescription');\n  return `\n  <a\n    href=\"#\"\n    data-media=\"${id}\"\n    class=\"selected-media list-group-item list-group-item-action flex-column align-items-start\">\n    <div class=\"d-flex w-100 justify-content-between\">\n      <div>\n        <b class=\"mb-1 m-0\">\n          ${media_content ? media_content.title : name}\n        </b>\n        </br>\n        <small class=\"mb-1\">${description}</small>\n      </div>\n      <div class=\"selected-media-preview\">\n        <img src=\"${media_content.preview}\">\n      </div>\n    </div>\n  </a>\n`;\n};\n\nmodule.exports = {\n  templates: {\n    mediaItem,\n    paginationLoader,\n    noMediasFound,\n    tagItem,\n    noTagsFound,\n    tagsSelectOptions,\n    tagsSelect,\n    tagsLoader,\n    uploadModalTitle,\n    mediaPreview,\n    noPreview,\n    imagePreview,\n    videoPreview,\n    audioPreview,\n    uploadPreview,\n    uploadFeedback,\n    metadataForm,\n    selectedMedia\n  }\n};\n\n//# sourceURL=webpack://file-manager/./src/resources/js/templates.js?");
+
+/***/ }),
+
+/***/ "./src/resources/js/utils.js":
+/*!***********************************!*\
+  !*** ./src/resources/js/utils.js ***!
+  \***********************************/
+/***/ ((module) => {
+
+eval("/* eslint-disable no-restricted-syntax */\n\n/* eslint-disable no-console */\nconst request = (endpoint, callback, method = 'GET', data = false, headers = false, err = false) => {\n  const head = new Headers();\n\n  if (headers) {\n    Object.entries(headers).forEach(([key, val]) => head.append(key, val));\n  } else {\n    head.append('Accept', 'application/json');\n  }\n\n  let formData = null;\n\n  if (data) {\n    formData = new FormData();\n\n    for (const [key, value] of Object.entries(data)) {\n      if (key && value) {\n        if (typeof value === 'object') {\n          // Array\n          if (Array.isArray(value)) {\n            for (const [, subValue] of Object.entries(value)) {\n              formData.append(`${key}[]`, subValue);\n            }\n          } else if (value instanceof File) {\n            // Object\n            formData.append(key, value);\n          } else {\n            formData.append(key, JSON.stringify(value));\n          }\n        } else {\n          // Default\n          formData.append(key, value);\n        }\n      }\n    }\n  }\n\n  if (method.toLowerCase() === 'post') {\n    let csrfToken = false;\n    const csrfTokenElement = document.querySelector('meta[name=csrf-token]');\n\n    if (csrfTokenElement !== undefined) {\n      csrfToken = csrfTokenElement.content;\n    }\n\n    if (csrfToken) {\n      if (formData === null) formData = new FormData();\n      formData.append('_token', csrfToken);\n    }\n  }\n\n  fetch(document.location.origin + endpoint, {\n    method,\n    headers: head,\n    body: formData\n  }).then(response => response.json()).then(result => callback(result)).catch(e => err ? err(e) : console.error(e));\n};\n\nconst truncate = (str, length, ending = '...') => {\n  if (str.length > length) {\n    return str.substring(0, length - ending.length) + ending;\n  }\n\n  return str;\n};\n\nconst toast = (text, type = 'success') => {\n  new Noty({\n    type,\n    text\n  }).show();\n};\n\nconst customEvent = (event, detail = {}, parent = window) => {\n  const e = new CustomEvent(event, {\n    detail\n  });\n  parent.dispatchEvent(e);\n};\n\nconst arrayUniqueByKey = (array, key) => [...new Map(array.map(item => [item[key], item])).values()];\n\nconst isJson = str => {\n  try {\n    return JSON.parse(str);\n  } catch (e) {\n    return false;\n  }\n};\n\nconst getPossibleTranslation = value => {\n  const json = isJson(value);\n  if (typeof json === 'string') return json;\n  if (!json) return value;else {\n    if (json.en !== undefined) return json.en;else {\n      const locale = Object.keys(json).shift();\n      return json[locale];\n    }\n  }\n};\n\nmodule.exports = {\n  request,\n  truncate,\n  toast,\n  customEvent,\n  arrayUniqueByKey,\n  getPossibleTranslation\n};\n\n//# sourceURL=webpack://file-manager/./src/resources/js/utils.js?");
+
+/***/ }),
+
+/***/ "./src/resources/sass/style.scss":
+/*!***************************************!*\
+  !*** ./src/resources/sass/style.scss ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extract-plugin\n\n\n//# sourceURL=webpack://file-manager/./src/resources/sass/style.scss?");
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module can't be inlined because the eval devtool is used.
+/******/ 	var __webpack_exports__ = __webpack_require__("./src/resources/js/app.js");
+/******/ 	
+/******/ })()
+;

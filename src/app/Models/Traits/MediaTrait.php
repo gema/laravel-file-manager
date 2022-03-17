@@ -3,10 +3,24 @@
 namespace GemaDigital\FileManager\app\Models\Traits;
 
 use DB;
+use GemaDigital\FileManager\app\Models\MediaContent;
 use GemaDigital\FileManager\app\Models\MediaField;
 
 trait MediaTrait
 {
+    public function getMedia($column)
+    {
+        $mediaFieldId = $this->attributes[$column];
+        try {
+            $mediaIds = DB::table('media_field_has_media')
+                ->where('media_field_id', $mediaFieldId)->get()->pluck('media_id');
+            $mediaContents = MediaContent::whereIn('media_id', $mediaIds)->get();
+            return $mediaContents;
+        } catch (\Exception $e) {
+            return $mediaFieldId;
+        }
+    }
+
     public static function afterCreate($entry)
     {
         DB::beginTransaction();
