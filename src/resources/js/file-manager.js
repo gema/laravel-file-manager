@@ -10,6 +10,7 @@ let globalMedias = [];
 let globalTags = [];
 let globalTagsLastPage = 1;
 let globalMediaTypes = [];
+let globalParents = [];
 let modalShown = false;
 let mediaList = [];
 
@@ -358,18 +359,27 @@ const renderUploadMediaList = (medias, types) => {
       document.querySelector(`#audio-preview-audio-${i}`).load();
     }
 
-    Select2.createGroupedField({
-      container: document.querySelector(`#select2-container-${i}`),
-      name: 'parentId',
-      label: 'Parent',
-      url: '/admin/media/fetch/parents',
-      class: 'form-control',
-    });
+    const container = document.querySelector(`#select2-container-${i}`);
+    if(globalParents.show){
+      Select2.createGroupedField({
+        container,
+        name: 'parentId',
+        label: globalParents.label,
+        url: '/admin/media/fetch/parents',
+        class: 'form-control',
+      });
+    }else if(globalParents.id){
+      container.innerHTML += `
+        <input type="text" value="${globalParents.id}" name="parentId">
+        <input type="text" value="${globalParents.model}" name="parentModel">
+      `;
+    }
+    
 
     i += 1;
   });
 
-  Select2.initGroupedFields();
+  if(globalParents.show) Select2.initGroupedFields();
 };
 
 const initSelectedMediasEdition = (prefix, medias, type) => {
@@ -740,6 +750,14 @@ const initUploadModal = (medias, types) => {
           }
         }
 
+        const parentIdHidden = document.querySelector(`#metadata-form-${i} input[name="parentId"]`);
+        const parentNamespaceHidden = document.querySelector(`#metadata-form-${i} input[name="parentModel"]`);
+
+        if(parentIdHidden !== null && parentNamespaceHidden !== null){
+          metadata.parent_id = parentIdHidden.value;
+          metadata.parent_model = parentNamespaceHidden.value;
+        }
+
         promises.push(mediaUploadPromise(media, metadata));
         i += 1;
       });
@@ -901,10 +919,11 @@ const onMediaLoadedSingle = medias => {
 };
 
 const setGlobals = ({ data }) => {
-  const { tags, types } = data;
+  const { tags, types, parent } = data;
   globalTags = tags.data;
   globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
+  globalParents = parent
 };
 
 const onGlobalsLoaded = response => {

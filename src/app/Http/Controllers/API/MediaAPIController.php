@@ -219,12 +219,22 @@ class MediaAPIController
             file_get_contents($request->file('media'))
         );
 
+        $path = 'global-storage';
+
+        // Get parent name
+        if(isset($request->parent_model) && isset($request->parent_id)){
+            $parentModel = $request->parent_model;
+            $parentId = $request->parent_id;
+            $model = new $parentModel();
+            $path = $model::find($parentId)->slug;
+        }
+
         // Make request to media cloud
         $file = fopen(Storage::disk(config('file-manager.tmp_disk'))->path('/' . $tmpFilePath), 'r');
         $response = Http::acceptJson()->attach('file', $file, $originalFilename)->post(env('MEDIA_CLOUD_ENDPOINT'), [
             'defaults' => env('MEDIA_CLOUD_DEFAULTS'),
             'apikey' => env('MEDIA_CLOUD_API_KEY'),
-            'path' => 'client',
+            'path' => $path,
         ]);
 
         // Delete tmp file

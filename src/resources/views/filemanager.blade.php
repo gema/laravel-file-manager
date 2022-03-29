@@ -4,9 +4,7 @@
     $publicPath = '/vendor/gemadigital/file-manager/src/resources/bundles';
     $jsBundle = File::get(base_path() . $publicPath . '/js/bundle.js');
     $cssBundle = File::get(base_path() . $publicPath . '/css/bundle.css');
-    $parentsField = call_user_func(config('file-manager.parents_field'));
-    $parentsField = $parentsField ? 1 : 0;
-    @endphp
+@endphp
 
 @if (isset($crud))
     @if ($crud->checkIfFieldIsFirstOfItsType($field, $fields) || isset($field['first']))
@@ -18,7 +16,6 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
             <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
             <script>
-                window.parentsField = '{{$parentsField}}'
                 $(document).on('show.bs.modal', '.modal', function () {
                     var zIndex = 1040 + (10 * $('.modal:visible').length);
                     $(this).css('z-index', zIndex);
@@ -44,7 +41,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
         <script type="text/javascript">{!! $jsBundle !!}</script>
-        <script>window.parentsField = '{{$parentsField}}'</script>
     @endpush
 
     @include('file-manager::filemanager-modals')

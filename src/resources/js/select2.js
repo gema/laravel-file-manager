@@ -28,6 +28,11 @@ const generateFieldHtml = (options, fieldType) => {
 const initAjaxField = id => {
   const field = document.querySelector(`#${id}`);
   const { url } = field.dataset;
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
   $(field).select2({
     theme: 'bootstrap',
     multiple: false,
@@ -45,7 +50,6 @@ const initAjaxField = id => {
       processResults({ data, current_page, last_page }) {
         const results = [];
         Object.values(data).forEach(tag => {
-          // console.log(tag)
           results.push({
             id: tag.id,
             text: getPossibleTranslation(JSON.stringify(tag.name)),
@@ -53,10 +57,6 @@ const initAjaxField = id => {
         })
 
         more = current_page < last_page;
-        console.log({
-          results,
-          pagination: {more},
-        })
         return {
           results,
           pagination: {more},
@@ -70,7 +70,11 @@ const initGroupedFields = (container = document) => {
   container.querySelectorAll('.select2-grouped').forEach(selectElement => {
     const { url } = selectElement.dataset;
     const finished = [];
-    console.log(url);
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
     $(selectElement).select2({
       theme: 'bootstrap',
       multiple: false,
