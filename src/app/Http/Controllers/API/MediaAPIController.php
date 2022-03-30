@@ -109,13 +109,15 @@ class MediaAPIController
             if (!$disk) {
                 $mediaCloudResponse = $this->mediaCloudRequest($request);
                 $preview = $mediaCloudResponse['preview'] !== null ? $mediaCloudResponse['preview'] : '';
+                $original = $mediaCloudResponse['original'] !== null ? $mediaCloudResponse['original'] : '';
+
                 $mediaContent = MediaContent::create([
                     'media_cloud_id' => $mediaCloudResponse['id'],
                     'media_id' => $media->id,
                     'title' => $request->title ? $request->title : '[No title provided]',
                     'description' => $request->description ? $request->description : '[No description provided]',
                     'preview' => $preview,
-                    'content' => isset($mediaCloudResponse['original']) ? ['original' => $mediaCloudResponse['original']] : null,
+                    'content' => ['original' => $original],
                 ]);
             } else {
                 $parentFolder = '';
@@ -155,6 +157,7 @@ class MediaAPIController
             return json_response([
                 'id' => $media->id,
                 'preview' => $preview,
+                'original' => $original,
                 'filename' => $filename,
                 'success' => true,
                 'msg' => 'Media uploaded successfully.',
