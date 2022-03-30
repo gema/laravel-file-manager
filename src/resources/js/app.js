@@ -5,6 +5,7 @@ const { templates } = require('./templates');
 
 window.onload = init;
 
+// File Manager JS API
 window.FileManagerAPI = {
   renderSelectedMedias: (fieldName, selectedMedias) => {
     const baseField = document.querySelector(`.filemanager-field[name="${fieldName}"]`);
@@ -21,6 +22,4 @@ window.FileManagerAPI = {
     const input = baseField.querySelector('.selected-medias-input');
     input.value = JSON.stringify({ medias: selectedMedias.map(m => m.id) });
   },
-
-  oi : 'oi',
 };
