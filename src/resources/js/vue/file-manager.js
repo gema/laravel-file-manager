@@ -1,4 +1,5 @@
 /* eslint-disable no-use-before-define */
+
 const { templates } = require('../templates');
 const Select2 = require('../select2');
 const { request, toast, customEvent } = require('../utils');

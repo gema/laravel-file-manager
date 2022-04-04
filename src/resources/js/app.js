@@ -1,4 +1,14 @@
 import '../sass/style.scss';
+import 'cropperjs/dist/cropper.css';
+
+window.$ = window.jQuery = require('jquery');
+import 'bootstrap';
+import 'jquery-ui/ui/widgets/selectable';
+import Cropper from 'cropperjs';
+
+require('select2');
+
+window.Cropper = Cropper;
 
 const { init } = require('./file-manager');
 const { templates } = require('./templates');

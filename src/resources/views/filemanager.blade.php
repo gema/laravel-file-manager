@@ -9,12 +9,9 @@
 @if (isset($crud))
     @if ($crud->checkIfFieldIsFirstOfItsType($field, $fields) || isset($field['first']))
         @push('after_styles')
-            <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet"/>
             <style>{!! $cssBundle !!}</style>
         @endpush
         @push('after_scripts')
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-            <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
             <script>
                 $(document).on('show.bs.modal', '.modal', function () {
                     var zIndex = 1040 + (10 * $('.modal:visible').length);
@@ -34,12 +31,9 @@
 @else
     @include("file-manager::translations")
     @push('after_styles')
-        <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet"/>
         <style>{!! $cssBundle !!}</style>
     @endpush
     @push('after_scripts')
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
         <script type="text/javascript">{!! $jsBundle !!}</script>
     @endpush
 

@@ -160,6 +160,9 @@
     background-size: cover;
   }
 
+  // SELECTABLE
+  .select2-dropdown.select2-dropdown--below{ z-index: 9999!important;}
+
   // JQUERY UI
   .selection-area .ui-selecting { background: #9789e7; color: white; }
   .selection-area .ui-selected { background: #7c69ef; color: white; }

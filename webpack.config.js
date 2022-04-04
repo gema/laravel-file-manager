@@ -47,7 +47,7 @@ const mainConfig = Object.assign({}, config, {
 
 const vueConfig = Object.assign({}, config, {
   mode,
-  entry : './src/resources/js/vue/entry.js',
+  entry : './src/resources/js/vue/app.js',
   output: {
     path: path.resolve(__dirname, 'src/resources/bundles'),
     filename: 'js/vue_bundle.js',
