@@ -20,7 +20,7 @@
 @endif
 
 @push('after_scripts')
-    <script type="text/javascript" src="/bundle/js/bundle.js"></script>
+    <script type="text/javascript" src="/bundles/js/bundle.js"></script>
 @endpush
 
 <div class="custom-file-manager card">
