@@ -38,9 +38,9 @@ const mainConfig = Object.assign({}, config, {
   mode,
   entry: './src/resources/js/app.js',
   output: {
-    path: path.resolve(__dirname, 'src/resources/bundles'),
+    path: path.resolve(__dirname, 'src/public/bundles'),
     filename: 'js/bundle.js',
-    publicPath: 'src/resources/bundles',
+    publicPath: 'src/public/bundles',
   },
   plugins: [new MiniCssExtractPlugin({ filename: 'css/bundle.css' })],
 })
@@ -49,9 +49,9 @@ const vueConfig = Object.assign({}, config, {
   mode,
   entry : './src/resources/js/vue/app.js',
   output: {
-    path: path.resolve(__dirname, 'src/resources/bundles'),
+    path: path.resolve(__dirname, 'src/public/bundles'),
     filename: 'js/vue_bundle.js',
-    publicPath: 'src/resources/bundles',
+    publicPath: 'src/public/bundles',
   },
   plugins: [new MiniCssExtractPlugin({ filename: 'css/vue_bundle.css' })],
 })
