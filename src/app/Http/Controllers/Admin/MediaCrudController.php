@@ -2,6 +2,7 @@
 
 namespace GemaDigital\FileManager\app\Http\Controllers\Admin;
 
+use Symfony\Component\HttpFoundation\Request;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -58,11 +59,29 @@ class MediaCrudController extends CrudController
         ]);
     }
 
-    protected function fetchGlobalData()
+    protected function fetchGlobalData(Request $request)
     {
+        $global = false;
+        $parentId = false;
+        $parentNamespace = false;
+        $show = admin() ?: call_user_func(config('file-manager.parents_field'));
+        
+        if(!$show && !admin()){
+            $parentQuery = call_user_func(config('file-manager.parents_query'));
+            $parentId = $parentQuery->first()->id;
+            $parentNamespace = get_class($parentQuery->getModel());
+        }
+
         return json_response([
             'tags' => $this->fetchTags(),
             'types' => $this->fetchTypes(),
+            'parent' => [
+                'label' => config('file-manager.parents_label'),
+                'show' => $show,
+                'id' => $parentId,
+                'model' => $parentNamespace,
+                'global' => $global
+            ]
         ]);
     }
 

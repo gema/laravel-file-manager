@@ -109,13 +109,15 @@ class MediaAPIController
             if (!$disk) {
                 $mediaCloudResponse = $this->mediaCloudRequest($request);
                 $preview = $mediaCloudResponse['preview'] !== null ? $mediaCloudResponse['preview'] : '';
+                $original = $mediaCloudResponse['original'] !== null ? $mediaCloudResponse['original'] : '';
+
                 $mediaContent = MediaContent::create([
                     'media_cloud_id' => $mediaCloudResponse['id'],
                     'media_id' => $media->id,
                     'title' => $request->title ? $request->title : '[No title provided]',
                     'description' => $request->description ? $request->description : '[No description provided]',
                     'preview' => $preview,
-                    'content' => isset($mediaCloudResponse['original']) ? ['original' => $mediaCloudResponse['original']] : null,
+                    'content' => ['original' => $original],
                 ]);
             } else {
                 $parentFolder = '';
@@ -155,6 +157,7 @@ class MediaAPIController
             return json_response([
                 'id' => $media->id,
                 'preview' => $preview,
+                'original' => $original,
                 'filename' => $filename,
                 'success' => true,
                 'msg' => 'Media uploaded successfully.',
@@ -219,12 +222,22 @@ class MediaAPIController
             file_get_contents($request->file('media'))
         );
 
+        $path = 'global-storage';
+
+        // Get parent name
+        if(isset($request->parent_model) && isset($request->parent_id)){
+            $parentModel = $request->parent_model;
+            $parentId = $request->parent_id;
+            $model = new $parentModel();
+            $path = $model::find($parentId)->slug;
+        }
+
         // Make request to media cloud
         $file = fopen(Storage::disk(config('file-manager.tmp_disk'))->path('/' . $tmpFilePath), 'r');
         $response = Http::acceptJson()->attach('file', $file, $originalFilename)->post(env('MEDIA_CLOUD_ENDPOINT'), [
             'defaults' => env('MEDIA_CLOUD_DEFAULTS'),
             'apikey' => env('MEDIA_CLOUD_API_KEY'),
-            'path' => 'client',
+            'path' => $path,
         ]);
 
         // Delete tmp file

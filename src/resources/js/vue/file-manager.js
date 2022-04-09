@@ -1,4 +1,5 @@
 /* eslint-disable no-use-before-define */
+
 const { templates } = require('../templates');
 const Select2 = require('../select2');
 const { request, toast, customEvent } = require('../utils');
@@ -13,6 +14,7 @@ let globalContainer;
 let globalUploadContainer;
 let globalMediaListContainer;
 let globalTagsListContainer;
+let globalParents;
 
 const init = options => {
   globalOptions = options;
@@ -42,10 +44,11 @@ const onGlobalsLoaded = globals => {
 };
 
 const setGlobals = ({ data }) => {
-  const { tags, types } = data;
+  const { tags, types, parent } = data;
   globalTags = tags.data;
   globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
+  globalParents = parent;
 
   globalContainer = document.querySelector('#media-modal___BV_modal_outer_');
   globalMediaListContainer = globalContainer.querySelector('.custom-file-manager .list');
@@ -438,12 +441,22 @@ const renderUploadsPreview = files => {
     listContainer.innerHTML += templates.uploadPreview(file, i, globalMediaTypes);
     initVideoPreview(file.media, i);
     initAudioPreview(file.media, i);
-    initParentSelect2(i);
+    if(globalParents.show){
+      initParentSelect2(i, globalParents.label);
+    }
     i += 1;
   });
 
   initRemoveButtons(files);
-  Select2.initGroupedFields(globalUploadContainer);
+  if(globalParents.show){
+    Select2.initGroupedFields(globalUploadContainer);
+  }
+  else if(globalParents.id){
+    listContainer.innerHTML += `
+      <input type="text" value="${globalParents.id}" name="parentId">
+      <input type="text" value="${globalParents.model}" name="parentModel">
+    `;
+  }
 };
 
 const initRemoveButtons = files => {
@@ -476,11 +489,11 @@ const initAudioPreview = (media, i) => {
   }
 };
 
-const initParentSelect2 = i => {
+const initParentSelect2 = (i, label) => {
   Select2.createGroupedField({
-    container: globalUploadContainer.querySelector(`#select2-container-${i}`),
+    label,
     name: 'parentId',
-    label: 'Parent',
+    container: globalUploadContainer.querySelector(`#select2-container-${i}`),
     url: '/admin/media/fetch/parents',
     class: 'form-control',
   });
@@ -532,6 +545,14 @@ const generateFileMetadata = (file, i) => {
       metadata.parent_model = dataAttrs.namespace;
       metadata.parent_id = parentSelect.value;
     }
+  }
+
+  const parentIdHidden = document.querySelector(`#metadata-form-${i} input[name="parentId"]`);
+  const parentNamespaceHidden = document.querySelector(`#metadata-form-${i} input[name="parentModel"]`);
+
+  if(parentIdHidden !== null && parentNamespaceHidden !== null){
+    metadata.parent_id = parentIdHidden.value;
+    metadata.parent_model = parentNamespaceHidden.value;
   }
 
   return metadata;

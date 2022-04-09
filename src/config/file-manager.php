@@ -6,7 +6,9 @@ return [
         // App\Models\Project::class,
     ],
 
-    // TODO
+    // Label for the parents field
+    'parents_label' => 'Parents',
+
     // Parent field should appear or should be infer
     // You may use a closure to define the access to this
     'parents_field' => (function () {

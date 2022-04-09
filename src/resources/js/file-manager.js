@@ -2,14 +2,16 @@
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
+
 const Select2 = require('./select2');
 const { request, truncate, toast, arrayUniqueByKey } = require('./utils');
 const { templates } = require('./templates');
 
 let globalMedias = [];
-let globalTags = [];
-let globalTagsLastPage = 1;
+// let globalTags = [];
+// let globalTagsLastPage = 1;
 let globalMediaTypes = [];
+let globalParents = [];
 let modalShown = false;
 let mediaList = [];
 
@@ -30,119 +32,119 @@ const getSelectedTags = prefix => {
   return tagsIds;
 };
 
-const toggleTagBtn = parent => {
-  const isSelected = Object.values(parent.classList).includes('selected');
-  parent.classList.toggle('selected', !isSelected);
-};
+// const toggleTagBtn = parent => {
+//   const isSelected = Object.values(parent.classList).includes('selected');
+//   parent.classList.toggle('selected', !isSelected);
+// };
 
-const getSelectedMedias = prefix => {
-  selectedMedias = [];
-  document
-    .querySelectorAll(`${prefix}.selectable.ui-selected`)
-    .forEach(selectable => {
-      selectedMedias.push(selectable.dataset.file);
-    });
-  return selectedMedias;
-};
+// const getSelectedMedias = prefix => {
+//   selectedMedias = [];
+//   document
+//     .querySelectorAll(`${prefix}.selectable.ui-selected`)
+//     .forEach(selectable => {
+//       selectedMedias.push(selectable.dataset.file);
+//     });
+//   return selectedMedias;
+// };
 
-const initTagsModal = (prefix, title) => {
-  const modal = document.querySelector('#asign-tag-modal');
-  const selectedMedias = getSelectedMedias(prefix);
+// const initTagsModal = (prefix, title) => {
+//   const modal = document.querySelector('#asign-tag-modal');
+//   const selectedMedias = getSelectedMedias(prefix);
 
-  if (selectedMedias.length) {
-    modal.querySelector('.modal-title').textContent = title;
-    // modal.querySelector('.modal-body').innerHTML = templates.tagsSelect(globalTags);
+//   if (selectedMedias.length) {
+//     modal.querySelector('.modal-title').textContent = title;
+//     // modal.querySelector('.modal-body').innerHTML = templates.tagsSelect(globalTags);
     
-    Select2.createAjaxField({
-      container: modal.querySelector('.modal-body'),
-      id: 'tags-modal-select',
-      name: 'tags',
-      label: 'tags',
-      url: '/admin/media/fetch/tags',
-      class: 'form-control tags-select',
-    });
+//     Select2.createAjaxField({
+//       container: modal.querySelector('.modal-body'),
+//       id: 'tags-modal-select',
+//       name: 'tags',
+//       label: 'tags',
+//       url: '/admin/media/fetch/tags',
+//       class: 'form-control tags-select',
+//     });
 
-    Select2.initAjaxField('tags-modal-select');
+//     Select2.initAjaxField('tags-modal-select');
 
-    $(modal).modal('show');
-    return modal;
-  }
+//     $(modal).modal('show');
+//     return modal;
+//   }
 
-  toast(__('selectMediasFirst'), 'danger');
-  return modal;
-};
+//   toast(__('selectMediasFirst'), 'danger');
+//   return modal;
+// };
 
-const initUnsignTag = prefix => {
-  $(`${prefix}#unsign-tag-button`)
-    .off('click')
-    .on('click', () => {
-      const modal = initTagsModal(prefix, __('removeTag'));
+// const initUnsignTag = prefix => {
+//   $(`${prefix}#unsign-tag-button`)
+//     .off('click')
+//     .on('click', () => {
+//       const modal = initTagsModal(prefix, __('removeTag'));
 
-      const saveBtn = $('#asign-tag-modal .modal-save');
-      saveBtn.off('click');
-      saveBtn.on('click', () => {
-        const tags = [modal.querySelector('.tags-select').value];
-        const unsignData = {
-          tags,
-          medias: selectedMedias,
-        };
+//       const saveBtn = $('#asign-tag-modal .modal-save');
+//       saveBtn.off('click');
+//       saveBtn.on('click', () => {
+//         const tags = [modal.querySelector('.tags-select').value];
+//         const unsignData = {
+//           tags,
+//           medias: selectedMedias,
+//         };
 
-        const formData = new FormData();
-        Object.entries(unsignData).forEach(([key, value]) => {
-          formData.append(key, value);
-        });
+//         const formData = new FormData();
+//         Object.entries(unsignData).forEach(([key, value]) => {
+//           formData.append(key, value);
+//         });
 
-        fetch('/api/media/tag/unsign', {
-          method: 'POST',
-          body: formData,
-        })
-          .then(r => r.json())
-          .then(response => {
-            if (response.data > 0) {
-              toast(__('tagsUnsigned'));
-              $(modal).modal('hide');
-            } else toast(__('tagsUnsignedError'), 'danger');
-          })
-          .catch(e => console.log(e));
-      });
-    });
-};
+//         fetch('/api/media/tag/unsign', {
+//           method: 'POST',
+//           body: formData,
+//         })
+//           .then(r => r.json())
+//           .then(response => {
+//             if (response.data > 0) {
+//               toast(__('tagsUnsigned'));
+//               $(modal).modal('hide');
+//             } else toast(__('tagsUnsignedError'), 'danger');
+//           })
+//           .catch(e => console.log(e));
+//       });
+//     });
+// };
 
-const initAsignTag = prefix => {
-  $(`${prefix}#asign-tag-button`)
-    .off('click')
-    .on('click', () => {
-      const modal = initTagsModal(prefix, __('asignTag'));
+// const initAsignTag = prefix => {
+//   $(`${prefix}#asign-tag-button`)
+//     .off('click')
+//     .on('click', () => {
+//       const modal = initTagsModal(prefix, __('asignTag'));
 
-      const saveBtn = $('#asign-tag-modal .modal-save');
-      saveBtn.off('click');
-      saveBtn.on('click', () => {
-        const tags = [modal.querySelector('.tags-select').value];
-        const asignData = {
-          tags,
-          medias: selectedMedias,
-        };
+//       const saveBtn = $('#asign-tag-modal .modal-save');
+//       saveBtn.off('click');
+//       saveBtn.on('click', () => {
+//         const tags = [modal.querySelector('.tags-select').value];
+//         const asignData = {
+//           tags,
+//           medias: selectedMedias,
+//         };
 
-        const formData = new FormData();
-        Object.entries(asignData).forEach(([key, value]) => {
-          formData.append(key, value);
-        });
+//         const formData = new FormData();
+//         Object.entries(asignData).forEach(([key, value]) => {
+//           formData.append(key, value);
+//         });
 
-        fetch('/api/media/tag', {
-          method: 'POST',
-          body: formData,
-        })
-          .then(r => r.json())
-          .then(response => {
-            if (response.data) {
-              toast(__('tagsAsigned'));
-              $(modal).modal('hide');
-            } else toast(__('tagsAsignedError'), 'danger');
-          })
-          .catch(e => console.log(e));
-      });
-    })
-};
+//         fetch('/api/media/tag', {
+//           method: 'POST',
+//           body: formData,
+//         })
+//           .then(r => r.json())
+//           .then(response => {
+//             if (response.data) {
+//               toast(__('tagsAsigned'));
+//               $(modal).modal('hide');
+//             } else toast(__('tagsAsignedError'), 'danger');
+//           })
+//           .catch(e => console.log(e));
+//       });
+//     })
+// };
 
 const getMedias = (page = 1, tags = null, type = false, callback = false) => {
   request(`/admin/media/fetch/media?page=${page}`, callback, 'POST', {
@@ -358,18 +360,28 @@ const renderUploadMediaList = (medias, types) => {
       document.querySelector(`#audio-preview-audio-${i}`).load();
     }
 
-    Select2.createGroupedField({
-      container: document.querySelector(`#select2-container-${i}`),
-      name: 'parentId',
-      label: 'Parent',
-      url: '/admin/media/fetch/parents',
-      class: 'form-control',
-    });
+    const container = document.querySelector(`#select2-container-${i}`);
+
+    if(globalParents.show){
+      Select2.createGroupedField({
+        container,
+        name: 'parentId',
+        label: globalParents.label,
+        url: '/admin/media/fetch/parents',
+        class: 'form-control',
+      });
+    }else if(globalParents.id){
+      container.innerHTML += `
+        <input type="text" value="${globalParents.id}" name="parentId">
+        <input type="text" value="${globalParents.model}" name="parentModel">
+      `;
+    }
+    
 
     i += 1;
   });
 
-  Select2.initGroupedFields();
+  if(globalParents.show) Select2.initGroupedFields();
 };
 
 const initSelectedMediasEdition = (prefix, medias, type) => {
@@ -581,80 +593,80 @@ const initRefresh = (prefix = '', type = false) => {
     });
 };
 
-const initTags = (prefix = '', type = false) => {
-  const tagsContainer = document.querySelector(`${prefix}.tags-container ul`);
-  tagsContainer.innerHTML = '';
-  globalTags.forEach(tag => {
-    tagsContainer.innerHTML += `
-      <li class="list-group-item">
-        <a href="#" title="${tag.name}" class="select-tag" data-tag="${tag.id}">
-          ${truncate(tag.name, 10)}
-        </a>
-      </li>
-    `;
-  });
+// const initTags = (prefix = '', type = false) => {
+//   const tagsContainer = document.querySelector(`${prefix}.tags-container ul`);
+//   tagsContainer.innerHTML = '';
+//   globalTags.forEach(tag => {
+//     tagsContainer.innerHTML += `
+//       <li class="list-group-item">
+//         <a href="#" title="${tag.name}" class="select-tag" data-tag="${tag.id}">
+//           ${truncate(tag.name, 10)}
+//         </a>
+//       </li>
+//     `;
+//   });
 
-  initTagsPagination(tagsContainer.parentElement, globalTagsLastPage, prefix, type);
+//   initTagsPagination(tagsContainer.parentElement, globalTagsLastPage, prefix, type);
 
-  initAsignTag(prefix);
-  initUnsignTag(prefix);
-  initTagsFilter(prefix, type);
-};
+//   initAsignTag(prefix);
+//   initUnsignTag(prefix);
+//   initTagsFilter(prefix, type);
+// };
 
-const initTagsFilter = (prefix, type) => {
-  document.querySelectorAll(`${prefix}.select-tag`).forEach(tagBtn => {
-    tagBtn.addEventListener('click', e => {
-      toggleTagBtn(e.currentTarget.parentNode);
-      const selectedTags = getSelectedTags(prefix);
+// const initTagsFilter = (prefix, type) => {
+//   document.querySelectorAll(`${prefix}.select-tag`).forEach(tagBtn => {
+//     tagBtn.addEventListener('click', e => {
+//       toggleTagBtn(e.currentTarget.parentNode);
+//       const selectedTags = getSelectedTags(prefix);
 
-      toggleLoader(prefix, true);
+//       toggleLoader(prefix, true);
 
-      getMedias(1, selectedTags, type, medias => {
-        renderMediasTable(medias, prefix);
-      });
-    });
-  });
-}
+//       getMedias(1, selectedTags, type, medias => {
+//         renderMediasTable(medias, prefix);
+//       });
+//     });
+//   });
+// }
 
-const initTagsPagination = (container, lastPage, prefix, type) => {
-  let page = 1;
-  let isLoading = false;
+// const initTagsPagination = (container, lastPage, prefix, type) => {
+//   let page = 1;
+//   let isLoading = false;
 
-  $(container).off('scroll');
-  $(container).on('scroll', () => {
-    if (
-      container.offsetHeight + container.scrollTop >=
-      container.scrollHeight - 1
-    ) {
-      if (!isLoading && page + 1 <= lastPage) {
-        page += 1;
-        isLoading = true;
+//   $(container).off('scroll');
+//   $(container).on('scroll', () => {
+//     if (
+//       container.offsetHeight + container.scrollTop >=
+//       container.scrollHeight - 1
+//     ) {
+//       if (!isLoading && page + 1 <= lastPage) {
+//         page += 1;
+//         isLoading = true;
 
-        container.innerHTML += '<span class="w-100 text-center tags-loader la la-spinner la-spin mt-3"></span>';
-        getTags(page, ({ data }) => {
-          document.querySelector('.tags-loader').remove();
-          data.forEach(tag => {
-            container.querySelector('ul').innerHTML += `
-              <li class="list-group-item">
-                <a href="#" title="${tag.name}" class="select-tag" data-tag="${tag.id}">
-                  ${truncate(tag.name, 10)}
-                </a>
-              </li>
-            `;
-          });
-          isLoading = false;
-          initTagsFilter(prefix, type)
-        });
-      }
-    }
-  });
-};
+//         container.innerHTML += '<span class="w-100 text-center tags-loader la la-spinner la-spin mt-3"></span>';
+//         getTags(page, ({ data }) => {
+//           document.querySelector('.tags-loader').remove();
+//           data.forEach(tag => {
+//             container.querySelector('ul').innerHTML += `
+//               <li class="list-group-item">
+//                 <a href="#" title="${tag.name}" class="select-tag" data-tag="${tag.id}">
+//                   ${truncate(tag.name, 10)}
+//                 </a>
+//               </li>
+//             `;
+//           });
+//           isLoading = false;
+//           initTagsFilter(prefix, type)
+//         });
+//       }
+//     }
+//   });
+// };
 
-const getTags = (page = 1, callback = false) => {
-  request(`/admin/media/fetch/tags?page=${page}`, callback, 'POST', {
-    _token: document.querySelector('meta[name=csrf-token]').content,
-  });
-};
+// const getTags = (page = 1, callback = false) => {
+//   request(`/admin/media/fetch/tags?page=${page}`, callback, 'POST', {
+//     _token: document.querySelector('meta[name=csrf-token]').content,
+//   });
+// };
 
 const initCropper = i => {
   const imgTobeCrop = document.querySelector(`.to_be_crop_${i}`);
@@ -738,6 +750,14 @@ const initUploadModal = (medias, types) => {
             metadata.parent_model = dataAttrs.namespace;
             metadata.parent_id = parentSelect.value;
           }
+        }
+
+        const parentIdHidden = document.querySelector(`#metadata-form-${i} input[name="parentId"]`);
+        const parentNamespaceHidden = document.querySelector(`#metadata-form-${i} input[name="parentModel"]`);
+
+        if(parentIdHidden !== null && parentNamespaceHidden !== null){
+          metadata.parent_id = parentIdHidden.value;
+          metadata.parent_model = parentNamespaceHidden.value;
         }
 
         promises.push(mediaUploadPromise(media, metadata));
@@ -901,10 +921,11 @@ const onMediaLoadedSingle = medias => {
 };
 
 const setGlobals = ({ data }) => {
-  const { tags, types } = data;
-  globalTags = tags.data;
-  globalTagsLastPage = tags.last_page;
+  const { types, parent } = data;
+  // globalTags = tags.data;
+  // globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
+  globalParents = parent
 };
 
 const onGlobalsLoaded = response => {

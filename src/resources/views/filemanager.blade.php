@@ -1,54 +1,27 @@
-@php
-    use Illuminate\Support\Facades\File;
+@push('after_styles')
+    <link rel="stylesheet" href="/bundles/css/bundle.css" />
+@endpush
 
-    $publicPath = '/vendor/gemadigital/file-manager/src/resources/bundles';
-    $jsBundle = File::get(base_path() . $publicPath . '/js/bundle.js');
-    $cssBundle = File::get(base_path() . $publicPath . '/css/bundle.css');
-    $parentsField = call_user_func(config('file-manager.parents_field'));
-    $parentsField = $parentsField ? 1 : 0;
-    @endphp
+@include("file-manager::translations")
+@include('file-manager::filemanager-modals')
 
-@if (isset($crud))
-    @if ($crud->checkIfFieldIsFirstOfItsType($field, $fields))
-        @push('after_styles')
-            <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet"/>
-            <style>{!! $cssBundle !!}</style>
-        @endpush
-        @push('after_scripts')
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
-            <script>
-                window.parentsField = '{{$parentsField}}'
-                $(document).on('show.bs.modal', '.modal', function () {
-                    var zIndex = 1040 + (10 * $('.modal:visible').length);
-                    $(this).css('z-index', zIndex);
-                    setTimeout(function() {
-                        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-                    }, 0);
-                });
-            </script>
-            <script type="text/javascript">{!! $jsBundle !!}</script>
-
-        @endpush
-
-        @include('file-manager::filemanager-modals')
-        @include("file-manager::translations")
-    @endif
-@else
-    @include("file-manager::translations")
-    @push('after_styles')
-        <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet"/>
-        <style>{!! $cssBundle !!}</style>
-    @endpush
+@if (isset($crud) && ($crud->checkIfFieldIsFirstOfItsType($field, $fields) || isset($field['first'])))
     @push('after_scripts')
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
-        <script type="text/javascript">{!! $jsBundle !!}</script>
-        <script>window.parentsField = '{{$parentsField}}'</script>
+        <script>
+            $(document).on('show.bs.modal', '.modal', function () {
+                var zIndex = 1040 + (10 * $('.modal:visible').length);
+                $(this).css('z-index', zIndex);
+                setTimeout(function() {
+                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+                }, 0);
+            });
+        </script>
     @endpush
-
-    @include('file-manager::filemanager-modals')
 @endif
+
+@push('after_scripts')
+    <script type="text/javascript" src="/bundles/js/bundle.js"></script>
+@endpush
 
 <div class="custom-file-manager card">
     <div class="card-header">
