@@ -108,8 +108,8 @@ class MediaAPIController
             $disk = config('file-manager.disk');
             if (!$disk) {
                 $mediaCloudResponse = $this->mediaCloudRequest($request);
-                $preview = $mediaCloudResponse['preview'] !== null ? $mediaCloudResponse['preview'] : '';
-                $original = $mediaCloudResponse['original'] !== null ? $mediaCloudResponse['original'] : '';
+                $preview = isset($mediaCloudResponse['preview'])? $mediaCloudResponse['preview'] : '';
+                $original = isset($mediaCloudResponse['original']) ? $mediaCloudResponse['original'] : '';
 
                 $mediaContent = MediaContent::create([
                     'media_cloud_id' => $mediaCloudResponse['id'],
