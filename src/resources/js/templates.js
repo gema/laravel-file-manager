@@ -140,9 +140,9 @@ const typesList = (types, type) => {
   } else if (/^video/.test(type)) {
     [selectedType] = types.filter(type => type.key === 'video');
   } else if (/^audio/.test(type)) {
-    [selectedType] = types.filter(type => type.key === 'audio');
+    [selectedType] = types.filter(type => type.key === 'audio' || type.key === 'music');
   } else if (/^model/.test(type)) {
-    [selectedType] = types.filter(type => type.key === '3d_model');
+    [selectedType] = types.filter(type => type.key === '3d_model_interact' || type.key === '3d_model_ar');
   }
 
   types.forEach(type => {
