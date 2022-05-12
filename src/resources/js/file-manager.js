@@ -37,15 +37,15 @@ const getSelectedTags = prefix => {
 //   parent.classList.toggle('selected', !isSelected);
 // };
 
-// const getSelectedMedias = prefix => {
-//   selectedMedias = [];
-//   document
-//     .querySelectorAll(`${prefix}.selectable.ui-selected`)
-//     .forEach(selectable => {
-//       selectedMedias.push(selectable.dataset.file);
-//     });
-//   return selectedMedias;
-// };
+const getSelectedMedias = prefix => {
+  selectedMedias = [];
+  document
+    .querySelectorAll(`${prefix}.selectable.ui-selected`)
+    .forEach(selectable => {
+      selectedMedias.push(selectable.dataset.file);
+    });
+  return selectedMedias;
+};
 
 // const initTagsModal = (prefix, title) => {
 //   const modal = document.querySelector('#asign-tag-modal');
