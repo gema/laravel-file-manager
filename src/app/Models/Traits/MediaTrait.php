@@ -8,9 +8,12 @@ use GemaDigital\FileManager\app\Models\MediaField;
 
 trait MediaTrait
 {
-    public function getMedia($column)
+    public function getMedia($column, $mediaFieldId)
     {
-        $mediaFieldId = $this->attributes[$column];
+        if ($column) {
+            $mediaFieldId = $this->attributes[$column];
+        }
+
         try {
             $mediaIds = DB::table('media_field_has_media')
                 ->where('media_field_id', $mediaFieldId)->get()->pluck('media_id');
@@ -63,7 +66,6 @@ trait MediaTrait
         DB::beginTransaction();
         try {
             $original = $entry->getOriginal();
-
             foreach (self::$mediable as $column) {
                 if ($original[$column] !== null) {
                     DB::table('media_field_has_media')
