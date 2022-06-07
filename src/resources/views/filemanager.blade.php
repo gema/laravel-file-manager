@@ -1,5 +1,5 @@
 @push('after_styles')
-    <link rel="stylesheet" href="/bundles/css/bundle.css" />
+    <link rel="stylesheet" href="{{ url('/bundles/css/bundle.css') }}" />
 @endpush
 
 @include("file-manager::translations")
@@ -20,7 +20,7 @@
 @endif
 
 @push('after_scripts')
-    <script type="text/javascript" src="/bundles/js/bundle.js"></script>
+    <script type="text/javascript" src="{{ url('/bundles/js/bundle.js') }}"></script>
 @endpush
 
 <div class="custom-file-manager card">
