@@ -10,7 +10,7 @@ trait MediaTrait
 {
     public function getMedia($column, $mediaFieldId)
     {
-        if ($column) {
+        if ($column && isset($this->attributes[$column])) {
             $mediaFieldId = $this->attributes[$column];
         }
 
