@@ -8,9 +8,9 @@ use GemaDigital\FileManager\app\Models\MediaField;
 
 trait MediaTrait
 {
-    public function getMedia($column, $mediaFieldId)
+    public function getMedia($column, $mediaFieldId = false)
     {
-        if ($column && isset($this->attributes[$column])) {
+        if (!$mediaFieldId && $column && isset($this->attributes[$column])) {
             $mediaFieldId = $this->attributes[$column];
         }
 
@@ -66,17 +66,20 @@ trait MediaTrait
         DB::beginTransaction();
         try {
             $original = $entry->getOriginal();
-            foreach (self::$mediable as $column) {
-                if ($original[$column] !== null) {
-                    DB::table('media_field_has_media')
-                        ->where('media_field_id', $original[$column])
-                        ->delete();
-                }
-            }
 
-            MediaField::where('entity_id', $entry->id)
-                ->where('entity_type', self::class)
-                ->delete();
+            // TODO: MEDIA FIELDS NEED TO BE UPDATED INSTEAD OF DELETE/cREATE
+
+            // foreach (self::$mediable as $column) {
+            //     if ($original[$column] !== null) {
+            //         DB::table('media_field_has_media')
+            //             ->where('media_field_id', $original[$column])
+            //             ->delete();
+            //     }
+            // }
+
+            // MediaField::where('entity_id', $entry->id)
+            //     ->where('entity_type', self::class)
+            //     ->delete();
 
             DB::commit();
 
