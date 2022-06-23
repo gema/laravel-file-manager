@@ -149,7 +149,7 @@ class MediaAPIController
                     'content' => '{"original" : "' . $path . '"}',
                 ]);
 
-                $preview = $path;
+                $preview = $original = $path;
             }
 
             DB::commit();
@@ -167,7 +167,7 @@ class MediaAPIController
                 'filename' => $filename,
                 'success' => false,
                 'msg' => 'Media failed to upload.',
-                'error' => 'Media failed to upload.',
+                'error' => $e->getMessage(),
             ];
 
             DB::rollback();
