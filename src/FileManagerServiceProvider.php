@@ -11,10 +11,10 @@ class FileManagerServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->loadTranslationsFrom(__DIR__.'/resources/lang', 'file-manager');
-        $this->loadViewsFrom(__DIR__.'/resources/views', 'file-manager');
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
-        $this->loadRoutesFrom(__DIR__.'/routes/routes.php');
+        $this->loadTranslationsFrom(__DIR__ . '/resources/lang', 'file-manager');
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'file-manager');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadRoutesFrom(__DIR__ . '/routes/routes.php');
 
         // Publishing is only necessary when using the CLI.
         if ($this->app->runningInConsole()) {
@@ -27,7 +27,7 @@ class FileManagerServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/config/file-manager.php', 'file-manager');
+        $this->mergeConfigFrom(__DIR__ . '/config/file-manager.php', 'file-manager');
 
         // Register the service the package provides.
         $this->app->singleton('file-manager', function ($app) {
@@ -52,8 +52,10 @@ class FileManagerServiceProvider extends ServiceProvider
     {
         // Publishing the configuration file.
         $this->publishes([
-            __DIR__.'/config/file-manager.php' => config_path('file-manager.php'),
+            __DIR__ . '/config/file-manager.php' => config_path('file-manager.php'),
         ], 'file-manager.config');
+
+        $this->publishes([__DIR__ . '/public' => public_path()], 'public');
 
         // Publishing the views.
         /*$this->publishes([
