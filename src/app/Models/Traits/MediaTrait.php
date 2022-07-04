@@ -13,11 +13,11 @@ trait MediaTrait
         if (!$mediaFieldId && $column && isset($this->attributes[$column])) {
             $mediaFieldId = $this->attributes[$column];
         }
-
         try {
             $mediaIds = DB::table('media_field_has_media')
                 ->where('media_field_id', $mediaFieldId)->get()->pluck('media_id');
-            $mediaContents = MediaContent::whereIn('media_id', $mediaIds)->get();
+            $mediaContents = MediaContent::whereIn('media_id', $mediaIds)->with('media')->get();
+
             return $mediaContents;
         } catch (\Exception $e) {
             return $mediaFieldId;
