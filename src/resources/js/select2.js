@@ -49,10 +49,12 @@ const initAjaxField = id => {
       },
       processResults({ data, current_page, last_page }) {
         const results = [];
-        Object.values(data).forEach(tag => {
+        Object.values(data).forEach(val => {
           results.push({
-            id: tag.id,
-            text: getPossibleTranslation(JSON.stringify(tag.name)),
+            id: val.id,
+            text: Array.isArray(val.name) ?
+            val.name[0].data[Object.keys(val.name[0].data)[0]]
+            : getPossibleTranslation(JSON.stringify(val.name)),
           })
         })
 
@@ -105,7 +107,9 @@ const initGroupedFields = (container = document) => {
                   text: namespace.split('\\').pop(),
                   children: Object.values(response.data).map(entry => ({
                     id: entry.id,
-                    text: getPossibleTranslation(JSON.stringify(entry.name)),
+                    text: Array.isArray(entry.name) ?
+                    entry.name[0].data[Object.keys(entry.name[0].data)[0]]
+                    : getPossibleTranslation(JSON.stringify(entry.name)),
                     namespace,
                   })),
                 });
@@ -117,15 +121,16 @@ const initGroupedFields = (container = document) => {
               Object.values(response.data).forEach(entry => {
                 results.push({
                   id: entry.id,
-                  text: getPossibleTranslation(JSON.stringify(entry.name)),
+                  text: Array.isArray(entry.name) ?
+                  entry.name[0].data[Object.keys(entry.name[0].data)[0]]
+                  : getPossibleTranslation(JSON.stringify(entry.name)),
                   namespace,
                 });
               });
               more = response.current_page < response.last_page;
             });
           }
-
-          console.log({results});
+         
           return {
             results,
             pagination: { more },

@@ -235,14 +235,11 @@ const cropImageTemplate = (media, i) => {
 };
 
 const renderUploadMediaList = (medias, types) => {
-  console.log({medias, types})
   const mediasList = document.querySelector('#upload-modal .medias-list');
   mediasList.innerHTML = '';
   let i = 0;
 
   medias.forEach(({media, is3d}) => {
-    // media = media.media;
-
     let mediaTemplate = '';
     let hasVideo = false;
     let hasAudio = false;
