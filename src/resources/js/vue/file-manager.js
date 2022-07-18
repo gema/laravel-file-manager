@@ -502,6 +502,7 @@ const initParentSelect2 = (i, label) => {
 const onUploadSave = (e, files) => {
   removeValidationErrors();
   e.currentTarget.classList.add('d-none');
+  console.log(files, appendLoadersToUploads(files), resolveUploadPromises(generateUploadPromises(files)))
   appendLoadersToUploads(files);
   resolveUploadPromises(generateUploadPromises(files));
 };

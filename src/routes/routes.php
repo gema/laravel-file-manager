@@ -30,7 +30,7 @@ Route::group(
 Route::group(
     [
         'namespace' => 'API',
-        'middleware' => ['api'],
+        // 'middleware' => ['api'],
         'prefix' => 'api',
     ],
     function () {
