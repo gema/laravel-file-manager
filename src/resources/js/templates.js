@@ -47,14 +47,14 @@ const uploadModalTitle = length => `
   Uploading <span class="medias-count">${length}</span> medias
 `;
 
-const uploadPreview = (file, i, types) => {
+const uploadPreview = (file, i, types, mediaType) => {
   const { media } = file;
 
   const ext =  media.name.split('.').pop();
   const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];
   const is3d = ext3D.includes(ext);
   const mediaPreviewTemplate = mediaPreview(media, i, is3d);
-  const metadataFormTemplate = metadataForm(i, types, {media, is3d});
+  const metadataFormTemplate = metadataForm(i, types, {media, is3d}, mediaType);
 
   let mediaSize = media.size;
   let unit = '';
@@ -94,7 +94,7 @@ const uploadPreview = (file, i, types) => {
       </div>
       <div
         id="collapse_${i}" 
-        class="collapse ${i === 0 ? 'show' : ''}"
+        class="collapse"
         aria-labelledby="heading_${i}"
         data-parent="#accordion">   
         <div class="card-body">
@@ -106,10 +106,10 @@ const uploadPreview = (file, i, types) => {
   `;
 };
 
-const metadataForm = (i, types, {media, is3d}) => {
+const metadataForm = (i, types, {media, is3d}, mediaType) => {
   let { name, type } = media;
   if (is3d) type = 'model';
-  const typesListTemplate = typesList(types, type);
+  const typesListTemplate = typesList(types, type, mediaType);
   const select = `
     <div id="select2-container-${i}" class="form-group">
       
@@ -131,22 +131,10 @@ const metadataForm = (i, types, {media, is3d}) => {
     </form>`;
 };
 
-const typesList = (types, type) => {
+const typesList = (types, type, mediaType) => {
   let list = '';
-  let selectedType;
-
-  if (/^image/.test(type)) {
-    [selectedType] = types.filter(type => type.key === 'image');
-  } else if (/^video/.test(type)) {
-    [selectedType] = types.filter(type => type.key === 'video');
-  } else if (/^audio/.test(type)) {
-    [selectedType] = types.filter(type => type.key === 'audio' || type.key === 'music');
-  } else if (/^model/.test(type)) {
-    [selectedType] = types.filter(type => type.key === '3d_model_interact' || type.key === '3d_model_ar');
-  }
-
   types.forEach(type => {
-    list += `<option ${selectedType.id === type.id ? 'selected' : ''} value="${type.id}">${type.name}</option>`;
+    list += `<option ${type.id === mediaType ? 'selected' : ''} value="${mediaType}">${type.name}</option>`;
   });
 
 
@@ -273,7 +261,6 @@ const selectedMedia = ({media_content, name, id}) => {
   </a>
 `;
 }
-
 module.exports = {
   templates: {
     mediaItem,

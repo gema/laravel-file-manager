@@ -15,10 +15,16 @@ let globalUploadContainer;
 let globalMediaListContainer;
 let globalTagsListContainer;
 let globalParents;
+let allowedMedias;
+let mediaType;
 
 const init = options => {
   globalOptions = options;
   loadGlobals(onGlobalsLoaded);
+  window.addEventListener(`get_extensions_${globalOptions.name}`, (e) => {
+    allowedMedias = e.detail.extensions
+    mediaType = e.detail.mediaType
+  });
 };
 
 const loadGlobals = (callback = false) => {
@@ -386,6 +392,7 @@ const onRefreshClick = () => {
 };
 
 const onRefresh = ({ data }) => {
+  customEvent(`on_refresh_${globalOptions.name}`, data);
   renderMediaList(data);
 };
 
@@ -410,18 +417,28 @@ const onHiddenInputChange = e => {
   e.currentTarget.files.forEach(media => {
     globalUploadList.push({ media, cropped: null });
   });
-
   customEvent(`upload_modal_open_${globalOptions.name}`);
   setTimeout(initUploadModal, 100);
 };
 
+
 const initUploadModal = (files = globalUploadList) => {
+  let mediastoRemove = []
+  files.map(e =>  {
+    e.timestamp = Date.now();
+    if(!allowedMedias.includes(e.media.type)) {
+      const i = files.findIndex(x => e.timestamp === x.timestamp && e.media.size === x.media.size)
+      mediastoRemove.push(i)
+    }
+  })
+  mediastoRemove.reverse().forEach(key => {
+    files.splice(key, 1)
+  });
   globalUploadContainer = document.querySelector('#upload-modal-vue');
   const uploadModal = document.querySelector('#upload-modal-vue');
   uploadModal.querySelector('.modal-title').innerHTML = templates.uploadModalTitle(files.length);
 
   renderUploadsPreview(files);
-
   uploadModal.querySelector('footer .btn-primary')
     .addEventListener('click', e => {
       onUploadSave(e, files);
@@ -438,7 +455,7 @@ const renderUploadsPreview = files => {
   let i = 0;
 
   files.forEach(file => {
-    listContainer.innerHTML += templates.uploadPreview(file, i, globalMediaTypes);
+    listContainer.innerHTML += templates.uploadPreview(file, i, globalMediaTypes, mediaType);
     initVideoPreview(file.media, i);
     initAudioPreview(file.media, i);
     if(globalParents.show){
@@ -502,8 +519,8 @@ const initParentSelect2 = (i, label) => {
 const onUploadSave = (e, files) => {
   removeValidationErrors();
   e.currentTarget.classList.add('d-none');
-  console.log(files, appendLoadersToUploads(files), resolveUploadPromises(generateUploadPromises(files)))
   appendLoadersToUploads(files);
+  console.log('ready to upload')
   resolveUploadPromises(generateUploadPromises(files));
 };
 
