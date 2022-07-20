@@ -202,7 +202,6 @@ export default {
         }
       });
       this.selectedMedias = selectedMedias;
-
       this.$refs["media-modal"].hide();
       toast(`Medias selected successfully`);
       this.$emit("save", this.selectedMedias);
@@ -260,10 +259,12 @@ export default {
       this.medias = this.medias.concat(detail.medias);
     },
     onLoad({ detail }) {
+      this.medias = [];
       this.medias = detail.medias;
     },
     onRefresh({ detail }) {
       this.medias = detail;
+      this.selectedMedias = [];
     },
     getExtensions() {
       customEvent(`get_extensions_${this.name}`, {

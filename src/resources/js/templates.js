@@ -55,6 +55,7 @@ const uploadPreview = (file, i, types, mediaType) => {
   const is3d = ext3D.includes(ext);
   const mediaPreviewTemplate = mediaPreview(media, i, is3d);
   const metadataFormTemplate = metadataForm(i, types, {media, is3d}, mediaType);
+  visitdataForm(i);
 
   let mediaSize = media.size;
   let unit = '';
@@ -67,7 +68,7 @@ const uploadPreview = (file, i, types, mediaType) => {
     j += 1;
   }
 
-  return `
+  return `\
     <div class="card file-row" data-name="${media.name}">
       <div class="card-header" id="heading_${i}">
         <h5 class="mb-0" style="text-align:center">
@@ -106,26 +107,24 @@ const uploadPreview = (file, i, types, mediaType) => {
   `;
 };
 
-const metadataForm = (i, types, {media, is3d}, mediaType) => {
-  let { name, type } = media;
-  if (is3d) type = 'model';
-  const typesListTemplate = typesList(types, type, mediaType);
-  const select = `
+const visitdataForm = (i) => {
+  return `
     <div id="select2-container-${i}" class="form-group">
       
     </div>
   `;
+}
+
+const metadataForm = (i, types, {media, is3d}, mediaType) => {
+  let { name, type } = media;
+  if (is3d) type = 'model';
+  const typesListTemplate = typesList(types, type, mediaType);
 
   return `
     <form id="metadata-form-${i}">
-      ${select}
       <div class="form-group">
         <label>Title</label>
         <input name="title" type="text" class="form-control" value="${name.split('.').shift()}">
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea name="description" class="form-control"></textarea>
       </div>
       ${typesListTemplate}
     </form>`;
@@ -139,7 +138,7 @@ const typesList = (types, type, mediaType) => {
 
 
   return `
-  <div class="form-group">
+  <div class="form-group d-none">
     <label>Media Type</label>
     <select name="type" class="form-control">
       ${list}
@@ -281,5 +280,6 @@ module.exports = {
     uploadFeedback,
     metadataForm,
     selectedMedia,
+    visitdataForm,
   },
 };

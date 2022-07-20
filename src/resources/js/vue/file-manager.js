@@ -431,9 +431,7 @@ const initUploadModal = (files = globalUploadList) => {
       mediastoRemove.push(i)
     }
   })
-  mediastoRemove.reverse().forEach(key => {
-    files.splice(key, 1)
-  });
+  mediastoRemove.reverse().forEach(key => files.splice(key, 1));
   globalUploadContainer = document.querySelector('#upload-modal-vue');
   const uploadModal = document.querySelector('#upload-modal-vue');
   uploadModal.querySelector('.modal-title').innerHTML = templates.uploadModalTitle(files.length);
@@ -453,14 +451,14 @@ const renderUploadsPreview = files => {
   const listContainer = document.querySelector('#upload-modal-vue .medias-list');
   listContainer.innerHTML = '';
   let i = 0;
-
+  listContainer .innerHTML += templates.visitdataForm(i)
+  if(globalParents.show){
+    initParentSelect2(i, globalParents.label);
+  }
   files.forEach(file => {
     listContainer.innerHTML += templates.uploadPreview(file, i, globalMediaTypes, mediaType);
     initVideoPreview(file.media, i);
     initAudioPreview(file.media, i);
-    if(globalParents.show){
-      initParentSelect2(i, globalParents.label);
-    }
     i += 1;
   });
 
@@ -555,7 +553,7 @@ const generateFileMetadata = (file, i) => {
   metadata.name = file.media.name;
 
   const parentSelect = document.querySelector(
-    `#metadata-form-${i} select[name="parentId"]`
+    `select[name="parentId"]`
   );
   if (parentSelect !== null) {
     const dataAttrs = $(parentSelect).find(':selected').data();
