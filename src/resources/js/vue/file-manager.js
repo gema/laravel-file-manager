@@ -117,7 +117,6 @@ const renderNoMediasFound = () => {
 const initSelection = medias => {
   $('.selection-area')
     .selectable();
-
   $('#media-modal .modal-footer')
     .find('.btn-primary')
     .on('click', () => onMediasSelected(medias));
@@ -633,10 +632,12 @@ const handleSuccessResponse = (row, { msg, success }) => {
 
   const textClass = success ? 'success' : 'danger';
   const feedback = row.querySelector('.card-header p');
-  feedback.innerHTML = msg;
-  feedback.classList.remove('text-danger');
-  feedback.classList.remove('text-success');
-  feedback.classList.add(`text-${textClass}`);
+  if(feedback) {
+    feedback.innerHTML = msg;
+    feedback.classList.remove('text-danger');
+    feedback.classList.remove('text-success');
+    feedback.classList.add(`text-${textClass}`);
+  }
 };
 
 const handleErrorResponse = (row, errors) => {

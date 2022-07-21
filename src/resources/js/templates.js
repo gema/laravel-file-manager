@@ -4,9 +4,12 @@ const { truncate } = require('./utils');
 const mediaItem = media => `
 <div
   title="${media.media_content.title}" 
-  class="ui-widget-content selectable col-md-2 col-sm-3 m-1" data-file="${media.id}"
+  class="ui-widget-content selectable col-md-2 col-sm-3 m-2 p-1 flex flex-column" data-file="${media.id}"
+  style="height: fit-content"
 >
-  <img src="${media.media_content.preview}">
+  <img class="m-auto mb-2" src="${media.media_content.preview}">
+  <p class="mb-0 text-center">${truncate(media.media_content.title, 18)}</p>
+  <p class="text-sm mb-0 text-center font-weight-light">${media.media_content.updated_at.slice(0, 10)}</p>
 </div>
 `;
 
@@ -69,11 +72,11 @@ const uploadPreview = (file, i, types, mediaType) => {
   }
 
   return `\
-    <div class="card file-row" data-name="${media.name}">
-      <div class="card-header" id="heading_${i}">
+    <div class="card file-row overflow-hidden border-0" data-name="${media.name}">
+      <div class="card-header border-0" id="heading_${i}">
         <h5 class="mb-0" style="text-align:center">
           <button
-            class="btn btn-link"
+            class="btn text-dark"
             data-toggle="collapse"
             data-target="#collapse_${i}"
             aria-expanded="true"
@@ -82,9 +85,8 @@ const uploadPreview = (file, i, types, mediaType) => {
           >
           <b>${truncate(media.name, 25)}</b> ${mediaSize} ${unit}
           <span class="loader-container"></span>
-          <p class="mt-2 mb-0 text-center"></p>
           </button>
-          <a href="#" style="float:right" class="text-danger">
+          <a href="#" class="text-danger">
             <i
               style="vertical-align:middle"
               data-name="${media.name}"
@@ -98,7 +100,7 @@ const uploadPreview = (file, i, types, mediaType) => {
         class="collapse"
         aria-labelledby="heading_${i}"
         data-parent="#accordion">   
-        <div class="card-body">
+        <div class="card-body border border-top-0 overflow-hidden">
           ${mediaPreviewTemplate}
           ${metadataFormTemplate}
         </div>
