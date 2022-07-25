@@ -14,6 +14,7 @@ let globalMediaTypes = [];
 let globalParents = [];
 let modalShown = false;
 let mediaList = [];
+let mediaType = document.querySelector('.fileType').getAttribute('data-type')
 
 const toggleLoader = (prefix, show = true) => {
   const container = document.querySelector(`${prefix}.selection-area`);
@@ -157,8 +158,12 @@ const getMedias = (page = 1, tags = null, type = false, callback = false) => {
 const mediaItemTemplate = media => `
   <div
     title="${media.media_content.title}" 
-    class="selectable col-md-2 col-sm-3 m-1" data-file="${media.id}">
-    <img src="${media.media_content.preview}">
+    class="ui-widget-content selectable col-md-2 col-sm-3 m-2 p-1 flex flex-column" data-file="${media.id}"
+    style="height: fit-content"
+  >
+    <img class="m-auto mb-2" src="${media.media_content.preview}">
+    <p class="mb-0 text-center">${truncate(media.media_content.title, 18)}</p>
+    <p class="text-sm mb-0 text-center font-weight-light">${media.media_content.updated_at.slice(0, 10)}</p>
   </div>
 `;
 
@@ -169,7 +174,8 @@ const mediaUploadPromise = (media, metadata) => {
   formData.append('name', media.media.name);
 
   Object.entries(metadata).forEach(([key, value]) => {
-    formData.append(key, value);
+    if(key === 'type') formData.append(key, mediaType);
+    else formData.append(key, value);
   });
 
   return fetch('/api/media/upload', {
@@ -238,7 +244,7 @@ const renderUploadMediaList = (medias, types) => {
   const mediasList = document.querySelector('#upload-modal .medias-list');
   mediasList.innerHTML = '';
   let i = 0;
-
+  mediasList.innerHTML += templates.visitdataForm(i)
   medias.forEach(({media, is3d}) => {
     let mediaTemplate = '';
     let hasVideo = false;
@@ -304,11 +310,11 @@ const renderUploadMediaList = (medias, types) => {
     const metadataForm = templates.metadataForm(i, types, {media, is3d});
 
     mediasList.innerHTML += `
-      <div class="card file-row" data-name="${media.name}">
-        <div class="card-header" id="heading_${i}">
+      <div class="card file-row overflow-hidden border-0" data-name="${media.name}">
+        <div class="card-header border-0" id="heading_${i}">
           <h5 class="mb-0" style="text-align:center">
             <button
-              class="btn btn-link"
+              class="btn text-dark"
               data-toggle="collapse"
               data-target="#collapse_${i}"
               aria-expanded="true"
@@ -317,9 +323,8 @@ const renderUploadMediaList = (medias, types) => {
             >
             <b>${truncate(media.name, 25)}</b> ${mediaSize} ${unit}
             <span class="loader-container"></span>
-            <p class="mt-2 mb-0 text-center"></p>
             </button>
-            <a href="#" style="float:right" class="text-danger">
+            <a href="#" class="text-danger">
               <i
                 style="vertical-align:middle"
                 data-name="${media.name}"
@@ -330,15 +335,16 @@ const renderUploadMediaList = (medias, types) => {
         </div>
         <div
           id="collapse_${i}" 
-          class="collapse ${i === 0 ? 'show' : ''}"
+          class="collapse"
           aria-labelledby="heading_${i}"
           data-parent="#accordion">   
-          <div class="card-body">
+          <div class="card-body border border-top-0 overflow-hidden">
             ${mediaTemplate}
             ${metadataForm}
           </div>
         </div>
-      </div>`;
+      </div>
+    `;
 
     if (hasVideo) {
       const reader = new FileReader();
@@ -356,22 +362,23 @@ const renderUploadMediaList = (medias, types) => {
         URL.createObjectURL(media);
       document.querySelector(`#audio-preview-audio-${i}`).load();
     }
+    if(i === 0) {
+      const container = document.querySelector(`#select2-container-${i}`);
 
-    const container = document.querySelector(`#select2-container-${i}`);
-
-    if(globalParents.show){
-      Select2.createGroupedField({
-        container,
-        name: 'parentId',
-        label: globalParents.label,
-        url: '/admin/media/fetch/parents',
-        class: 'form-control',
-      });
-    }else if(globalParents.id){
-      container.innerHTML += `
-        <input type="text" value="${globalParents.id}" name="parentId">
-        <input type="text" value="${globalParents.model}" name="parentModel">
-      `;
+      if(globalParents.show){
+        Select2.createGroupedField({
+          container,
+          name: 'parentId',
+          label: globalParents.label,
+          url: '/admin/media/fetch/parents',
+          class: 'form-control',
+        });
+      }else if(globalParents.id){
+        container.innerHTML += `
+          <input type="text" value="${globalParents.id}" name="parentId">
+          <input type="text" value="${globalParents.model}" name="parentModel">
+        `;
+      }
     }
     
 
@@ -739,7 +746,7 @@ const initUploadModal = (medias, types) => {
         metadataFields.forEach(field => (metadata[field.name] = field.value));
 
         const parentSelect = document.querySelector(
-          `#metadata-form-${i} select[name="parentId"]`
+          `select[name="parentId"]`
         );
         if (parentSelect !== null) {
           const dataAttrs = $(parentSelect).find(':selected').data();
@@ -793,10 +800,12 @@ const initUploadModal = (medias, types) => {
 
                 const textClass = success ? 'success' : 'danger';
                 const feedback = fileRow.querySelector('.card-header p')
-                feedback.textContent = msg;
-                feedback.classList.remove('text-danger');
-                feedback.classList.remove('text-success');
-                feedback.classList.add(`text-${textClass}`);
+                if(feedback){
+                  feedback.textContent = msg;
+                  feedback.classList.remove('text-danger');
+                  feedback.classList.remove('text-success');
+                  feedback.classList.add(`text-${textClass}`);
+                }
               } else if (fileRow) {
                 Object.entries(response.errors).forEach(([name, errors]) => {
                   const field = fileRow.querySelector(

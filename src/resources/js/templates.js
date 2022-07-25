@@ -4,9 +4,12 @@ const { truncate } = require('./utils');
 const mediaItem = media => `
 <div
   title="${media.media_content.title}" 
-  class="ui-widget-content selectable col-md-2 col-sm-3 m-1" data-file="${media.id}"
+  class="ui-widget-content selectable col-md-2 col-sm-3 m-2 p-1 flex flex-column" data-file="${media.id}"
+  style="height: fit-content"
 >
-  <img src="${media.media_content.preview}">
+  <img class="m-auto mb-2" src="${media.media_content.preview}">
+  <p class="mb-0 text-center">${truncate(media.media_content.title, 18)}</p>
+  <p class="text-sm mb-0 text-center font-weight-light">${media.media_content.updated_at.slice(0, 10)}</p>
 </div>
 `;
 
@@ -47,14 +50,15 @@ const uploadModalTitle = length => `
   Uploading <span class="medias-count">${length}</span> medias
 `;
 
-const uploadPreview = (file, i, types) => {
+const uploadPreview = (file, i, types, mediaType) => {
   const { media } = file;
 
   const ext =  media.name.split('.').pop();
   const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];
   const is3d = ext3D.includes(ext);
   const mediaPreviewTemplate = mediaPreview(media, i, is3d);
-  const metadataFormTemplate = metadataForm(i, types, {media, is3d});
+  const metadataFormTemplate = metadataForm(i, types, {media, is3d}, mediaType);
+  visitdataForm(i);
 
   let mediaSize = media.size;
   let unit = '';
@@ -68,11 +72,11 @@ const uploadPreview = (file, i, types) => {
   }
 
   return `
-    <div class="card file-row" data-name="${media.name}">
-      <div class="card-header" id="heading_${i}">
+    <div class="card file-row overflow-hidden border-0" data-name="${media.name}">
+      <div class="card-header border-0" id="heading_${i}">
         <h5 class="mb-0" style="text-align:center">
           <button
-            class="btn btn-link"
+            class="btn text-dark"
             data-toggle="collapse"
             data-target="#collapse_${i}"
             aria-expanded="true"
@@ -81,9 +85,8 @@ const uploadPreview = (file, i, types) => {
           >
           <b>${truncate(media.name, 25)}</b> ${mediaSize} ${unit}
           <span class="loader-container"></span>
-          <p class="mt-2 mb-0 text-center"></p>
           </button>
-          <a href="#" style="float:right" class="text-danger">
+          <a href="#" class="text-danger">
             <i
               style="vertical-align:middle"
               data-name="${media.name}"
@@ -94,10 +97,10 @@ const uploadPreview = (file, i, types) => {
       </div>
       <div
         id="collapse_${i}" 
-        class="collapse ${i === 0 ? 'show' : ''}"
+        class="collapse"
         aria-labelledby="heading_${i}"
         data-parent="#accordion">   
-        <div class="card-body">
+        <div class="card-body border border-top-0 overflow-hidden">
           ${mediaPreviewTemplate}
           ${metadataFormTemplate}
         </div>
@@ -106,52 +109,38 @@ const uploadPreview = (file, i, types) => {
   `;
 };
 
-const metadataForm = (i, types, {media, is3d}) => {
-  let { name, type } = media;
-  if (is3d) type = 'model';
-  const typesListTemplate = typesList(types, type);
-  const select = `
+const visitdataForm = (i) => {
+  return `
     <div id="select2-container-${i}" class="form-group">
       
     </div>
   `;
+}
+
+const metadataForm = (i, types, {media, is3d}, mediaType) => {
+  let { name, type } = media;
+  if (is3d) type = 'model';
+  const typesListTemplate = typesList(types, type, mediaType);
 
   return `
     <form id="metadata-form-${i}">
-      ${select}
       <div class="form-group">
         <label>Title</label>
         <input name="title" type="text" class="form-control" value="${name.split('.').shift()}">
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea name="description" class="form-control"></textarea>
       </div>
       ${typesListTemplate}
     </form>`;
 };
 
-const typesList = (types, type) => {
+const typesList = (types, type, mediaType) => {
   let list = '';
-  let selectedType;
-
-  if (/^image/.test(type)) {
-    [selectedType] = types.filter(type => type.key === 'image');
-  } else if (/^video/.test(type)) {
-    [selectedType] = types.filter(type => type.key === 'video');
-  } else if (/^audio/.test(type)) {
-    [selectedType] = types.filter(type => type.key === 'audio' || type.key === 'music');
-  } else if (/^model/.test(type)) {
-    [selectedType] = types.filter(type => type.key === '3d_model_interact' || type.key === '3d_model_ar');
-  }
-
   types.forEach(type => {
-    list += `<option ${selectedType.id === type.id ? 'selected' : ''} value="${type.id}">${type.name}</option>`;
+    list += `<option ${type.id === mediaType ? 'selected' : ''} value="${mediaType}">${type.name}</option>`;
   });
 
 
   return `
-  <div class="form-group">
+  <div class="form-group d-none">
     <label>Media Type</label>
     <select name="type" class="form-control">
       ${list}
@@ -273,7 +262,6 @@ const selectedMedia = ({media_content, name, id}) => {
   </a>
 `;
 }
-
 module.exports = {
   templates: {
     mediaItem,
@@ -294,5 +282,6 @@ module.exports = {
     uploadFeedback,
     metadataForm,
     selectedMedia,
+    visitdataForm,
   },
 };
