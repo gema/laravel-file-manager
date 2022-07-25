@@ -422,15 +422,15 @@ const onHiddenInputChange = e => {
 
 
 const initUploadModal = (files = globalUploadList) => {
-  let mediastoRemove = []
-  files.map(e =>  {
-    e.timestamp = Date.now();
-    if(!allowedMedias.includes(e.media.type)) {
-      const i = files.findIndex(x => e.timestamp === x.timestamp && e.media.size === x.media.size)
-      mediastoRemove.push(i)
-    }
-  })
-  mediastoRemove.reverse().forEach(key => files.splice(key, 1));
+  // let mediastoRemove = []
+  // files.map(e =>  {
+  //   e.timestamp = Date.now();
+  //   if(!allowedMedias.includes(e.media.type)) {
+  //     const i = files.findIndex(x => e.timestamp === x.timestamp && e.media.size === x.media.size)
+  //     mediastoRemove.push(i)
+  //   }
+  // })
+  // mediastoRemove.reverse().forEach(key => files.splice(key, 1));
   globalUploadContainer = document.querySelector('#upload-modal-vue');
   const uploadModal = document.querySelector('#upload-modal-vue');
   uploadModal.querySelector('.modal-title').innerHTML = templates.uploadModalTitle(files.length);
