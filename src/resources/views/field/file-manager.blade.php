@@ -20,7 +20,7 @@ if(isset($entry)){
 }
 @endphp
 
-<div class="col-12 m-0 p-0 filemanager-field" name="{{ $field['name'] }}">
+<div class="col-12 m-0 p-0 filemanager-field fileType" name="{{ $field['name'] }}" data-type="{{ $field['media_type'] }}">
     @include('crud::fields.inc.wrapper_start')
         <label>{!! $field['label'] !!}</label>
         <div class="mb-1">

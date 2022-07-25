@@ -71,7 +71,7 @@ const uploadPreview = (file, i, types, mediaType) => {
     j += 1;
   }
 
-  return `\
+  return `
     <div class="card file-row overflow-hidden border-0" data-name="${media.name}">
       <div class="card-header border-0" id="heading_${i}">
         <h5 class="mb-0" style="text-align:center">
