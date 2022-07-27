@@ -22,7 +22,7 @@ const init = options => {
   globalOptions = options;
   loadGlobals(onGlobalsLoaded);
   window.addEventListener(`get_extensions_${globalOptions.name}`, (e) => {
-    allowedMedias = e.detail.extensions
+    // allowedMedias = e.detail.extensions
     mediaType = e.detail.mediaType
   });
 };
@@ -467,8 +467,8 @@ const renderUploadsPreview = files => {
   }
   else if(globalParents.id){
     listContainer.innerHTML += `
-      <input type="text" value="${globalParents.id}" name="parentId">
-      <input type="text" value="${globalParents.model}" name="parentModel">
+      <input type="text" value="${globalParents.id}" name="parentId" class="hidden-id" hidden>
+      <input type="text" value="${globalParents.model}"  class="hidden-model" name="parentModel" hidden>
     `;
   }
 };
@@ -562,8 +562,8 @@ const generateFileMetadata = (file, i) => {
     }
   }
 
-  const parentIdHidden = document.querySelector(`#metadata-form-${i} input[name="parentId"]`);
-  const parentNamespaceHidden = document.querySelector(`#metadata-form-${i} input[name="parentModel"]`);
+  const parentIdHidden = document.querySelector(`.hidden-id`);
+  const parentNamespaceHidden = document.querySelector(`.hidden-model`);
 
   if(parentIdHidden !== null && parentNamespaceHidden !== null){
     metadata.parent_id = parentIdHidden.value;
