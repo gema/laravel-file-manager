@@ -229,7 +229,7 @@ export default {
 
     onUploadModalOpen() {
       this.$refs["upload-modal-vue"].show();
-      if (this.extensions.length) this.getExtensions();
+      this.getExtensions();
     },
 
     onUploadModalCLose() {
@@ -268,7 +268,7 @@ export default {
     },
     getExtensions() {
       customEvent(`get_extensions_${this.name}`, {
-        extensions: this.extensions,
+        // extensions: this.extensions,
         mediaType: this.mediaType,
       });
     },
