@@ -564,7 +564,6 @@ const generateFileMetadata = (file, i) => {
 
   const parentIdHidden = document.querySelector(`.hidden-id`);
   const parentNamespaceHidden = document.querySelector(`.hidden-model`);
-  console.log(parentIdHidden, parentNamespaceHidden)
 
   if(parentIdHidden !== null && parentNamespaceHidden !== null){
     metadata.parent_id = parentIdHidden.value;
