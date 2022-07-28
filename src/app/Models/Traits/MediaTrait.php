@@ -13,10 +13,16 @@ trait MediaTrait
         if (!$mediaFieldId && $column && isset($this->attributes[$column])) {
             $mediaFieldId = $this->attributes[$column];
         }
+
         try {
             $mediaIds = DB::table('media_field_has_media')
-                ->where('media_field_id', $mediaFieldId)->get()->pluck('media_id');
-            $mediaContents = MediaContent::whereIn('media_id', $mediaIds)->with('media')->get();
+                ->where('media_field_id', $mediaFieldId)->orderBy('position')->get()->pluck('media_id');
+
+            $orderedIds = implode(',', $mediaIds->toArray());
+            $mediaContents = MediaContent::whereIn('media_id', $mediaIds)
+                ->with('media')
+                ->orderByRaw("FIELD(media_id, $orderedIds)")
+                ->get();
 
             return $mediaContents;
         } catch (\Exception $e) {
@@ -39,12 +45,14 @@ trait MediaTrait
                         ]);
 
                         $data = [];
-
+                        $i = 1;
                         foreach ($mediaIds as $mediaId) {
                             array_push($data, [
                                 'media_id' => $mediaId,
                                 'media_field_id' => $mediaField->id,
+                                'position' => $i,
                             ]);
+                            $i++;
                         }
 
                         DB::table('media_field_has_media')->insert($data);

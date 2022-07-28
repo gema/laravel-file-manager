@@ -39,10 +39,16 @@ class MediaTypeCrudController extends CrudController
         ]);
 
         CRUD::addColumn([
-            'type' => 'relationship',
-            'name' => 'mediaVersions',
-            'label' => 'Media Versions',
+            'type' => 'array',
+            'name' => 'extensions',
+            'label' => 'Allowed Extensions',
         ]);
+
+        // CRUD::addColumn([
+        //     'type' => 'relationship',
+        //     'name' => 'mediaVersions',
+        //     'label' => 'Media Versions',
+        // ]);
     }
 
     protected function setupCreateOperation()
@@ -65,6 +71,27 @@ class MediaTypeCrudController extends CrudController
             'label' => 'Media Versions',
             'ajax' => true,
             'inline_create' => ['entity' => 'media-version'],
+        ]);
+
+        CRUD::addField([
+            'type' => 'select2_from_array',
+            'name' => 'extensions',
+            'label' => 'Allowed extensions',
+            'options' => [
+                'jpg' => 'jpg',
+                'jpeg' => 'jpeg',
+                'webp' => 'webp',
+                'png' => 'png',
+                'gif' => 'gif',
+                'mp4' => 'mp4',
+                'mov' => 'mov',
+                'mp3' => 'mp3',
+                'wav' => 'wav',
+                'glb' => 'glb',
+                'gltf' => 'gltf',
+            ],
+            'allows_null' => false,
+            'allows_multiple' => true,
         ]);
     }
 

@@ -19,7 +19,10 @@ class MediaType extends Model
 
     protected $table = 'media_types';
     protected $guarded = ['id'];
-    protected $fillable = ['key', 'name'];
+    protected $fillable = ['key', 'name', 'extensions'];
+    protected $casts = [
+        'extensions' => 'array',
+    ];
 
     /*
     |--------------------------------------------------------------------------
