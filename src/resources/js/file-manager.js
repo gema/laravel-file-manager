@@ -705,8 +705,11 @@ const initUploadModal = (medias, types) => {
   const titleSpan = document.querySelector('#upload-modal .modal-title span');
   const button = document.querySelector('#upload-modal .modal-save');
   const buttonSpan = button.querySelector('span');
+  let extensions = null
+  const i = types.findIndex(e => e.id === Number(mediaType))
+  if(i >= 0) extensions = types[i].extensions
+  if(extensions) medias = medias.filter((file) => extensions.includes(file.media.type.split('/')[1]))
   const totalMedias = medias.length;
-
   renderUploadMediaList(medias, types);
 
   button.classList.remove('d-none');
