@@ -23,9 +23,9 @@ trait MediaTrait
                 ->with('media')
                 ->orderByRaw("FIELD(media_id, $orderedIds)")
                 ->get();
-
             return $mediaContents;
         } catch (\Exception $e) {
+            dd($e);
             return $mediaFieldId;
         }
     }
