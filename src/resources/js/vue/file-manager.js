@@ -424,7 +424,13 @@ const initUploadModal = (files = globalUploadList) => {
   let extensions = null
   const i = globalMediaTypes.findIndex(e => e.id === mediaType)
   if(i >= 0) extensions = globalMediaTypes[i].extensions
-  if(extensions) files = files.filter((file) => extensions.includes(file.media.type.split('/')[1]))
+  if(extensions) files = files.filter((file) => {
+    if(!extensions.includes(file.media.type.split('/')[1])) {
+      toast('Some of the medias do not have the correct extension', 'error');
+      return false
+    }
+    return true
+  })
 
   globalUploadContainer = document.querySelector('#upload-modal-vue');
   const uploadModal = document.querySelector('#upload-modal-vue');

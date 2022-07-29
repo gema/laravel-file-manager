@@ -44,4 +44,5 @@ return [
     'image_cropped' => 'imagem cortada com sucesso',
     'invalid_metadata' => 'Os metadados fornecidos são inválidos',
     'no_preview' => 'A pré-visualização de $ não é suportada',
+    'valid_extensions' => 'Extensão não é válida',
 ];

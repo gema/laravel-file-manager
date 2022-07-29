@@ -44,4 +44,5 @@ return [
     'image_cropped' => 'image cropped with success',
     'invalid_metadata' => 'Provided metadata is invalid',
     'no_preview' => '$ preview is not supported',
+    'valid_extensions' => 'Some of the medias do not have the correct extension',
 ];

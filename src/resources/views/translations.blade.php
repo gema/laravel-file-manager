@@ -23,7 +23,8 @@
       invalidMetadata : '{{__("file-manager::messages.invalid_metadata")}}',
       asignTag : '{{__("file-manager::messages.asign_tag")}}',
       removeTag : '{{__("file-manager::messages.remove_tag")}}',
-      noPreview : '{{__("file-manager::messages.no_preview")}}'
+      noPreview : '{{__("file-manager::messages.no_preview")}}',
+      validExtensions : '{{__("file-manager::messages.valid_extensions")}}'
     }
   }
 

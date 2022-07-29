@@ -708,7 +708,13 @@ const initUploadModal = (medias, types) => {
   let extensions = null
   const i = types.findIndex(e => e.id === Number(mediaType))
   if(i >= 0) extensions = types[i].extensions
-  if(extensions) medias = medias.filter((file) => extensions.includes(file.media.type.split('/')[1]))
+  if(extensions) medias = medias.filter((file) => {
+    if(!extensions.includes(file.media.type.split('/')[1])) {
+      toast(__('validExtensions'), 'error');
+      return false
+    }
+    return true
+  })
   const totalMedias = medias.length;
   renderUploadMediaList(medias, types);
 
