@@ -16,25 +16,21 @@ trait MediaTrait
 
         try {
             $mediaIds = DB::table('media_field_has_media')
-                ->where('media_field_id', $mediaFieldId)->orderBy('position')->get()->pluck('media_id');
+                ->where('media_field_id', $mediaFieldId)->orderBy('position')->get()->pluck('media_id', 'position');
 
-            $orderedIds = $mediaIds->toArray();
+            $orderedIds = array_values($mediaIds->toArray());
             $mediaContents = MediaContent::whereIn('media_id', $mediaIds)
                 ->with('media')->get();
 
-            $sorted = $mediaContents->sort(function ($a, $b) use ($orderedIds) {
-                $aPos = null;
-                $bPos = null;
-
-                for ($i = 0; $i > count($orderedIds); $i++) {
-                    $orderedIds[$i] == $a['media_id'] && $aPos = $i;
-                    $orderedIds[$i] == $b['media_id'] && $bPos = $i;
+            foreach ($mediaContents as $mediaContent) {
+                foreach ($mediaIds as $position => $mediaId) {
+                    if ($mediaContent->media_id == $mediaId) {
+                        $mediaContent->position = $position;
+                    }
                 }
+            }
 
-                return ($aPos < $bPos) ? -1 : 1;
-            });
-
-            return $sorted->values();
+            return $mediaContents->sortBy('position')->values();
         } catch (\Exception $e) {
             \Log::info($e);
             return $mediaFieldId;
