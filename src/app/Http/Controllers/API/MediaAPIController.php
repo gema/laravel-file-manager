@@ -237,7 +237,8 @@ class MediaAPIController
             // Make request to media cloud
             $file = fopen(Storage::disk(config('file-manager.tmp_disk'))->path('/' . $tmpFilePath), 'r');
             $response =
-            Http::acceptJson()
+            Http::withoutVerifying()
+                ->acceptJson()
                 ->attach('file', $file, $originalFilename)
                 ->post(
                     env('MEDIA_CLOUD_ENDPOINT'),
