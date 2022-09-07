@@ -108,7 +108,8 @@ class MediaAPIController
             $disk = config('file-manager.disk');
             if (!$disk) {
                 $mediaCloudResponse = $this->mediaCloudRequest($request);
-                $preview = isset($mediaCloudResponse['preview'])? $mediaCloudResponse['preview'] : '';
+
+                $preview = isset($mediaCloudResponse['preview']) ? $mediaCloudResponse['preview'] : '';
                 $original = isset($mediaCloudResponse['original']) ? $mediaCloudResponse['original'] : '';
 
                 $mediaContent = MediaContent::create([
@@ -213,37 +214,47 @@ class MediaAPIController
 
     private function mediaCloudRequest(Request $request)
     {
-        $originalFilename = $request->media->getClientOriginalName();
-        $tmpFilePath = 'tmp/' . $originalFilename;
+        try {
+            $originalFilename = $request->media->getClientOriginalName();
+            $tmpFilePath = 'tmp/' . $originalFilename;
 
-        // Create Tmp File
-        Storage::disk(config('file-manager.tmp_disk'))->put(
-            $tmpFilePath,
-            file_get_contents($request->file('media'))
-        );
+            // Create Tmp File
+            Storage::disk(config('file-manager.tmp_disk'))->put(
+                $tmpFilePath,
+                file_get_contents($request->file('media'))
+            );
 
-        $path = 'global-storage';
+            $path = 'global-storage';
 
-        // Get parent name
-        if(isset($request->parent_model) && isset($request->parent_id)){
-            $parentModel = $request->parent_model;
-            $parentId = $request->parent_id;
-            $model = new $parentModel();
-            $path = $model::find($parentId)->slug;
+            // Get parent name
+            if (isset($request->parent_model) && isset($request->parent_id)) {
+                $parentModel = $request->parent_model;
+                $parentId = $request->parent_id;
+                $model = new $parentModel();
+                $path = $model::find($parentId)->slug;
+            }
+
+            // Make request to media cloud
+            $file = fopen(Storage::disk(config('file-manager.tmp_disk'))->path('/' . $tmpFilePath), 'r');
+            $response =
+            Http::acceptJson()
+                ->attach('file', $file, $originalFilename)
+                ->post(
+                    env('MEDIA_CLOUD_ENDPOINT'),
+                    [
+                        'defaults' => env('MEDIA_CLOUD_DEFAULTS'),
+                        'apikey' => env('MEDIA_CLOUD_API_KEY'),
+                        'path' => $path,
+                    ]
+                );
+
+            // Delete tmp file
+            Storage::disk(config('file-manager.tmp_disk'))->delete($tmpFilePath);
+
+            return $response->json();
+        } catch (\Exception $e) {
+            throw $e;
         }
-
-        // Make request to media cloud
-        $file = fopen(Storage::disk(config('file-manager.tmp_disk'))->path('/' . $tmpFilePath), 'r');
-        $response = Http::acceptJson()->attach('file', $file, $originalFilename)->post(env('MEDIA_CLOUD_ENDPOINT'), [
-            'defaults' => env('MEDIA_CLOUD_DEFAULTS'),
-            'apikey' => env('MEDIA_CLOUD_API_KEY'),
-            'path' => $path,
-        ]);
-
-        // Delete tmp file
-        Storage::disk(config('file-manager.tmp_disk'))->delete($tmpFilePath);
-
-        return $response->json();
     }
 
     public function mediaCloudWebhook(Request $request)
