@@ -4,8 +4,15 @@
 /* eslint-disable no-console */
 
 const Select2 = require('./select2');
-const { request, truncate, toast, arrayUniqueByKey } = require('./utils');
-const { templates } = require('./templates');
+const {
+  request,
+  truncate,
+  toast,
+  arrayUniqueByKey
+} = require('./utils');
+const {
+  templates
+} = require('./templates');
 
 let globalMedias = [];
 // let globalTags = [];
@@ -55,7 +62,7 @@ const getSelectedMedias = prefix => {
 //   if (selectedMedias.length) {
 //     modal.querySelector('.modal-title').textContent = title;
 //     // modal.querySelector('.modal-body').innerHTML = templates.tagsSelect(globalTags);
-    
+
 //     Select2.createAjaxField({
 //       container: modal.querySelector('.modal-body'),
 //       id: 'tags-modal-select',
@@ -158,7 +165,7 @@ const getMedias = (page = 1, tags = null, type = false, callback = false) => {
 const mediaItemTemplate = media => `
   <div
     title="${media.media_content.title}" 
-    class="ui-widget-content selectable col-md-2 col-sm-3 m-2 p-1 flex flex-column" data-file="${media.id}"
+    class="ui-widget-content selectable col-md-2 col-sm-3 m-1 p-3 flex flex-column" data-file="${media.id}"
     style="height: fit-content"
   >
     <img class="m-auto mb-2" src="${media.media_content.preview}">
@@ -174,7 +181,7 @@ const mediaUploadPromise = (media, metadata) => {
   formData.append('name', media.media.name);
 
   Object.entries(metadata).forEach(([key, value]) => {
-    if(key === 'type') formData.append(key, mediaType);
+    if (key === 'type') formData.append(key, mediaType);
     else formData.append(key, value);
   });
 
@@ -245,7 +252,10 @@ const renderUploadMediaList = (medias, types) => {
   mediasList.innerHTML = '';
   let i = 0;
   mediasList.innerHTML += templates.visitdataForm(i)
-  medias.forEach(({media, is3d}) => {
+  medias.forEach(({
+    media,
+    is3d
+  }) => {
     let mediaTemplate = '';
     let hasVideo = false;
     let hasAudio = false;
@@ -307,7 +317,10 @@ const renderUploadMediaList = (medias, types) => {
       j += 1;
     }
 
-    const metadataForm = templates.metadataForm(i, types, {media, is3d});
+    const metadataForm = templates.metadataForm(i, types, {
+      media,
+      is3d
+    });
 
     mediasList.innerHTML += `
       <div class="card file-row overflow-hidden border-0" data-name="${media.name}">
@@ -362,10 +375,10 @@ const renderUploadMediaList = (medias, types) => {
         URL.createObjectURL(media);
       document.querySelector(`#audio-preview-audio-${i}`).load();
     }
-    if(i === 0) {
+    if (i === 0) {
       const container = document.querySelector(`#select2-container-${i}`);
 
-      if(globalParents.show){
+      if (globalParents.show) {
         Select2.createGroupedField({
           container,
           name: 'parentId',
@@ -373,19 +386,19 @@ const renderUploadMediaList = (medias, types) => {
           url: '/admin/media/fetch/parents',
           class: 'form-control',
         });
-      }else if(globalParents.id){
+      } else if (globalParents.id) {
         container.innerHTML += `
           <input type="text" value="${globalParents.id}" name="parentId">
           <input type="text" value="${globalParents.model}" name="parentModel">
         `;
       }
     }
-    
+
 
     i += 1;
   });
 
-  if(globalParents.show) Select2.initGroupedFields();
+  if (globalParents.show) Select2.initGroupedFields();
 };
 
 const initSelectedMediasEdition = (prefix, medias, type) => {
@@ -413,9 +426,9 @@ const initSelectedMediasEdition = (prefix, medias, type) => {
       const descriptionField = modal.querySelector(
         'textarea[name="description"]'
       );
-      descriptionField.value = media.media_content
-        ? media.media_content.description
-        : '';
+      descriptionField.value = media.media_content ?
+        media.media_content.description :
+        '';
 
       modal.querySelector('.modal-save').addEventListener('click', () => {
         const mediaData = {
@@ -436,9 +449,9 @@ const initSelectedMediasEdition = (prefix, medias, type) => {
         });
 
         fetch(`/api/media/${media.media_content.id}/edit`, {
-          method: 'POST',
-          body: formData,
-        })
+            method: 'POST',
+            body: formData,
+          })
           .then(r => r.json())
           .then(data => {
             modal
@@ -491,11 +504,13 @@ const initSelection = (medias, prefix, type) => {
         let value;
 
         if (selectedMedias.length) {
-          value = JSON.stringify({ medias: selectedMedias });
+          value = JSON.stringify({
+            medias: selectedMedias
+          });
         } else {
           value = null
         }
-        
+
         document.querySelector(`${prefix} .selected-medias-input`).value = value;
 
         const selectedMediasContainer = document.querySelector(
@@ -707,9 +722,9 @@ const initUploadModal = (medias, types) => {
   const buttonSpan = button.querySelector('span');
   let extensions = null
   const i = types.findIndex(e => e.id === Number(mediaType))
-  if(i >= 0) extensions = types[i].extensions
-  if(extensions) medias = medias.filter((file) => {
-    if(!extensions.includes(file.media.type.split('/')[1])) {
+  if (i >= 0) extensions = types[i].extensions
+  if (extensions) medias = medias.filter((file) => {
+    if (!extensions.includes(file.media.type.split('/')[1])) {
       toast(__('validExtensions'), 'error');
       return false
     }
@@ -768,7 +783,7 @@ const initUploadModal = (medias, types) => {
         const parentIdHidden = document.querySelector(`#metadata-form-${i} input[name="parentId"]`);
         const parentNamespaceHidden = document.querySelector(`#metadata-form-${i} input[name="parentModel"]`);
 
-        if(parentIdHidden !== null && parentNamespaceHidden !== null){
+        if (parentIdHidden !== null && parentNamespaceHidden !== null) {
           metadata.parent_id = parentIdHidden.value;
           metadata.parent_model = parentNamespaceHidden.value;
         }
@@ -799,7 +814,10 @@ const initUploadModal = (medias, types) => {
                 .forEach(err => err.remove());
 
               if (!response.errors) {
-                const { msg, success } = response.data;
+                const {
+                  msg,
+                  success
+                } = response.data;
                 const fileLoader = fileRow.querySelector(
                   'span.loader-container'
                 );
@@ -809,7 +827,7 @@ const initUploadModal = (medias, types) => {
 
                 const textClass = success ? 'success' : 'danger';
                 const feedback = fileRow.querySelector('.card-header p')
-                if(feedback){
+                if (feedback) {
                   feedback.textContent = msg;
                   feedback.classList.remove('text-danger');
                   feedback.classList.remove('text-success');
@@ -891,7 +909,11 @@ const initUpload = prefix => {
     hiddenInput.files.forEach(media => {
       const ext = media.name.split('.').pop();
       const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];
-      mediaList.push({ media, cropped: null, is3d: ext3D.includes(ext) });
+      mediaList.push({
+        media,
+        cropped: null,
+        is3d: ext3D.includes(ext)
+      });
     });
     if (!modalShown) {
       uploadModal.modal('show');
@@ -935,8 +957,13 @@ const onMediaLoadedSingle = medias => {
   initUploadModalHandler();
 };
 
-const setGlobals = ({ data }) => {
-  const { types, parent } = data;
+const setGlobals = ({
+  data
+}) => {
+  const {
+    types,
+    parent
+  } = data;
   // globalTags = tags.data;
   // globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
@@ -956,11 +983,13 @@ const onGlobalsLoaded = response => {
   if (fileManagerFields.length) {
     fileManagerFields.forEach(fileManagerField => {
       const name =
-        fileManagerField !== null
-          ? fileManagerField.getAttribute('name')
-          : false;
+        fileManagerField !== null ?
+        fileManagerField.getAttribute('name') :
+        false;
       const prefix = name ? `.filemanager-field[name="${name}"] ` : '';
-      const { type } = fileManagerField.dataset;
+      const {
+        type
+      } = fileManagerField.dataset;
       getMedias(1, '', type, medias => {
         initMediaField(medias, prefix, type);
       });
@@ -985,4 +1014,6 @@ const loadGlobals = (callback = false) => {
   );
 };
 
-module.exports = { init };
+module.exports = {
+  init
+};
