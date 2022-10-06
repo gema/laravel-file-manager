@@ -4,7 +4,7 @@ const { truncate } = require('./utils');
 const mediaItem = media => `
 <div
   title="${media.media_content.title}" 
-  class="ui-widget-content selectable col-md-2 col-sm-3 m-2 p-1 flex flex-column" data-file="${media.id}"
+  class="ui-widget-content selectable col-md-2 col-sm-3 m-1 p-3 flex flex-column" data-file="${media.id}"
   style="height: fit-content"
 >
   <img class="m-auto mb-2" src="${media.media_content.preview}">
