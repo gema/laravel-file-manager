@@ -4,6 +4,7 @@ namespace GemaDigital\FileManager\app\Http\Controllers\Admin;
 
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Config;
 use GemaDigital\FileManager\app\Http\Requests\MediaTypeRequest;
 use \GemaDigital\FileManager\app\Models\MediaType;
 
@@ -77,19 +78,7 @@ class MediaTypeCrudController extends CrudController
             'type' => 'select2_from_array',
             'name' => 'extensions',
             'label' => 'Allowed extensions',
-            'options' => [
-                'jpg' => 'jpg',
-                'jpeg' => 'jpeg',
-                'webp' => 'webp',
-                'png' => 'png',
-                'gif' => 'gif',
-                'mp4' => 'mp4',
-                'mov' => 'mov',
-                'mp3' => 'mp3',
-                'wav' => 'wav',
-                'glb' => 'glb',
-                'gltf' => 'gltf',
-            ],
+            'options' => Config::get('file-manager.allowed_extensions'),
             'allows_null' => false,
             'allows_multiple' => true,
         ]);

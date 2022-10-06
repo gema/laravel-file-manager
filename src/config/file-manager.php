@@ -55,4 +55,20 @@ return [
         'defaults' => env('MEDIA_CLOUD_DEFAULTS'),
         'path' => env('MEDIA_CLOUD_PATH', 'uploads'),
     ],
+
+    // Media Types Allowed extensions
+    'allowed_extensions' => [
+        'jpg' => 'jpg',
+        'jpeg' => 'jpeg',
+        'webp' => 'webp',
+        'png' => 'png',
+        'gif' => 'gif',
+        'mp4' => 'mp4',
+        'mov' => 'mov',
+        'mp3' => 'mp3',
+        'wav' => 'wav',
+        'glb' => 'glb',
+        'gltf' => 'gltf',
+        'svg' => 'svg',
+    ],
 ];
