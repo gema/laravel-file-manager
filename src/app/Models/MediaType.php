@@ -34,4 +34,9 @@ class MediaType extends Model
     {
         return $this->belongsToMany(MediaVersion::class, 'media_type_has_versions', 'media_type_id', 'media_version_id');
     }
+
+    public function combinableTypes()
+    {
+        return $this->belongsToMany(MediaType::class, 'media_types_has_combinations', 'media_type_id', 'combinated_media_type_id');
+    }
 }

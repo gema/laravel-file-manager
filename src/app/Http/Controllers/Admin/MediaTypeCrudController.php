@@ -45,11 +45,11 @@ class MediaTypeCrudController extends CrudController
             'label' => 'Allowed Extensions',
         ]);
 
-        // CRUD::addColumn([
-        //     'type' => 'relationship',
-        //     'name' => 'mediaVersions',
-        //     'label' => 'Media Versions',
-        // ]);
+        CRUD::addColumn([
+            'type' => 'relationship',
+            'name' => 'combinableTypes',
+            'label' => 'Combinable Media Types',
+        ]);
     }
 
     protected function setupCreateOperation()
@@ -72,6 +72,12 @@ class MediaTypeCrudController extends CrudController
             'label' => 'Media Versions',
             'ajax' => true,
             'inline_create' => ['entity' => 'media-version'],
+        ]);
+
+        CRUD::addField([
+            'type' => 'relationship',
+            'name' => 'combinableTypes',
+            'label' => 'Combinable Media Types',
         ]);
 
         CRUD::addField([

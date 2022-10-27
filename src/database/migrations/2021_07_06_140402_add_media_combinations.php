@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMediaCombinations extends Migration
+class AddMediaCombinations extends Migration
 {
     public function up()
     {
@@ -12,7 +12,6 @@ class CreateMediaCombinations extends Migration
             $table->foreignId('media_type_id')->constrained('media_types');
             $table->foreignId('combinated_media_type_id')->constrained('media_types');
         });
-
         Schema::create('media_has_combinations', function (Blueprint $table) {
             $table->foreignId('media_id')->constrained('medias');
             $table->foreignId('combinated_media_id')->constrained('medias');
