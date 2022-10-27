@@ -8,10 +8,10 @@ const {
   request,
   truncate,
   toast,
-  arrayUniqueByKey
+  arrayUniqueByKey,
 } = require('./utils');
 const {
-  templates
+  templates,
 } = require('./templates');
 
 let globalMedias = [];
@@ -254,7 +254,7 @@ const renderUploadMediaList = (medias, types) => {
   mediasList.innerHTML += templates.visitdataForm(i)
   medias.forEach(({
     media,
-    is3d
+    is3d,
   }) => {
     let mediaTemplate = '';
     let hasVideo = false;
@@ -319,7 +319,7 @@ const renderUploadMediaList = (medias, types) => {
 
     const metadataForm = templates.metadataForm(i, types, {
       media,
-      is3d
+      is3d,
     });
 
     mediasList.innerHTML += `
@@ -449,9 +449,9 @@ const initSelectedMediasEdition = (prefix, medias, type) => {
         });
 
         fetch(`/api/media/${media.media_content.id}/edit`, {
-            method: 'POST',
-            body: formData,
-          })
+          method: 'POST',
+          body: formData,
+        })
           .then(r => r.json())
           .then(data => {
             modal
@@ -505,7 +505,7 @@ const initSelection = (medias, prefix, type) => {
 
         if (selectedMedias.length) {
           value = JSON.stringify({
-            medias: selectedMedias
+            medias: selectedMedias,
           });
         } else {
           value = null
@@ -723,7 +723,7 @@ const initUploadModal = (medias, types) => {
   let extensions = null
   const i = types.findIndex(e => e.id === Number(mediaType))
   if (i >= 0) extensions = types[i].extensions
-  if (extensions) medias = medias.filter((file) => {
+  if (extensions) medias = medias.filter(file => {
     if (!extensions.includes(file.media.type.split('/')[1])) {
       toast(__('validExtensions'), 'error');
       return false
@@ -770,7 +770,7 @@ const initUploadModal = (medias, types) => {
         metadataFields.forEach(field => (metadata[field.name] = field.value));
 
         const parentSelect = document.querySelector(
-          `select[name="parentId"]`
+          'select[name="parentId"]'
         );
         if (parentSelect !== null) {
           const dataAttrs = $(parentSelect).find(':selected').data();
@@ -816,7 +816,7 @@ const initUploadModal = (medias, types) => {
               if (!response.errors) {
                 const {
                   msg,
-                  success
+                  success,
                 } = response.data;
                 const fileLoader = fileRow.querySelector(
                   'span.loader-container'
@@ -912,7 +912,7 @@ const initUpload = prefix => {
       mediaList.push({
         media,
         cropped: null,
-        is3d: ext3D.includes(ext)
+        is3d: ext3D.includes(ext),
       });
     });
     if (!modalShown) {
@@ -958,11 +958,11 @@ const onMediaLoadedSingle = medias => {
 };
 
 const setGlobals = ({
-  data
+  data,
 }) => {
   const {
     types,
-    parent
+    parent,
   } = data;
   // globalTags = tags.data;
   // globalTagsLastPage = tags.last_page;
@@ -984,11 +984,11 @@ const onGlobalsLoaded = response => {
     fileManagerFields.forEach(fileManagerField => {
       const name =
         fileManagerField !== null ?
-        fileManagerField.getAttribute('name') :
-        false;
+          fileManagerField.getAttribute('name') :
+          false;
       const prefix = name ? `.filemanager-field[name="${name}"] ` : '';
       const {
-        type
+        type,
       } = fileManagerField.dataset;
       getMedias(1, '', type, medias => {
         initMediaField(medias, prefix, type);
@@ -1015,5 +1015,5 @@ const loadGlobals = (callback = false) => {
 };
 
 module.exports = {
-  init
+  init,
 };
