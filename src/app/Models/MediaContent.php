@@ -38,4 +38,9 @@ class MediaContent extends Model
     {
         return $this->belongsTo(Media::class);
     }
+
+    public function combinatedMedias()
+    {
+        return $this->belongsToMany(Media::class, 'media_has_combinations', 'media_id', 'combinated_media_id');
+    }
 }

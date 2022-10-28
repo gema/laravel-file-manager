@@ -20,7 +20,7 @@ trait MediaTrait
 
             $orderedIds = array_values($mediaIds->toArray());
             $mediaContents = MediaContent::whereIn('media_id', $mediaIds)
-                ->with('media')->get();
+                ->with(['media', 'combinatedMedias'])->get();
 
             foreach ($mediaContents as $mediaContent) {
                 foreach ($mediaIds as $position => $mediaId) {
@@ -45,24 +45,37 @@ trait MediaTrait
                 if ($entry[$column] !== null) {
                     $decoded = json_decode($entry[$column]);
                     if (is_object($decoded) && count($decoded->medias) > 0) {
-                        $mediaIds = $decoded->medias;
+                        $medias = $decoded->medias;
                         $mediaField = MediaField::create([
                             'entity_type' => self::class,
                             'entity_id' => $entry->id,
                         ]);
 
                         $data = [];
+                        $combinationData = [];
+
                         $i = 1;
-                        foreach ($mediaIds as $mediaId) {
+                        foreach ($medias as $media) {
                             array_push($data, [
-                                'media_id' => $mediaId,
+                                'media_id' => $media->id,
                                 'media_field_id' => $mediaField->id,
                                 'position' => $i,
                             ]);
+
+                            if (count($media->combined_medias)) {
+                                foreach ($media->combined_medias as $combinedMediaId) {
+                                    array_push($combinationData, [
+                                        'media_id' => $media->id,
+                                        'combinated_media_id' => $combinedMediaId,
+                                    ]);
+                                }
+                            }
+
                             $i++;
                         }
 
                         DB::table('media_field_has_media')->insert($data);
+                        DB::table('media__has_combinations')->insert($combinationData);
 
                         $entry[$column] = $mediaField->id;
                         $entry->saveQuietly();
