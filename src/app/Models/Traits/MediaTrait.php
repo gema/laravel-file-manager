@@ -20,7 +20,7 @@ trait MediaTrait
 
             $orderedIds = array_values($mediaIds->toArray());
             $mediaContents = MediaContent::whereIn('media_id', $mediaIds)
-                ->with(['media', 'combinatedMedias'])->get();
+                ->with(['media'])->get();
 
             foreach ($mediaContents as $mediaContent) {
                 foreach ($mediaIds as $position => $mediaId) {

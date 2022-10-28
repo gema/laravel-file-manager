@@ -40,6 +40,6 @@ class Media extends Model
 
     public function getCombinationsAttribute()
     {
-        return $this->combinatedMedias()->get();
+        return $this->combinatedMedias()->with('mediaContent')->get();
     }
 }
