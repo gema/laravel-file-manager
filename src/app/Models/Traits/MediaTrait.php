@@ -5,6 +5,7 @@ namespace GemaDigital\FileManager\app\Models\Traits;
 use DB;
 use GemaDigital\FileManager\app\Models\MediaContent;
 use GemaDigital\FileManager\app\Models\MediaField;
+use GemaDigital\FileManager\app\Models\MediaCombination;
 
 trait MediaTrait
 {
@@ -75,11 +76,11 @@ trait MediaTrait
                         }
 
                         DB::table('media_field_has_media')->insert($data);
-                        
+
                         MediaCombination::upsert(
                             $combinationData,
                             ['media_id', 'combinated_media_id'],
-                            []
+                            ['updated_at']
                         );
 
                         $entry[$column] = $mediaField->id;
