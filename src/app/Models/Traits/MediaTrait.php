@@ -75,7 +75,12 @@ trait MediaTrait
                         }
 
                         DB::table('media_field_has_media')->insert($data);
-                        DB::table('media_has_combinations')->insert($combinationData);
+                        
+                        MediaCombination::upsert(
+                            $combinationData,
+                            ['media_id', 'combinated_media_id'],
+                            []
+                        );
 
                         $entry[$column] = $mediaField->id;
                         $entry->saveQuietly();
