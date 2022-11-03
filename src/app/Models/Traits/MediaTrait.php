@@ -3,9 +3,9 @@
 namespace GemaDigital\FileManager\app\Models\Traits;
 
 use DB;
+use GemaDigital\FileManager\app\Models\MediaCombination;
 use GemaDigital\FileManager\app\Models\MediaContent;
 use GemaDigital\FileManager\app\Models\MediaField;
-use GemaDigital\FileManager\app\Models\MediaCombination;
 
 trait MediaTrait
 {
@@ -57,19 +57,27 @@ trait MediaTrait
 
                         $i = 1;
                         foreach ($medias as $media) {
-                            array_push($data, [
-                                'media_id' => $media->id,
-                                'media_field_id' => $mediaField->id,
-                                'position' => $i,
-                            ]);
+                            if (is_object($media)) {
+                                array_push($data, [
+                                    'media_id' => $media->id,
+                                    'media_field_id' => $mediaField->id,
+                                    'position' => $i,
+                                ]);
 
-                            if (count($media->combined_medias)) {
-                                foreach ($media->combined_medias as $combinedMediaId) {
-                                    array_push($combinationData, [
-                                        'media_id' => $media->id,
-                                        'combinated_media_id' => $combinedMediaId,
-                                    ]);
+                                if (count($media->combined_medias)) {
+                                    foreach ($media->combined_medias as $combinedMediaId) {
+                                        array_push($combinationData, [
+                                            'media_id' => $media->id,
+                                            'combinated_media_id' => $combinedMediaId,
+                                        ]);
+                                    }
                                 }
+                            } else {
+                                array_push($data, [
+                                    'media_id' => $media,
+                                    'media_field_id' => $mediaField->id,
+                                    'position' => $i,
+                                ]);
                             }
 
                             $i++;
@@ -77,11 +85,13 @@ trait MediaTrait
 
                         DB::table('media_field_has_media')->insert($data);
 
-                        MediaCombination::upsert(
-                            $combinationData,
-                            ['media_id', 'combinated_media_id'],
-                            ['updated_at']
-                        );
+                        if (!empty($combinationData)) {
+                            MediaCombination::upsert(
+                                $combinationData,
+                                ['media_id', 'combinated_media_id'],
+                                ['updated_at']
+                            );
+                        }
 
                         $entry[$column] = $mediaField->id;
                         $entry->saveQuietly();
