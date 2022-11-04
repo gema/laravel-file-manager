@@ -38,6 +38,42 @@ trait MediaTrait
         }
     }
 
+    private function buildData($medias)
+    {
+        $data = [];
+        $combinationData = [];
+
+        $i = 1;
+        foreach ($medias as $media) {
+            if (is_object($media)) {
+                array_push($data, [
+                    'media_id' => $media->id,
+                    'media_field_id' => $mediaField->id,
+                    'position' => $i,
+                ]);
+
+                if (count($media->combined_medias)) {
+                    foreach ($media->combined_medias as $combinedMediaId) {
+                        array_push($combinationData, [
+                            'media_id' => $media->id,
+                            'combinated_media_id' => $combinedMediaId,
+                        ]);
+                    }
+                }
+            } else {
+                array_push($data, [
+                    'media_id' => $media,
+                    'media_field_id' => $mediaField->id,
+                    'position' => $i,
+                ]);
+            }
+
+            $i++;
+        }
+
+        return ['medias' => $data, 'combinations' => $combinationData];
+    }
+
     public static function afterCreate($entry)
     {
         DB::beginTransaction();
@@ -52,42 +88,13 @@ trait MediaTrait
                             'entity_id' => $entry->id,
                         ]);
 
-                        $data = [];
-                        $combinationData = [];
+                        $data = $this->buildData($medias);
 
-                        $i = 1;
-                        foreach ($medias as $media) {
-                            if (is_object($media)) {
-                                array_push($data, [
-                                    'media_id' => $media->id,
-                                    'media_field_id' => $mediaField->id,
-                                    'position' => $i,
-                                ]);
+                        DB::table('media_field_has_media')->insert($data['medias']);
 
-                                if (count($media->combined_medias)) {
-                                    foreach ($media->combined_medias as $combinedMediaId) {
-                                        array_push($combinationData, [
-                                            'media_id' => $media->id,
-                                            'combinated_media_id' => $combinedMediaId,
-                                        ]);
-                                    }
-                                }
-                            } else {
-                                array_push($data, [
-                                    'media_id' => $media,
-                                    'media_field_id' => $mediaField->id,
-                                    'position' => $i,
-                                ]);
-                            }
-
-                            $i++;
-                        }
-
-                        DB::table('media_field_has_media')->insert($data);
-
-                        if (!empty($combinationData)) {
+                        if (!empty($data['combinations'])) {
                             MediaCombination::upsert(
-                                $combinationData,
+                                $data['combinations'],
                                 ['media_id', 'combinated_media_id'],
                                 ['updated_at']
                             );
@@ -112,23 +119,37 @@ trait MediaTrait
         try {
             $original = $entry->getOriginal();
 
-            // TODO: MEDIA FIELDS NEED TO BE UPDATED INSTEAD OF DELETE/cREATE
+            foreach (self::$mediable as $column) {
+                // Delete media field associations
+                \DB::table('media_field_has_media')->where('media_field_id', $original[$column])->delete();
 
-            // foreach (self::$mediable as $column) {
-            //     if ($original[$column] !== null) {
-            //         DB::table('media_field_has_media')
-            //             ->where('media_field_id', $original[$column])
-            //             ->delete();
-            //     }
-            // }
+                $decoded = json_decode($entry[$column]);
+                if (is_object($decoded)) {
+                    $medias = $decoded->medias;
 
-            // MediaField::where('entity_id', $entry->id)
-            //     ->where('entity_type', self::class)
-            //     ->delete();
+                    // Delete media combinations
+                    foreach ($medias as $media) {
+                        if (is_object($media)) {
+                            DB::table('media_has_combinations')->where('media_id', $media->id)->delete();
+                        }
+                    }
+
+                    // Create new media field associations and media combinations
+                    $data = $this->buildData($medias);
+
+                    DB::table('media_field_has_media')->insert($data['medias']);
+
+                    if (!empty($data['combinations'])) {
+                        MediaCombination::upsert(
+                            $data['combinations'],
+                            ['media_id', 'combinated_media_id'],
+                            ['updated_at']
+                        );
+                    }
+                }
+            }
 
             DB::commit();
-
-            self::afterCreate($entry);
         } catch (\Exception $e) {
             \Log::info($e);
             DB::rollback();
