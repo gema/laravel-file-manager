@@ -128,7 +128,7 @@ trait MediaTrait
 
                     // Delete media combinations
                     foreach ($medias as $media) {
-                        if (is_object($media)) {
+                        if (is_object($media) && isset($media->combined_medias)) {
                             DB::table('media_has_combinations')->where('media_id', $media->id)->delete();
                         }
                     }
