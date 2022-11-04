@@ -38,7 +38,7 @@ trait MediaTrait
         }
     }
 
-    private function buildData($medias)
+    public static function buildData($medias)
     {
         $data = [];
         $combinationData = [];
@@ -88,7 +88,7 @@ trait MediaTrait
                             'entity_id' => $entry->id,
                         ]);
 
-                        $data = $this->buildData($medias);
+                        $data = self::buildData($medias);
 
                         DB::table('media_field_has_media')->insert($data['medias']);
 
@@ -135,7 +135,9 @@ trait MediaTrait
                     }
 
                     // Create new media field associations and media combinations
-                    $data = $this->buildData($medias);
+                    $data = self::buildData($medias);
+
+                    dd($data);
 
                     DB::table('media_field_has_media')->insert($data['medias']);
 
