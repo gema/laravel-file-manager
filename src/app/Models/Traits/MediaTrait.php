@@ -38,11 +38,10 @@ trait MediaTrait
         }
     }
 
-    public static function buildData($medias)
+    public static function buildData($medias, $mediaField)
     {
         $data = [];
         $combinationData = [];
-
         $i = 1;
         foreach ($medias as $media) {
             if (is_object($media)) {
@@ -88,7 +87,7 @@ trait MediaTrait
                             'entity_id' => $entry->id,
                         ]);
 
-                        $data = self::buildData($medias);
+                        $data = self::buildData($medias, $mediaField);
 
                         DB::table('media_field_has_media')->insert($data['medias']);
 
@@ -118,9 +117,9 @@ trait MediaTrait
         DB::beginTransaction();
         try {
             $original = $entry->getOriginal();
-
             foreach (self::$mediable as $column) {
                 // Delete media field associations
+                $mediaField = DB::table('media_fields')->where('id', $original[$column])->first();
                 \DB::table('media_field_has_media')->where('media_field_id', $original[$column])->delete();
 
                 $decoded = json_decode($entry[$column]);
@@ -135,7 +134,7 @@ trait MediaTrait
                     }
 
                     // Create new media field associations and media combinations
-                    $data = self::buildData($medias);
+                    $data = self::buildData($medias, $mediaField);
 
                     DB::table('media_field_has_media')->insert($data['medias']);
 
@@ -147,6 +146,10 @@ trait MediaTrait
                         );
                     }
                 }
+
+                $entry->refresh();
+                $entry[$column] = $mediaField->id;
+                $entry->saveQuietly();
             }
 
             DB::commit();
