@@ -137,8 +137,6 @@ trait MediaTrait
                     // Create new media field associations and media combinations
                     $data = self::buildData($medias);
 
-                    dd($data);
-
                     DB::table('media_field_has_media')->insert($data['medias']);
 
                     if (!empty($data['combinations'])) {
