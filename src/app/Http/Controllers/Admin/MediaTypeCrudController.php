@@ -88,6 +88,14 @@ class MediaTypeCrudController extends CrudController
             'allows_null' => false,
             'allows_multiple' => true,
         ]);
+
+        CRUD::addField([
+            'type' => 'json',
+            'name' => 'extra_fields',
+            'label' => 'Extra Fields',
+            'view_namespace' => 'json-field-for-backpack::fields',
+            'modes' => ['tree', 'code'],
+        ]);
     }
 
     protected function setupUpdateOperation()

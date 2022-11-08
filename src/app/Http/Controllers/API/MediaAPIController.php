@@ -119,6 +119,7 @@ class MediaAPIController
                     'description' => $request->description ? $request->description : '[No description provided]',
                     'preview' => $preview,
                     'content' => ['original' => $original],
+                    'extra_fields' => $request->extra_fields,
                 ]);
             } else {
                 $parentFolder = '';

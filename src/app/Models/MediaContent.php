@@ -19,9 +19,10 @@ class MediaContent extends Model
 
     protected $table = 'media_content';
     protected $guarded = ['id'];
-    protected $fillable = ['media_cloud_id', 'media_id', 'title', 'description', 'state', 'content', 'preview'];
+    protected $fillable = ['media_cloud_id', 'media_id', 'title', 'description', 'state', 'content', 'preview', 'extra_fields'];
     protected $casts = [
         'content' => 'array',
+        'extra_fields' => 'array',
     ];
     /*
     |--------------------------------------------------------------------------
