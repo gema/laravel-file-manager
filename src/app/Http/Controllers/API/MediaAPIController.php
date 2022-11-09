@@ -190,7 +190,7 @@ class MediaAPIController
             return json_response(null, 422, 200, $validation->errors());
         }
 
-        $mediaContent = MediaContent::find($request->route('id'));
+        $mediaContent = MediaContent::where('media_id', $request->route('id'));
         $media = Media::find($mediaContent->media_id);
         if (!$media || !$mediaContent) {
             return json_response(['updated' => false]);
