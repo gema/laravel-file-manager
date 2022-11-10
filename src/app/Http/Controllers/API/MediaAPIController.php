@@ -119,7 +119,7 @@ class MediaAPIController
                     'description' => $request->description ? $request->description : '[No description provided]',
                     'preview' => $preview,
                     'content' => ['original' => $original],
-                    'extra_fields' => $request->extra_fields,
+                    'extra_fields' => json_decode($request->extra_fields),
                 ]);
             } else {
                 $parentFolder = '';
@@ -190,7 +190,7 @@ class MediaAPIController
             return json_response(null, 422, 200, $validation->errors());
         }
 
-        $mediaContent = MediaContent::where('media_id', $request->route('id'))->get();
+        $mediaContent = MediaContent::find($request->route('id'));
         $media = Media::find($mediaContent->media_id);
         if (!$media || !$mediaContent) {
             return json_response(['updated' => false]);
@@ -202,6 +202,7 @@ class MediaAPIController
 
         $mediaContent->title = $request->title;
         $mediaContent->description = $request->description;
+        $mediaContent->extra_fields = json_decode($request->extra_fields);
 
         $media->save();
         $mediaContent->save();
