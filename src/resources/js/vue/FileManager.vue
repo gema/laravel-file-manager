@@ -128,14 +128,34 @@ export default {
     "triggerClasses",
     "asignedMedias",
     "extensions",
+    "extraFields",
   ],
+  watch: {
+    asignedMedias: {
+      immediate: true,
+      deep: true,
+      handler(val) {
+        if (val.length) {
+          this.selectedMedias = val
+          this.fetchAsignedMedias();
+        }
+      }
+    }
+  },
   data() {
     return {
       selectedMedias: false,
       medias: false,
+      editedMediaId: null,
     };
   },
   mounted() {
+    FileManager.default.init({
+      name: this.name,
+      mediaType: this.mediaType,
+      min: this.min || 0,
+      max: this.max || 10,
+    });
     $(window)
       .off(`change_${this.name}`)
       .on(`change_${this.name}`, this.onMediasSelected);
@@ -158,8 +178,6 @@ export default {
     $(window)
       .off(`on_refresh_${this.name}`)
       .on(`on_refresh_${this.name}`, this.onRefresh);
-
-    if (this.asignedMedias.length) this.fetchAsignedMedias();
   },
   methods: {
     fetchAsignedMedias() {
@@ -240,7 +258,8 @@ export default {
       this.$refs["edit-media-modal"].show();
       this.editedMediaId = e.currentTarget.dataset.media;
     },
-    onEditModalShown() {
+    async onEditModalShown() {
+      await this.getExtensions()
       customEvent(`edit_media_${this.name}`, {
         mediaId: this.editedMediaId,
         medias: this.selectedMedias,
@@ -270,6 +289,7 @@ export default {
       customEvent(`get_extensions_${this.name}`, {
         // extensions: this.extensions,
         mediaType: this.mediaType,
+        extraFields: this.extraFields,
       });
     },
   },

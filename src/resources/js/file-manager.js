@@ -5,13 +5,13 @@
 
 const Select2 = require('./select2');
 const {
-  request,
-  truncate,
-  toast,
-  arrayUniqueByKey,
+    request,
+    truncate,
+    toast,
+    arrayUniqueByKey,
 } = require('./utils');
 const {
-  templates,
+    templates,
 } = require('./templates');
 
 let globalMedias = [];
@@ -24,20 +24,20 @@ let mediaList = [];
 let mediaType = document.querySelector('.fileType').getAttribute('data-type')
 
 const toggleLoader = (prefix, show = true) => {
-  const container = document.querySelector(`${prefix}.selection-area`);
-  if (container) {
-    container.innerHTML = '';
-    const loader = document.querySelector(`${prefix}.media-loader`);
-    loader.classList.toggle('d-none', !show);
-  }
+    const container = document.querySelector(`${prefix}.selection-area`);
+    if (container) {
+        container.innerHTML = '';
+        const loader = document.querySelector(`${prefix}.media-loader`);
+        loader.classList.toggle('d-none', !show);
+    }
 };
 
 const getSelectedTags = prefix => {
-  const tagsIds = [];
-  document
-    .querySelectorAll(`${prefix} .selected .select-tag`)
-    .forEach(tagBtn => tagsIds.push(parseInt(tagBtn.dataset.tag, 10)));
-  return tagsIds;
+    const tagsIds = [];
+    document
+        .querySelectorAll(`${prefix} .selected .select-tag`)
+        .forEach(tagBtn => tagsIds.push(parseInt(tagBtn.dataset.tag, 10)));
+    return tagsIds;
 };
 
 // const toggleTagBtn = parent => {
@@ -46,13 +46,13 @@ const getSelectedTags = prefix => {
 // };
 
 const getSelectedMedias = prefix => {
-  selectedMedias = [];
-  document
-    .querySelectorAll(`${prefix}.selectable.ui-selected`)
-    .forEach(selectable => {
-      selectedMedias.push(selectable.dataset.file);
-    });
-  return selectedMedias;
+    selectedMedias = [];
+    document
+        .querySelectorAll(`${prefix}.selectable.ui-selected`)
+        .forEach(selectable => {
+            selectedMedias.push(selectable.dataset.file);
+        });
+    return selectedMedias;
 };
 
 // const initTagsModal = (prefix, title) => {
@@ -155,11 +155,11 @@ const getSelectedMedias = prefix => {
 // };
 
 const getMedias = (page = 1, tags = null, type = false, callback = false) => {
-  request(`/admin/media/fetch/media?page=${page}`, callback, 'POST', {
-    _token: document.querySelector('meta[name=csrf-token]').content,
-    tags,
-    type,
-  });
+    request(`/admin/media/fetch/media?page=${page}`, callback, 'POST', {
+        _token: document.querySelector('meta[name=csrf-token]').content,
+        tags,
+        type,
+    });
 };
 
 const mediaItemTemplate = media => `
@@ -175,29 +175,29 @@ const mediaItemTemplate = media => `
 `;
 
 const mediaUploadPromise = (media, metadata) => {
-  const formData = new FormData();
-  formData.append('media', media.media);
-  formData.append('cropped', media.cropped ? media.cropped : null);
-  formData.append('name', media.media.name);
+    const formData = new FormData();
+    formData.append('media', media.media);
+    formData.append('cropped', media.cropped ? media.cropped : null);
+    formData.append('name', media.media.name);
 
-  Object.entries(metadata).forEach(([key, value]) => {
-    if (key === 'type') formData.append(key, mediaType);
-    else formData.append(key, value);
-  });
+    Object.entries(metadata).forEach(([key, value]) => {
+        if (key === 'type') formData.append(key, mediaType);
+        else formData.append(key, value);
+    });
 
-  return fetch('/api/media/upload', {
-    method: 'POST',
-    body: formData,
-  });
+    return fetch('/api/media/upload', {
+        method: 'POST',
+        body: formData,
+    });
 };
 
 const typesListTemplate = types => {
-  let typesList = '';
-  types.forEach(type => {
-    typesList += `<option value="${type.id}">${type.name}</option>`;
-  });
+    let typesList = '';
+    types.forEach(type => {
+        typesList += `<option value="${type.id}">${type.name}</option>`;
+    });
 
-  return `
+    return `
   <div class="form-group">
     <label>${__('mediaType')}</label>
     <select name="type" class="form-control">
@@ -207,13 +207,13 @@ const typesListTemplate = types => {
 };
 
 const metadataFormTemplate = (types, i) => {
-  const select = `
+    const select = `
     <div id="select2-container-${i}" class="form-group">
       
     </div>
   `;
 
-  return `
+    return `
   <form id="metadata-form-${i}">
     ${select}
     <div class="form-group">
@@ -229,18 +229,18 @@ const metadataFormTemplate = (types, i) => {
 };
 
 const cropImageTemplate = (media, i) => {
-  const tmpImg = document.createElement('img');
-  tmpImg.classList.add(`to_be_crop_${i}`);
-  tmpImg.style.maxWidth = '100%';
-  tmpImg.src = URL.createObjectURL(media);
+    const tmpImg = document.createElement('img');
+    tmpImg.classList.add(`to_be_crop_${i}`);
+    tmpImg.style.maxWidth = '100%';
+    tmpImg.src = URL.createObjectURL(media);
 
-  const buttonConfirm = document.createElement('button');
-  buttonConfirm.textContent = 'Confirm';
-  buttonConfirm.classList = 'confirm-crop btn btn-default btn-sm';
-  buttonConfirm.id = `crop_btn_${i}`;
-  buttonConfirm.dataset.id = i;
+    const buttonConfirm = document.createElement('button');
+    buttonConfirm.textContent = 'Confirm';
+    buttonConfirm.classList = 'confirm-crop btn btn-default btn-sm';
+    buttonConfirm.id = `crop_btn_${i}`;
+    buttonConfirm.dataset.id = i;
 
-  return `
+    return `
   <div class="d-none" id="imageCropper_${i}">
     ${buttonConfirm.outerHTML}
     ${tmpImg.outerHTML}
@@ -248,30 +248,30 @@ const cropImageTemplate = (media, i) => {
 };
 
 const renderUploadMediaList = (medias, types) => {
-  const mediasList = document.querySelector('#upload-modal .medias-list');
-  mediasList.innerHTML = '';
-  let i = 0;
-  mediasList.innerHTML += templates.visitdataForm(i)
-  medias.forEach(({
-    media,
-    is3d,
-  }) => {
-    let mediaTemplate = '';
-    let hasVideo = false;
-    let hasAudio = false;
+    const mediasList = document.querySelector('#upload-modal .medias-list');
+    mediasList.innerHTML = '';
+    let i = 0;
+    mediasList.innerHTML += templates.visitdataForm(i)
+    medias.forEach(({
+        media,
+        is3d,
+    }) => {
+        let mediaTemplate = '';
+        let hasVideo = false;
+        let hasAudio = false;
 
-    const typesWithoutPreview = ['video/avi'];
+        const typesWithoutPreview = ['video/avi'];
 
-    if (typesWithoutPreview.includes(media.type)) {
-      mediaTemplate = `<small>${__('noPreview', [media.type])}</small>`;
-    } else if (/^image/.test(media.type)) {
-      if (media.type !== 'image/gif') {
-        const cropBtn = `
+        if (typesWithoutPreview.includes(media.type)) {
+            mediaTemplate = `<small>${__('noPreview', [media.type])}</small>`;
+        } else if (/^image/.test(media.type)) {
+            if (media.type !== 'image/gif') {
+                const cropBtn = `
           <button id="crop-btn-${i}" class="form-control btn btn-default btn-sm crop-btn" data-id="${i}">
             ${__('crop')}
           </button>`;
 
-        mediaTemplate = `
+                mediaTemplate = `
           <img
             id="image-preview-${i}" 
             class="w-100 my-3"
@@ -281,48 +281,48 @@ const renderUploadMediaList = (medias, types) => {
             ${cropImageTemplate(media, i)}
           </div>
         `;
-      } else {
-        mediaTemplate = `
+            } else {
+                mediaTemplate = `
           <img
             id="image-preview-${i}" 
             class="w-100 my-3"
             src="${URL.createObjectURL(media)}">
         `;
-      }
-    } else if (/^video/.test(media.type)) {
-      hasVideo = true;
-      mediaTemplate = `
+            }
+        } else if (/^video/.test(media.type)) {
+            hasVideo = true;
+            mediaTemplate = `
         <video controls id="video-preview-video-${i}" class="w-100 my-3">
           <source id="video-preview-source-${i}" src="">
           Your browser does not support the video tag.
         </video>`;
-    } else if (/^audio/.test(media.type)) {
-      hasAudio = true;
-      mediaTemplate = `
+        } else if (/^audio/.test(media.type)) {
+            hasAudio = true;
+            mediaTemplate = `
       <audio class="w-100 my-3" id="audio-preview-audio-${i}" controls>
         <source src="" id="audio-preview-source-${i}" />
       </audio>`;
-    } else if (is3d) {
-      '<p>3d model</p>'
-    }
+        } else if (is3d) {
+            '<p>3d model</p>'
+        }
 
-    let mediaSize = media.size;
-    let unit = '';
-    let j = 0;
-    const units = ['KB', 'MB', 'GB'];
+        let mediaSize = media.size;
+        let unit = '';
+        let j = 0;
+        const units = ['KB', 'MB', 'GB'];
 
-    while (mediaSize > 1024 && j < units.length) {
-      mediaSize = Math.round(mediaSize / 1024);
-      unit = units[j];
-      j += 1;
-    }
+        while (mediaSize > 1024 && j < units.length) {
+            mediaSize = Math.round(mediaSize / 1024);
+            unit = units[j];
+            j += 1;
+        }
 
-    const metadataForm = templates.metadataForm(i, types, {
-      media,
-      is3d,
-    });
+        const metadataForm = templates.metadataForm(i, types, {
+            media,
+            is3d,
+        });
 
-    mediasList.innerHTML += `
+        mediasList.innerHTML += `
       <div class="card file-row overflow-hidden border-0" data-name="${media.name}">
         <div class="card-header border-0" id="heading_${i}">
           <h5 class="mb-0" style="text-align:center">
@@ -359,257 +359,257 @@ const renderUploadMediaList = (medias, types) => {
       </div>
     `;
 
-    if (hasVideo) {
-      const reader = new FileReader();
-      const x = i;
-      reader.onloadend = () => {
-        const video = document.querySelector(`#video-preview-video-${x}`);
-        video.src = reader.result;
-      };
+        if (hasVideo) {
+            const reader = new FileReader();
+            const x = i;
+            reader.onloadend = () => {
+                const video = document.querySelector(`#video-preview-video-${x}`);
+                video.src = reader.result;
+            };
 
-      reader.readAsDataURL(media);
-    }
+            reader.readAsDataURL(media);
+        }
 
-    if (hasAudio) {
-      document.querySelector(`#audio-preview-source-${i}`).src =
-        URL.createObjectURL(media);
-      document.querySelector(`#audio-preview-audio-${i}`).load();
-    }
-    if (i === 0) {
-      const container = document.querySelector(`#select2-container-${i}`);
+        if (hasAudio) {
+            document.querySelector(`#audio-preview-source-${i}`).src =
+                URL.createObjectURL(media);
+            document.querySelector(`#audio-preview-audio-${i}`).load();
+        }
+        if (i === 0) {
+            const container = document.querySelector(`#select2-container-${i}`);
 
-      if (globalParents.show) {
-        Select2.createGroupedField({
-          container,
-          name: 'parentId',
-          label: globalParents.label,
-          url: '/admin/media/fetch/parents',
-          class: 'form-control',
-        });
-      } else if (globalParents.id) {
-        container.innerHTML += `
+            if (globalParents.show) {
+                Select2.createGroupedField({
+                    container,
+                    name: 'parentId',
+                    label: globalParents.label,
+                    url: '/admin/media/fetch/parents',
+                    class: 'form-control',
+                });
+            } else if (globalParents.id) {
+                container.innerHTML += `
           <input type="text" value="${globalParents.id}" name="parentId">
           <input type="text" value="${globalParents.model}" name="parentModel">
         `;
-      }
-    }
+            }
+        }
 
 
-    i += 1;
-  });
+        i += 1;
+    });
 
-  if (globalParents.show) Select2.initGroupedFields();
+    if (globalParents.show) Select2.initGroupedFields();
 };
 
 const initSelectedMediasEdition = (prefix, medias, type) => {
-  document.querySelectorAll(`${prefix}.selected-media`).forEach(element => {
-    element.addEventListener('click', e => {
-      const mediaId = e.currentTarget.dataset.media;
-      const [media] = medias.filter(m => String(m.id) === mediaId);
+    document.querySelectorAll(`${prefix}.selected-media`).forEach(element => {
+        element.addEventListener('click', e => {
+            const mediaId = e.currentTarget.dataset.media;
+            const [media] = medias.filter(m => String(m.id) === mediaId);
 
-      const modal = document.querySelector('#edit-media-modal');
-      modal.querySelector('.modal-body').innerHTML = metadataFormTemplate(
-        globalMediaTypes,
-        media.id
-      );
+            const modal = document.querySelector('#edit-media-modal');
+            modal.querySelector('.modal-body').innerHTML = metadataFormTemplate(
+                globalMediaTypes,
+                media.id
+            );
 
-      modal.querySelector('.modal-save').innerHTML = 'Save';
+            modal.querySelector('.modal-save').innerHTML = 'Save';
 
-      const parentField = modal.querySelector('select[name="parentId"]');
-      if (parentField !== null) {
-        parentField.value = media ? media.parent_id : '';
-      }
-
-      const titleField = modal.querySelector('input[name="title"]');
-      titleField.value = media.media_content ? media.media_content.title : '';
-
-      const descriptionField = modal.querySelector(
-        'textarea[name="description"]'
-      );
-      descriptionField.value = media.media_content ?
-        media.media_content.description :
-        '';
-
-      modal.querySelector('.modal-save').addEventListener('click', () => {
-        const mediaData = {
-          title: modal.querySelector('input[name="title"]').value,
-          description: modal.querySelector('textarea[name="description"]')
-            .value,
-        };
-
-        if (parentField !== null) {
-          mediaData.parent = modal.querySelector(
-            'select[name="parentId"]'
-          ).value;
-        }
-
-        const formData = new FormData();
-        Object.entries(mediaData).forEach(([key, value]) => {
-          formData.append(key, value);
-        });
-
-        fetch(`/api/media/${media.media_content.id}/edit`, {
-          method: 'POST',
-          body: formData,
-        })
-          .then(r => r.json())
-          .then(data => {
-            modal
-              .querySelectorAll('small.text-danger')
-              .forEach(err => err.remove());
-
-            if (!data.errors && data.data.updated) {
-              document.querySelector(
-                `${prefix}.selected-media[data-media="${media.id}"]`
-              ).outerHTML = templates.selectedMedia(data.data.media);
-
-              modal.querySelector('.modal-save').innerHTML =
-                '<span class="modal-loader la la-spinner la-spin"></span>';
-
-              toggleLoader(prefix, true);
-              getMedias(1, '', type, medias1 => {
-                initSelectedMediasEdition(prefix, medias1.data, type);
-                // eslint-disable-next-line no-use-before-define
-                renderMediasTable(medias1, prefix, type);
-                $(modal).modal('hide');
-                toast(__('mediaUpdated'));
-              });
-            } else {
-              Object.entries(data.errors).forEach(([name, errors]) => {
-                const field = modal.querySelector(
-                  `input[name="${name}"], textarea[name="${name}"], select[name="${name}"]`
-                );
-                errors.forEach(error => {
-                  field.parentElement.innerHTML += `<small class="text-danger">${error}</small>`;
-                });
-              });
+            const parentField = modal.querySelector('select[name="parentId"]');
+            if (parentField !== null) {
+                parentField.value = media ? media.parent_id : '';
             }
-          });
-      });
 
-      $(modal).modal('show');
+            const titleField = modal.querySelector('input[name="title"]');
+            titleField.value = media.media_content ? media.media_content.title : '';
+
+            const descriptionField = modal.querySelector(
+                'textarea[name="description"]'
+            );
+            descriptionField.value = media.media_content ?
+                media.media_content.description :
+                '';
+
+            modal.querySelector('.modal-save').addEventListener('click', () => {
+                const mediaData = {
+                    title: modal.querySelector('input[name="title"]').value,
+                    description: modal.querySelector('textarea[name="description"]')
+                        .value,
+                };
+
+                if (parentField !== null) {
+                    mediaData.parent = modal.querySelector(
+                        'select[name="parentId"]'
+                    ).value;
+                }
+
+                const formData = new FormData();
+                Object.entries(mediaData).forEach(([key, value]) => {
+                    formData.append(key, value);
+                });
+
+                fetch(`/api/media/${media.media_content.id}/edit`, {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        modal
+                            .querySelectorAll('small.text-danger')
+                            .forEach(err => err.remove());
+
+                        if (!data.errors && data.data.updated) {
+                            document.querySelector(
+                                `${prefix}.selected-media[data-media="${media.id}"]`
+                            ).outerHTML = templates.selectedMedia(data.data.media);
+
+                            modal.querySelector('.modal-save').innerHTML =
+                                '<span class="modal-loader la la-spinner la-spin"></span>';
+
+                            toggleLoader(prefix, true);
+                            getMedias(1, '', type, medias1 => {
+                                initSelectedMediasEdition(prefix, medias1.data, type);
+                                // eslint-disable-next-line no-use-before-define
+                                renderMediasTable(medias1, prefix, type);
+                                $(modal).modal('hide');
+                                toast(__('mediaUpdated'));
+                            });
+                        } else {
+                            Object.entries(data.errors).forEach(([name, errors]) => {
+                                const field = modal.querySelector(
+                                    `input[name="${name}"], textarea[name="${name}"], select[name="${name}"]`
+                                );
+                                errors.forEach(error => {
+                                    field.parentElement.innerHTML += `<small class="text-danger">${error}</small>`;
+                                });
+                            });
+                        }
+                    });
+            });
+
+            $(modal).modal('show');
+        });
     });
-  });
 };
 
 const initSelection = (medias, prefix, type) => {
-  $('.selection-area')
-    .selectable();
+    $('.selection-area')
+        .selectable();
 
-  if (prefix !== '') {
-    document
-      .querySelector(`${prefix}#selectFilesBtn`)
-      .addEventListener('click', () => {
-        const selectedMedias = getSelectedMedias(prefix);
-        let value;
+    if (prefix !== '') {
+        document
+            .querySelector(`${prefix}#selectFilesBtn`)
+            .addEventListener('click', () => {
+                const selectedMedias = getSelectedMedias(prefix);
+                let value;
 
-        if (selectedMedias.length) {
-          value = JSON.stringify({
-            medias: selectedMedias,
-          });
-        } else {
-          value = null
-        }
+                if (selectedMedias.length) {
+                    value = JSON.stringify({
+                        medias: selectedMedias,
+                    });
+                } else {
+                    value = null
+                }
 
-        document.querySelector(`${prefix} .selected-medias-input`).value = value;
+                document.querySelector(`${prefix} .selected-medias-input`).value = value;
 
-        const selectedMediasContainer = document.querySelector(
-          `${prefix}.selected-medias-list`
-        );
-        selectedMediasContainer.innerHTML = '';
+                const selectedMediasContainer = document.querySelector(
+                    `${prefix}.selected-medias-list`
+                );
+                selectedMediasContainer.innerHTML = '';
 
-        document.querySelector(
-          `${prefix}.selected-medias-number`
-        ).innerHTML = `${selectedMedias.length}`;
+                document.querySelector(
+                    `${prefix}.selected-medias-number`
+                ).innerHTML = `${selectedMedias.length}`;
 
-        if (selectedMedias.length > 0) {
-          medias.forEach(media => {
-            if (selectedMedias.includes(String(media.id))) {
-              selectedMediasContainer.innerHTML += templates.selectedMedia(media);
-            }
-          });
+                if (selectedMedias.length > 0) {
+                    medias.forEach(media => {
+                        if (selectedMedias.includes(String(media.id))) {
+                            selectedMediasContainer.innerHTML += templates.selectedMedia(media);
+                        }
+                    });
 
-          initSelectedMediasEdition(prefix, medias, type);
-        } else {
-          selectedMediasContainer.innerHTML = `
+                    initSelectedMediasEdition(prefix, medias, type);
+                } else {
+                    selectedMediasContainer.innerHTML = `
             <li class="list-group-item">
               <small>${__('noMediasSelected')}</small>
             </li>
           `;
-        }
-      });
-  }
+                }
+            });
+    }
 };
 
 const initScroll = (container, lastPage, prefix = '', type) => {
-  let page = 1;
-  let isLoading = false;
+    let page = 1;
+    let isLoading = false;
 
-  $(container).off('scroll');
-  $(container).on('scroll', () => {
-    if (
-      container.offsetHeight + container.scrollTop >=
-      container.scrollHeight - 1
-    ) {
-      if (!isLoading && page + 1 <= lastPage) {
-        page += 1;
-        isLoading = true;
+    $(container).off('scroll');
+    $(container).on('scroll', () => {
+        if (
+            container.offsetHeight + container.scrollTop >=
+            container.scrollHeight - 1
+        ) {
+            if (!isLoading && page + 1 <= lastPage) {
+                page += 1;
+                isLoading = true;
 
-        container.innerHTML += `
+                container.innerHTML += `
         <div class="pagination-loader col-sm-12 d-flex justify-content-center m-0">
           <h4><span class="la la-spinner la-spin mt-3"></span></h4>
         </div>`;
 
-        getMedias(page, getSelectedTags(prefix), type, mediasResponse => {
-          container.querySelector('.pagination-loader').remove();
-          const medias = mediasResponse.data;
-          medias.forEach(media => {
-            container.innerHTML += mediaItemTemplate(media);
-          });
+                getMedias(page, getSelectedTags(prefix), type, mediasResponse => {
+                    container.querySelector('.pagination-loader').remove();
+                    const medias = mediasResponse.data;
+                    medias.forEach(media => {
+                        container.innerHTML += mediaItemTemplate(media);
+                    });
 
-          globalMedias = arrayUniqueByKey(globalMedias.concat(medias), 'id');
+                    globalMedias = arrayUniqueByKey(globalMedias.concat(medias), 'id');
 
-          isLoading = false;
-          if (prefix !== '') initSelection(globalMedias, prefix, type);
-        });
-      }
-    }
-  });
+                    isLoading = false;
+                    if (prefix !== '') initSelection(globalMedias, prefix, type);
+                });
+            }
+        }
+    });
 };
 
 const renderMediasTable = (medias, prefix, type = false) => {
-  globalMedias = arrayUniqueByKey(globalMedias.concat(medias.data), 'id');
-  toggleLoader(prefix, false);
-  const container = document.querySelector(
-    `${prefix} .custom-file-manager .list`
-  );
-  container.innerHTML = '';
+    globalMedias = arrayUniqueByKey(globalMedias.concat(medias.data), 'id');
+    toggleLoader(prefix, false);
+    const container = document.querySelector(
+        `${prefix} .custom-file-manager .list`
+    );
+    container.innerHTML = '';
 
-  if (medias.data.length) {
-    medias.data.forEach(media => {
-      // const tags = globalTags.filter(tag => media.tags.includes(tag.id));
-      container.innerHTML += mediaItemTemplate(media);
+    if (medias.data.length) {
+        medias.data.forEach(media => {
+            // const tags = globalTags.filter(tag => media.tags.includes(tag.id));
+            container.innerHTML += mediaItemTemplate(media);
 
-      initScroll(container, medias.last_page, prefix, type);
-      initSelection(globalMedias, prefix, type);
-    });
-  } else {
-    container.innerHTML = `
+            initScroll(container, medias.last_page, prefix, type);
+            initSelection(globalMedias, prefix, type);
+        });
+    } else {
+        container.innerHTML = `
     <tr>
       <td class="empty" colspan="6">${__('noMediasFound')}</td>
     </tr>`;
-  }
+    }
 };
 
 const initRefresh = (prefix = '', type = false) => {
-  document
-    .querySelector(`${prefix}#refreshBtn`)
-    .addEventListener('click', () => {
-      toggleLoader(prefix, true);
-      getMedias(1, '', type, medias => {
-        renderMediasTable(medias, prefix, type);
-      });
-    });
+    document
+        .querySelector(`${prefix}#refreshBtn`)
+        .addEventListener('click', () => {
+            toggleLoader(prefix, true);
+            getMedias(1, '', type, medias => {
+                renderMediasTable(medias, prefix, type);
+            });
+        });
 };
 
 // const initTags = (prefix = '', type = false) => {
@@ -688,332 +688,332 @@ const initRefresh = (prefix = '', type = false) => {
 // };
 
 const initCropper = i => {
-  const imgTobeCrop = document.querySelector(`.to_be_crop_${i}`);
-  const ImgCrop = new Cropper(imgTobeCrop, {
-    aspectRatio: '1/1',
-  });
+    const imgTobeCrop = document.querySelector(`.to_be_crop_${i}`);
+    const ImgCrop = new Cropper(imgTobeCrop, {
+        aspectRatio: '1/1',
+    });
 
-  const buttonConfirm = document.querySelector(`#crop_btn_${i}`);
+    const buttonConfirm = document.querySelector(`#crop_btn_${i}`);
 
-  buttonConfirm.addEventListener('click', () => {
-    const canvas = ImgCrop.getCroppedCanvas();
-    if (canvas !== null) {
-      canvas.toBlob(blob => {
-        blob.lastModifiedDate = new Date();
-        blob.lastModified = new Date();
+    buttonConfirm.addEventListener('click', () => {
+        const canvas = ImgCrop.getCroppedCanvas();
+        if (canvas !== null) {
+            canvas.toBlob(blob => {
+                blob.lastModifiedDate = new Date();
+                blob.lastModified = new Date();
 
-        const croppedImage = new File([blob], mediaList[i].media.name, {
-          type: blob.type,
-        });
+                const croppedImage = new File([blob], mediaList[i].media.name, {
+                    type: blob.type,
+                });
 
-        mediaList[i].media = croppedImage;
-        document.querySelector(`#image-preview-${i}`).src =
-          URL.createObjectURL(croppedImage);
-        $(`#crop-btn-${i}`).click();
-        toast(__('imageCropped'));
-      });
-    }
-  });
+                mediaList[i].media = croppedImage;
+                document.querySelector(`#image-preview-${i}`).src =
+                    URL.createObjectURL(croppedImage);
+                $(`#crop-btn-${i}`).click();
+                toast(__('imageCropped'));
+            });
+        }
+    });
 };
 
 const initUploadModal = (medias, types) => {
-  const titleSpan = document.querySelector('#upload-modal .modal-title span');
-  const button = document.querySelector('#upload-modal .modal-save');
-  const buttonSpan = button.querySelector('span');
-  let extensions = null
-  const i = types.findIndex(e => e.id === Number(mediaType))
-  if (i >= 0) extensions = types[i].extensions
-  if (extensions) medias = medias.filter(file => {
-    if (!extensions.includes(file.media.type.split('/')[1])) {
-      toast(__('validExtensions'), 'error');
-      return false
-    }
-    return true
-  })
-  const totalMedias = medias.length;
-  renderUploadMediaList(medias, types);
-
-  button.classList.remove('d-none');
-  titleSpan.innerHTML = totalMedias;
-  buttonSpan.innerHTML = totalMedias;
-
-  const removeMediaBtns = document.querySelectorAll('.remove-media-btn');
-  removeMediaBtns.forEach(removeBtn => {
-    removeBtn.addEventListener('click', e => {
-      const mediaName = e.target.dataset.name;
-      medias = medias.filter(media => media.media.name !== mediaName);
-
-      initUploadModal(medias, types);
-    });
-  });
-
-  $('#upload-modal .modal-save')
-    .off('click')
-    .on('click', e => {
-      e.currentTarget.classList.add('d-none');
-      const promises = [];
-      const promiseResponses = [];
-
-      let i = 0;
-
-      const fileNames = document.querySelectorAll('span.loader-container');
-      fileNames.forEach(fileName => {
-        fileName.innerHTML +=
-          '<span class="ml-2 la la-spinner la-spin"></span>';
-      });
-
-      medias.forEach(media => {
-        const metadataFields = document.querySelectorAll(
-          `#metadata-form-${i} .form-control`
-        );
-        const metadata = {};
-        metadataFields.forEach(field => (metadata[field.name] = field.value));
-
-        const parentSelect = document.querySelector(
-          'select[name="parentId"]'
-        );
-        if (parentSelect !== null) {
-          const dataAttrs = $(parentSelect).find(':selected').data();
-          if (dataAttrs !== undefined) {
-            metadata.parent_model = dataAttrs.namespace;
-            metadata.parent_id = parentSelect.value;
-          }
+    const titleSpan = document.querySelector('#upload-modal .modal-title span');
+    const button = document.querySelector('#upload-modal .modal-save');
+    const buttonSpan = button.querySelector('span');
+    let extensions = null
+    const i = types.findIndex(e => e.id === Number(mediaType))
+    if (i >= 0) extensions = types[i].extensions
+    if (extensions) medias = medias.filter(file => {
+        if (!extensions.includes(file.media.type.split('/')[1])) {
+            toast(__('validExtensions'), 'error');
+            return false
         }
+        return true
+    })
+    const totalMedias = medias.length;
+    renderUploadMediaList(medias, types);
 
-        const parentIdHidden = document.querySelector(`#metadata-form-${i} input[name="parentId"]`);
-        const parentNamespaceHidden = document.querySelector(`#metadata-form-${i} input[name="parentModel"]`);
+    button.classList.remove('d-none');
+    titleSpan.innerHTML = totalMedias;
+    buttonSpan.innerHTML = totalMedias;
 
-        if (parentIdHidden !== null && parentNamespaceHidden !== null) {
-          metadata.parent_id = parentIdHidden.value;
-          metadata.parent_model = parentNamespaceHidden.value;
-        }
+    const removeMediaBtns = document.querySelectorAll('.remove-media-btn');
+    removeMediaBtns.forEach(removeBtn => {
+        removeBtn.addEventListener('click', e => {
+            const mediaName = e.target.dataset.name;
+            medias = medias.filter(media => media.media.name !== mediaName);
 
-        promises.push(mediaUploadPromise(media, metadata));
-        i += 1;
-      });
-
-      Promise.all(promises)
-        .then(
-          responses => {
-            responses.forEach(response => {
-              if (response.ok) {
-                promiseResponses.push(response.json());
-              }
-            });
-          },
-          e1 => console.log(e1)
-        )
-        .then(() => {
-          Promise.all(promiseResponses).then(responses => {
-            responses.forEach(response => {
-              const fileRow = document.querySelector(
-                `.file-row[data-name="${response.data.filename}"]`
-              );
-              document
-                .querySelectorAll('small.text-danger')
-                .forEach(err => err.remove());
-
-              if (!response.errors) {
-                const {
-                  msg,
-                  success,
-                } = response.data;
-                const fileLoader = fileRow.querySelector(
-                  'span.loader-container'
-                );
-
-                fileLoader.classList.value = 'ml-2';
-                fileLoader.innerHTML = success ? '✅' : '❌';
-
-                const textClass = success ? 'success' : 'danger';
-                const feedback = fileRow.querySelector('.card-header p')
-                if (feedback) {
-                  feedback.textContent = msg;
-                  feedback.classList.remove('text-danger');
-                  feedback.classList.remove('text-success');
-                  feedback.classList.add(`text-${textClass}`);
-                }
-              } else if (fileRow) {
-                Object.entries(response.errors).forEach(([name, errors]) => {
-                  const field = fileRow.querySelector(
-                    `input[name="${name}"], select[name="${name}"]`
-                  );
-                  errors.forEach(error => {
-                    field.parentElement.innerHTML += `<small class="text-danger">${error}</small>`;
-                  });
-                });
-
-                const fileLoader = fileRow.querySelector(
-                  'span.loader-container'
-                );
-
-                fileLoader.innerHTML = '❌';
-                const feedback = fileRow.querySelector('.card-header p')
-                feedback.innerHTML = __('invalidMetadata');
-                feedback.classList.add('text-danger');
-                feedback.classList.remove('text-success');
-
-                $(fileRow).find('.collapse').collapse('show');
-                e.currentTarget.classList.remove('d-none');
-              }
-            });
-          });
+            initUploadModal(medias, types);
         });
     });
 
-  $('.crop-btn')
-    .off('click')
-    .on('click', e1 => {
-      const i1 = e1.target.dataset.id;
-      const imageCropper = document.querySelector(`#imageCropper_${i1}`);
-      initCropper(i1);
-      if (Object.values(imageCropper.classList).includes('d-none')) {
-        imageCropper.classList.remove('d-none');
-      } else {
-        imageCropper.classList.add('d-none');
-      }
-    });
+    $('#upload-modal .modal-save')
+        .off('click')
+        .on('click', e => {
+            e.currentTarget.classList.add('d-none');
+            const promises = [];
+            const promiseResponses = [];
+
+            let i = 0;
+
+            const fileNames = document.querySelectorAll('span.loader-container');
+            fileNames.forEach(fileName => {
+                fileName.innerHTML +=
+                    '<span class="ml-2 la la-spinner la-spin"></span>';
+            });
+
+            medias.forEach(media => {
+                const metadataFields = document.querySelectorAll(
+                    `#metadata-form-${i} .form-control`
+                );
+                const metadata = {};
+                metadataFields.forEach(field => (metadata[field.name] = field.value));
+
+                const parentSelect = document.querySelector(
+                    'select[name="parentId"]'
+                );
+                if (parentSelect !== null) {
+                    const dataAttrs = $(parentSelect).find(':selected').data();
+                    if (dataAttrs !== undefined) {
+                        metadata.parent_model = dataAttrs.namespace;
+                        metadata.parent_id = parentSelect.value;
+                    }
+                }
+
+                const parentIdHidden = document.querySelector(`#metadata-form-${i} input[name="parentId"]`);
+                const parentNamespaceHidden = document.querySelector(`#metadata-form-${i} input[name="parentModel"]`);
+
+                if (parentIdHidden !== null && parentNamespaceHidden !== null) {
+                    metadata.parent_id = parentIdHidden.value;
+                    metadata.parent_model = parentNamespaceHidden.value;
+                }
+
+                promises.push(mediaUploadPromise(media, metadata));
+                i += 1;
+            });
+
+            Promise.all(promises)
+                .then(
+                    responses => {
+                        responses.forEach(response => {
+                            if (response.ok) {
+                                promiseResponses.push(response.json());
+                            }
+                        });
+                    },
+                    e1 => console.log(e1)
+                )
+                .then(() => {
+                    Promise.all(promiseResponses).then(responses => {
+                        responses.forEach(response => {
+                            const fileRow = document.querySelector(
+                                `.file-row[data-name="${response.data.filename}"]`
+                            );
+                            document
+                                .querySelectorAll('small.text-danger')
+                                .forEach(err => err.remove());
+
+                            if (!response.errors) {
+                                const {
+                                    msg,
+                                    success,
+                                } = response.data;
+                                const fileLoader = fileRow.querySelector(
+                                    'span.loader-container'
+                                );
+
+                                fileLoader.classList.value = 'ml-2';
+                                fileLoader.innerHTML = success ? '✅' : '❌';
+
+                                const textClass = success ? 'success' : 'danger';
+                                const feedback = fileRow.querySelector('.card-header p')
+                                if (feedback) {
+                                    feedback.textContent = msg;
+                                    feedback.classList.remove('text-danger');
+                                    feedback.classList.remove('text-success');
+                                    feedback.classList.add(`text-${textClass}`);
+                                }
+                            } else if (fileRow) {
+                                Object.entries(response.errors).forEach(([name, errors]) => {
+                                    const field = fileRow.querySelector(
+                                        `input[name="${name}"], select[name="${name}"]`
+                                    );
+                                    errors.forEach(error => {
+                                        field.parentElement.innerHTML += `<small class="text-danger">${error}</small>`;
+                                    });
+                                });
+
+                                const fileLoader = fileRow.querySelector(
+                                    'span.loader-container'
+                                );
+
+                                fileLoader.innerHTML = '❌';
+                                const feedback = fileRow.querySelector('.card-header p')
+                                feedback.innerHTML = __('invalidMetadata');
+                                feedback.classList.add('text-danger');
+                                feedback.classList.remove('text-success');
+
+                                $(fileRow).find('.collapse').collapse('show');
+                                e.currentTarget.classList.remove('d-none');
+                            }
+                        });
+                    });
+                });
+        });
+
+    $('.crop-btn')
+        .off('click')
+        .on('click', e1 => {
+            const i1 = e1.target.dataset.id;
+            const imageCropper = document.querySelector(`#imageCropper_${i1}`);
+            initCropper(i1);
+            if (Object.values(imageCropper.classList).includes('d-none')) {
+                imageCropper.classList.remove('d-none');
+            } else {
+                imageCropper.classList.add('d-none');
+            }
+        });
 };
 
 const initUploadModalHandler = (prefix = '', type = false) => {
-  const uploadModal = $('#upload-modal');
-  uploadModal.on('shown.bs.modal', () => {
-    initUploadModal(mediaList, globalMediaTypes);
-  });
-  uploadModal.on('hidden.bs.modal', () => {
-    modalShown = false;
-    // Refresh After Upload
-    toggleLoader(prefix, true);
-    getMedias(1, '', type, medias => {
-      renderMediasTable(medias, prefix, type);
+    const uploadModal = $('#upload-modal');
+    uploadModal.on('shown.bs.modal', () => {
+        initUploadModal(mediaList, globalMediaTypes);
     });
-  });
+    uploadModal.on('hidden.bs.modal', () => {
+        modalShown = false;
+        // Refresh After Upload
+        toggleLoader(prefix, true);
+        getMedias(1, '', type, medias => {
+            renderMediasTable(medias, prefix, type);
+        });
+    });
 };
 
 const initUpload = prefix => {
-  const hiddenInput = document.querySelector(`${prefix} #upload-field`);
-  const uploadButton = document.querySelector(`${prefix} #upload-button`);
+    const hiddenInput = document.querySelector(`${prefix} #upload-field`);
+    const uploadButton = document.querySelector(`${prefix} #upload-button`);
 
-  const uploadModal = $('#upload-modal');
+    const uploadModal = $('#upload-modal');
 
-  const uploadClickListener = () => {
-    hiddenInput.value = '';
-    hiddenInput.click();
-  };
+    const uploadClickListener = () => {
+        hiddenInput.value = '';
+        hiddenInput.click();
+    };
 
-  $(uploadButton).off('click');
-  $(uploadButton).on('click', uploadClickListener);
+    $(uploadButton).off('click');
+    $(uploadButton).on('click', uploadClickListener);
 
-  hiddenInput.addEventListener('change', () => {
-    mediaList = [];
-    hiddenInput.files.forEach(media => {
-      const ext = media.name.split('.').pop();
-      const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];
-      mediaList.push({
-        media,
-        cropped: null,
-        is3d: ext3D.includes(ext),
-      });
+    hiddenInput.addEventListener('change', () => {
+        mediaList = [];
+        hiddenInput.files.forEach(media => {
+            const ext = media.name.split('.').pop();
+            const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];
+            mediaList.push({
+                media,
+                cropped: null,
+                is3d: ext3D.includes(ext),
+            });
+        });
+        if (!modalShown) {
+            uploadModal.modal('show');
+            modalShown = true;
+        }
     });
-    if (!modalShown) {
-      uploadModal.modal('show');
-      modalShown = true;
-    }
-  });
 };
 
 const initMediaButton = prefix => {
-  const buttonContainer = document.querySelector(
-    `${prefix}.browse-media-btn-container`
-  );
-  const button = buttonContainer.querySelector('.filemanager-toggle');
-  const loader = buttonContainer.querySelector('.la-spinner');
+    const buttonContainer = document.querySelector(
+        `${prefix}.browse-media-btn-container`
+    );
+    const button = buttonContainer.querySelector('.filemanager-toggle');
+    const loader = buttonContainer.querySelector('.la-spinner');
 
-  button.disabled = false;
-  loader.remove();
+    button.disabled = false;
+    loader.remove();
 };
 
 const initMediaField = (medias, prefix, type) => {
-  renderMediasTable(medias, prefix, type);
-  initSelectedMediasEdition(prefix, medias.data, type);
+    renderMediasTable(medias, prefix, type);
+    initSelectedMediasEdition(prefix, medias.data, type);
 
-  const loadedEvent = new Event('medias-loaded');
-  document
-    .querySelector(`${prefix} #filemanager-container`)
-    .dispatchEvent(loadedEvent);
+    const loadedEvent = new Event('medias-loaded');
+    document
+        .querySelector(`${prefix} #filemanager-container`)
+        .dispatchEvent(loadedEvent);
 
-  // initTags(prefix, type);
-  initRefresh(prefix, type);
-  initUpload(prefix);
-  initUploadModalHandler(prefix, type);
-  initMediaButton(prefix);
+    // initTags(prefix, type);
+    initRefresh(prefix, type);
+    initUpload(prefix);
+    initUploadModalHandler(prefix, type);
+    initMediaButton(prefix);
 };
 
 const onMediaLoadedSingle = medias => {
-  renderMediasTable(medias, '');
-  // initTags();
-  initRefresh();
-  initUpload('');
-  initUploadModalHandler();
+    renderMediasTable(medias, '');
+    // initTags();
+    initRefresh();
+    initUpload('');
+    initUploadModalHandler();
 };
 
 const setGlobals = ({
-  data,
+    data,
 }) => {
-  const {
-    types,
-    parent,
-  } = data;
-  // globalTags = tags.data;
-  // globalTagsLastPage = tags.last_page;
-  globalMediaTypes = types.data;
-  globalParents = parent
+    const {
+        types,
+        parent,
+    } = data;
+    // globalTags = tags.data;
+    // globalTagsLastPage = tags.last_page;
+    globalMediaTypes = types.data;
+    globalParents = parent
 };
 
 const onGlobalsLoaded = response => {
-  setGlobals(response);
-  // Render upload modal
-  const modalTemplate = document.querySelector('template.upload-modal');
-  const node = modalTemplate.content.cloneNode(true);
-  document.body.appendChild(node);
-  // Init each field
-  const fileManagerFields = document.querySelectorAll(
-    '.filemanager-field.modal-dialog'
-  );
-  if (fileManagerFields.length) {
-    fileManagerFields.forEach(fileManagerField => {
-      const name =
-        fileManagerField !== null ?
-          fileManagerField.getAttribute('name') :
-          false;
-      const prefix = name ? `.filemanager-field[name="${name}"] ` : '';
-      const {
-        type,
-      } = fileManagerField.dataset;
-      getMedias(1, '', type, medias => {
-        initMediaField(medias, prefix, type);
-      });
-    });
-  } else {
-    getMedias(1, '', false, medias => {
-      onMediaLoadedSingle(medias);
-    });
-  }
+    setGlobals(response);
+    // Render upload modal
+    const modalTemplate = document.querySelector('template.upload-modal');
+    const node = modalTemplate.content.cloneNode(true);
+    document.body.appendChild(node);
+    // Init each field
+    const fileManagerFields = document.querySelectorAll(
+        '.filemanager-field.modal-dialog'
+    );
+    if (fileManagerFields.length) {
+        fileManagerFields.forEach(fileManagerField => {
+            const name =
+                fileManagerField !== null ?
+                fileManagerField.getAttribute('name') :
+                false;
+            const prefix = name ? `.filemanager-field[name="${name}"] ` : '';
+            const {
+                type,
+            } = fileManagerField.dataset;
+            getMedias(1, '', type, medias => {
+                initMediaField(medias, prefix, type);
+            });
+        });
+    } else {
+        getMedias(1, '', false, medias => {
+            onMediaLoadedSingle(medias);
+        });
+    }
 };
 
 const init = () => {
-  loadGlobals(onGlobalsLoaded);
+    loadGlobals(onGlobalsLoaded);
 };
 
 const loadGlobals = (callback = false) => {
-  toggleLoader('', true);
-  request(
-    '/admin/media/fetch/global-data',
-    callback,
-    'POST'
-  );
+    toggleLoader('', true);
+    request(
+        '/admin/media/fetch/global-data',
+        callback,
+        'POST'
+    );
 };
 
 module.exports = {
-  init,
+    init,
 };

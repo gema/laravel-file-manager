@@ -1,8 +1,14 @@
 /* eslint-disable no-use-before-define */
 
-const { templates } = require('../templates');
+const {
+  templates,
+} = require('../templates');
 const Select2 = require('../select2');
-const { request, toast, customEvent } = require('../utils');
+const {
+  request,
+  toast,
+  customEvent,
+} = require('../utils');
 
 let globalTags;
 let globalMediaTypes;
@@ -16,13 +22,15 @@ let globalMediaListContainer;
 let globalTagsListContainer;
 let globalParents;
 let mediaType;
+let extraFields;
 
 const init = options => {
   globalOptions = options;
   loadGlobals(onGlobalsLoaded);
-  window.addEventListener(`get_extensions_${globalOptions.name}`, (e) => {
+  window.addEventListener(`get_extensions_${globalOptions.name}`, e => {
     // allowedMedias = e.detail.extensions
-    mediaType = e.detail.mediaType
+    mediaType = e.detail.mediaType;
+    extraFields = e.detail.extraFields;
   });
 };
 
@@ -45,19 +53,29 @@ const toggleLoader = visible => {
 
 const onGlobalsLoaded = globals => {
   setGlobals(globals);
-  loadMedias();
+  if (globalContainer) loadMedias();
 };
 
-const setGlobals = ({ data }) => {
-  const { tags, types, parent } = data;
+const setGlobals = ({
+  data,
+}) => {
+  const {
+    tags,
+    types,
+    parent,
+  } = data;
   globalTags = tags.data;
   globalTagsLastPage = tags.last_page;
   globalMediaTypes = types.data;
   globalParents = parent;
 
   globalContainer = document.querySelector('#media-modal___BV_modal_outer_');
-  globalMediaListContainer = globalContainer.querySelector('.custom-file-manager .list');
-  globalTagsListContainer = globalContainer.querySelector('.tags-container ul');
+  if (globalContainer) {
+    globalMediaListContainer = globalContainer.querySelector('.custom-file-manager .list');
+    globalTagsListContainer = globalContainer.querySelector('.tags-container ul');
+  } else {
+    initSelectedMediaEdition();
+  }
 };
 
 const loadMedias = () => {
@@ -66,7 +84,11 @@ const loadMedias = () => {
   }, initMediaField);
 };
 
-const fetchMedias = ({ page, tags, type }, callback = false) => {
+const fetchMedias = ({
+  page,
+  tags,
+  type,
+}, callback = false) => {
   if (page === undefined) page = 1;
   if (tags === undefined) tags = null;
   if (type === undefined) type = false;
@@ -79,14 +101,19 @@ const fetchMedias = ({ page, tags, type }, callback = false) => {
 };
 
 // eslint-disable-next-line camelcase
-const initMediaField = ({ data, last_page }) => {
-  customEvent(`loaded_${globalOptions.name}`, { medias: data });
+const initMediaField = ({
+  data,
+  last_page,
+}) => {
+  customEvent(`loaded_${globalOptions.name}`, {
+    medias: data,
+  });
   renderMediaList(data);
   initScroll(last_page);
   // initTags();
   initRefresh();
   initUpload();
-  initSelectedMediaEdition();
+  //   initSelectedMediaEdition();
 };
 
 // Render Media List
@@ -123,9 +150,14 @@ const initSelection = medias => {
 
 const onMediasSelected = medias => {
   const selectedMedias = getSelectedMedias();
-  const value = JSON.stringify({ medias: selectedMedias });
+  const value = JSON.stringify({
+    medias: selectedMedias,
+  });
   const totalSelectedMedias = selectedMedias.length;
-  const { min, max } = globalOptions;
+  const {
+    min,
+    max,
+  } = globalOptions;
 
   if (totalSelectedMedias > max || totalSelectedMedias < min) {
     if (min === max) {
@@ -136,7 +168,11 @@ const onMediasSelected = medias => {
   } else if (selectedMedias.length) {
     $(`.selected-medias-input[name="${globalOptions.name}"]`)
       .val(value);
-    customEvent(`change_${globalOptions.name}`, { value, medias, selectedMedias });
+    customEvent(`change_${globalOptions.name}`, {
+      value,
+      medias,
+      selectedMedias,
+    });
   }
 };
 
@@ -150,7 +186,7 @@ const initScroll = lastPage => {
   let page = 1;
   $(globalMediaListContainer).on('scroll', () => {
     if (globalMediaListContainer.offsetHeight + globalMediaListContainer.scrollTop
-        >= globalMediaListContainer.scrollHeight - 1) {
+            >= globalMediaListContainer.scrollHeight - 1) {
       if (!isLoading && page + 1 <= lastPage) {
         page += 1;
         isLoading = true;
@@ -166,11 +202,15 @@ const initScroll = lastPage => {
   });
 };
 
-const onPageLoaded = ({ data }) => {
+const onPageLoaded = ({
+  data,
+}) => {
   removePaginationLoader();
   // renderMediaisTagsLoadingList(data);
   renderMediaItems(data);
-  customEvent(`loaded_new_page_${globalOptions.name}`, { medias: data });
+  customEvent(`loaded_new_page_${globalOptions.name}`, {
+    medias: data,
+  });
   isLoading = false;
 };
 
@@ -227,14 +267,16 @@ const initTagsPagination = (container, lastPage) => {
   $(container).on('scroll', () => {
     if (
       container.offsetHeight + container.scrollTop
-      >= container.scrollHeight - 1
+            >= container.scrollHeight - 1
     ) {
       if (!isTagsLoading && page + 1 <= lastPage) {
         page += 1;
         isTagsLoading = true;
 
         container.innerHTML += templates.tagsLoader();
-        getTags(page, ({ data }) => {
+        getTags(page, ({
+          data,
+        }) => {
           document.querySelector('.tags-loader').remove();
           data.forEach(tag => {
             container.querySelector('ul').innerHTML += templates.tagItem(tag);
@@ -266,7 +308,9 @@ const getSelectedTags = () => {
   return tagsIds;
 };
 
-const onListLoaded = ({ data }) => {
+const onListLoaded = ({
+  data,
+}) => {
   renderMediaList(data);
 };
 
@@ -389,7 +433,9 @@ const onRefreshClick = () => {
   }, onRefresh);
 };
 
-const onRefresh = ({ data }) => {
+const onRefresh = ({
+  data,
+}) => {
   customEvent(`on_refresh_${globalOptions.name}`, data);
   renderMediaList(data);
 };
@@ -413,24 +459,28 @@ const onUploadClick = () => {
 const onHiddenInputChange = e => {
   globalUploadList = [];
   e.currentTarget.files.forEach(media => {
-    globalUploadList.push({ media, cropped: null });
+    globalUploadList.push({
+      media,
+      cropped: null,
+    });
   });
   customEvent(`upload_modal_open_${globalOptions.name}`);
   setTimeout(initUploadModal, 100);
 };
 
-
 const initUploadModal = (files = globalUploadList) => {
-  let extensions = null
-  const i = globalMediaTypes.findIndex(e => e.id === mediaType)
-  if(i >= 0) extensions = globalMediaTypes[i].extensions
-  if(extensions) files = files.filter((file) => {
-    if(!extensions.includes(file.media.type.split('/')[1])) {
-      toast('Some of the medias do not have the correct extension', 'error');
-      return false
-    }
-    return true
-  })
+  let extensions = null;
+  const i = globalMediaTypes.findIndex(e => e.id === mediaType);
+  if (i >= 0) extensions = globalMediaTypes[i].extensions;
+  if (extensions) {
+    files = files.filter(file => {
+      if (!extensions.includes(file.media.type.split('/')[1])) {
+        toast('Some of the medias do not have the correct extension', 'error');
+        return false;
+      }
+      return true;
+    });
+  }
 
   globalUploadContainer = document.querySelector('#upload-modal-vue');
   const uploadModal = document.querySelector('#upload-modal-vue');
@@ -451,22 +501,21 @@ const renderUploadsPreview = files => {
   const listContainer = document.querySelector('#upload-modal-vue .medias-list');
   listContainer.innerHTML = '';
   let i = 0;
-  listContainer .innerHTML += templates.visitdataForm(i)
-  if(globalParents.show){
+  listContainer.innerHTML += templates.visitdataForm(i);
+  if (globalParents.show) {
     initParentSelect2(i, globalParents.label);
   }
   files.forEach(file => {
-    listContainer.innerHTML += templates.uploadPreview(file, i, globalMediaTypes, mediaType);
+    listContainer.innerHTML += templates.uploadPreview(file, i, globalMediaTypes, mediaType, extraFields);
     initVideoPreview(file.media, i);
     initAudioPreview(file.media, i);
     i += 1;
   });
 
   initRemoveButtons(files);
-  if(globalParents.show){
+  if (globalParents.show) {
     Select2.initGroupedFields(globalUploadContainer);
-  }
-  else if(globalParents.id){
+  } else if (globalParents.id) {
     listContainer.innerHTML += `
       <input type="text" value="${globalParents.id}" name="parentId" class="hidden-id" hidden>
       <input type="text" value="${globalParents.model}"  class="hidden-model" name="parentModel" hidden>
@@ -518,15 +567,13 @@ const onUploadSave = (e, files) => {
   removeValidationErrors();
   e.currentTarget.classList.add('d-none');
   appendLoadersToUploads(files);
-  console.log('ready to upload')
   resolveUploadPromises(generateUploadPromises(files));
 };
 
 const appendLoadersToUploads = () => {
   const fileNames = document.querySelectorAll('span.loader-container');
   fileNames.forEach(fileName => {
-    fileName.innerHTML
-        += '<span class="ml-2 la la-spinner la-spin"></span>';
+    fileName.innerHTML += '<span class="ml-2 la la-spinner la-spin"></span>';
   });
 };
 
@@ -553,7 +600,7 @@ const generateFileMetadata = (file, i) => {
   metadata.name = file.media.name;
 
   const parentSelect = document.querySelector(
-    `select[name="parentId"]`
+    'select[name="parentId"]'
   );
   if (parentSelect !== null) {
     const dataAttrs = $(parentSelect).find(':selected').data();
@@ -563,10 +610,10 @@ const generateFileMetadata = (file, i) => {
     }
   }
 
-  const parentIdHidden = document.querySelector(`.hidden-id`);
-  const parentNamespaceHidden = document.querySelector(`.hidden-model`);
+  const parentIdHidden = document.querySelector('.hidden-id');
+  const parentNamespaceHidden = document.querySelector('.hidden-model');
 
-  if(parentIdHidden !== null && parentNamespaceHidden !== null){
+  if (parentIdHidden !== null && parentNamespaceHidden !== null) {
     metadata.parent_id = parentIdHidden.value;
     metadata.parent_model = parentNamespaceHidden.value;
   }
@@ -574,17 +621,10 @@ const generateFileMetadata = (file, i) => {
   return metadata;
 };
 
-const makeUploadPromise = metadata => {
-  const formData = new FormData();
-  Object.entries(metadata).forEach(([key, value]) => {
-    formData.append(key, value);
-  });
-
-  return fetch('/api/media/upload', {
-    method: 'POST',
-    body: formData,
-  });
-};
+const makeUploadPromise = metadata => fetch('/api/media/upload', {
+  method: 'POST',
+  body: setExtraFields(metadata),
+});
 
 const resolveUploadPromises = promises => {
   const promiseResponses = [];
@@ -606,7 +646,10 @@ const resolveUploadPromises = promises => {
     });
 };
 
-const handleUploadResponse = ({ data, errors }) => {
+const handleUploadResponse = ({
+  data,
+  errors,
+}) => {
   const fileRow = document
     .querySelector(`.file-row[data-name="${data.filename}"]`);
 
@@ -623,7 +666,10 @@ const removeValidationErrors = () => {
     .forEach(err => err.remove());
 };
 
-const handleSuccessResponse = (row, { msg, success }) => {
+const handleSuccessResponse = (row, {
+  msg,
+  success,
+}) => {
   const fileLoader = row.querySelector(
     'span.loader-container'
   );
@@ -633,7 +679,7 @@ const handleSuccessResponse = (row, { msg, success }) => {
 
   const textClass = success ? 'success' : 'danger';
   const feedback = row.querySelector('.card-header p');
-  if(feedback) {
+  if (feedback) {
     feedback.innerHTML = msg;
     feedback.classList.remove('text-danger');
     feedback.classList.remove('text-success');
@@ -656,7 +702,7 @@ const handleErrorResponse = (row, errors) => {
   );
 
   fileLoader.innerHTML = '❌';
-  const feedback = row.querySelector('.card-header p')
+  const feedback = row.querySelector('.card-header p');
   feedback.innerHTML = 'The provided metadata is invalid';
   feedback.classList.add('text-danger');
   feedback.classList.remove('text-success');
@@ -714,75 +760,98 @@ const initSelectedMediaEdition = () => {
   window.addEventListener(`edit_media_${globalOptions.name}`, onEditSelectedMedia);
 };
 
-const onEditSelectedMedia = ({ detail }) => {
-  const { mediaId, medias } = detail;
+const onEditSelectedMedia = ({
+  detail,
+}) => {
+  const {
+    mediaId,
+    medias,
+  } = detail;
   const [media] = medias.filter(m => String(m.id) === mediaId);
   const modal = document.querySelector('#edit-media-modal');
 
-  initEditMediaModal(media.id, modal);
+  initEditMediaModal(media.id, modal, media);
   setEditableValues(media, modal);
   modal.querySelector('footer .btn-primary').addEventListener('click', () => {
     onEditionSave(modal, media);
   });
 };
 
-const initEditMediaModal = (id, modal) => {
-  modal.querySelector('.modal-body').innerHTML = templates.metadataForm(id, globalMediaTypes);
+const initEditMediaModal = (id, modal, media) => {
+  const obj = {
+    media,
+  };
+  modal.querySelector('.modal-body').innerHTML = templates.metadataForm(id, globalMediaTypes, obj, mediaType, extraFields);
   modal.querySelector('footer .btn-primary').innerHTML = 'Save';
   modal.querySelector('header .modal-title').textContent = 'Edit Media';
 };
 
 const setEditableValues = (media, modal) => {
   const parentField = modal.querySelector('select[name="parentId"]');
-  if (parentField !== null) {
+  if (parentField) {
     parentField.value = media ? media.parent_id : '';
   }
 
   const titleField = modal.querySelector('input[name="title"]');
-  titleField.value = media.media_content ? media.media_content.title : '';
-
+  if (media.media_content) titleField.value = media.media_content.title;
+  else if (media.media) titleField.value = media.title;
   const descriptionField = modal.querySelector(
     'textarea[name="description"]'
   );
-  descriptionField.value = media.media_content
-    ? media.media_content.description
-    : '';
+  if (descriptionField) {
+    descriptionField.value = media.media_content
+      ? media.media_content.description
+      : '';
+  }
 };
 
 const onEditionSave = (modal, media) => {
-  const mediaData = {
-    title: modal.querySelector('input[name="title"]').value,
-    description: modal.querySelector('textarea[name="description"]')
-      .value,
-  };
+  const metaData = {};
+  const metadataFields = document.querySelectorAll(
+    `#metadata-form-${media.id} .form-control`
+  );
+  metadataFields.forEach(field => (metaData[field.name] = field.value));
+  //   const description = modal.querySelector('textarea[name="description"]') ? modal.querySelector('textarea[name="description"]').value : 'Empty';
+  //   const mediaData = {
+  //     title: modal.querySelector('input[name="title"]').value,
+  //     description,
+  //     type: media.type_id,
+  //   };
 
   const parentField = modal.querySelector('select[name="parentId"]');
   if (parentField !== null) {
-    mediaData.parent = modal.querySelector(
+    metaData.parent = modal.querySelector(
       'select[name="parentId"]'
     ).value;
   }
 
   const formData = new FormData();
-  Object.entries(mediaData).forEach(([key, value]) => {
-    formData.append(key, value);
-  });
+  //   Object.entries(mediaData).forEach(([key, value]) => {
+  //     formData.append(key, value);
+  //   });
 
-  fetch(`/api/media/${media.media_content.id}/edit`, {
+  const obj = {};
+
+  fetch(`/api/media/${media.id}/edit`, {
     method: 'POST',
-    body: formData,
+    body: setExtraFields(metaData),
   })
     .then(r => r.json())
     .then(onEditionResponse);
 };
 
-const onEditionResponse = ({ data, errors }) => {
+const onEditionResponse = ({
+  data,
+  errors,
+}) => {
   document
     .querySelectorAll('#edit-media-modal small.text-danger')
     .forEach(err => err.remove());
 
   if (!errors && data.updated) {
-    customEvent(`updated_media_${globalOptions.name}`, { media: data.media });
+    customEvent(`updated_media_${globalOptions.name}`, {
+      media: data.media,
+    });
   } else {
     const modal = document.querySelector('#edit-media-modal');
     Object.entries(errors).forEach(([name, errs]) => {
@@ -796,4 +865,22 @@ const onEditionResponse = ({ data, errors }) => {
   }
 };
 
-export default { init };
+function setExtraFields(metadata) {
+  const formData = new FormData();
+  const obj = {};
+  Object.entries(metadata).forEach(([key, value]) => {
+    const customFields = key.split(' ');
+    if (customFields.includes('extra-field')) {
+      obj[customFields[0]] = value;
+    } else {
+      formData.append(key, value);
+    }
+  });
+  formData.append('extra_fields', JSON.stringify(obj));
+  formData.append('description', 'Empty');
+  return formData;
+}
+
+export default {
+  init,
+};
