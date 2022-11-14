@@ -19,7 +19,12 @@ class AddCustomFieldsToMediaTypes extends Migration
 
     public function down()
     {
-        $table->dropColumn('media_types');
-        $table->dropColumn('media_content');
+        Schema::table('media_types', function (Blueprint $table) {
+            $table->dropColumn('extra_fields');
+        });
+
+        Schema::table('media_content', function (Blueprint $table) {
+            $table->dropColumn('extra_fields');
+        });
     }
 }
