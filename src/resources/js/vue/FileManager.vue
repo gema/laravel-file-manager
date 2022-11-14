@@ -135,7 +135,7 @@ export default {
       immediate: true,
       deep: true,
       handler(val) {
-        if (val.length) {
+        if (val?.length) {
           this.selectedMedias = val
           this.fetchAsignedMedias();
         }
