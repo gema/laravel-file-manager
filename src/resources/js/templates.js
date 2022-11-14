@@ -166,7 +166,7 @@ const extraFieldsTest = (extraFields) => {
   extraFields.forEach(field => {
     list += `<div class="form-group">
                 <label>${field.name}</label>
-                <input name="${field.slug} extra-field" type="${field.type}" class="form-control"/>
+                <input name="${field.slug} extra-field" type="${field.type}" placeholder="${field.placeholder}" class="form-control"/>
               </div>`;
   });
 

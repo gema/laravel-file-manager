@@ -812,7 +812,7 @@ const setEditableValues = (media, modal) => {
     const fieldName = field.name.split(' ');
     const mediaExtraFields = media.extra_fields ? media.extra_fields : media.media_content.extra_fields;
     if (fieldName.includes('extra-field')) {
-      if (field.type === 'checkbox' && mediaExtraFields[fieldName[0]] === 'on') {
+      if (field.type === 'checkbox' && mediaExtraFields[fieldName[0]]) {
         field.checked = true;
       } else {
         field.value = mediaExtraFields[fieldName[0]];
@@ -826,7 +826,13 @@ const onEditionSave = (modal, media) => {
   const metadataFields = document.querySelectorAll(
     `#metadata-form-${media.id} .form-control`
   );
-  metadataFields.forEach(field => (metaData[field.name] = field.value));
+  metadataFields.forEach(field => {
+    if(field.type === 'checkbox') {
+      metaData[field.name] = field.checked
+    } else {
+      metaData[field.name] = field.value
+    }
+  });
   //   const description = modal.querySelector('textarea[name="description"]') ? modal.querySelector('textarea[name="description"]').value : 'Empty';
   //   const mediaData = {
   //     title: modal.querySelector('input[name="title"]').value,
