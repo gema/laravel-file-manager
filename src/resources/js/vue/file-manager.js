@@ -803,6 +803,22 @@ const setEditableValues = (media, modal) => {
       ? media.media_content.description
       : '';
   }
+
+  // const extraFields = modal.querySelector('input[name="title"]')
+  const metadataFields = document.querySelectorAll(
+    `#metadata-form-${media.id} .form-control`
+  );
+  metadataFields.forEach(field => {
+    const fieldName = field.name.split(' ');
+    const mediaExtraFields = media.extra_fields ? media.extra_fields : media.media_content.extra_fields;
+    if (fieldName.includes('extra-field')) {
+      if (field.type === 'checkbox' && mediaExtraFields[fieldName[0]] === 'on') {
+        field.checked = true;
+      } else {
+        field.value = mediaExtraFields[fieldName[0]];
+      }
+    }
+  });
 };
 
 const onEditionSave = (modal, media) => {
@@ -854,14 +870,16 @@ const onEditionResponse = ({
     });
   } else {
     const modal = document.querySelector('#edit-media-modal');
-    Object.entries(errors).forEach(([name, errs]) => {
-      const field = modal.querySelector(
-        `input[name="${name}"], select[name="${name}"]`
-      );
-      errs.forEach(error => {
-        $(field.parentElement).append(`<span class="text-danger">${error}</div>`);
+    if (errors) {
+      Object.entries(errors).forEach(([name, errs]) => {
+        const field = modal.querySelector(
+          `input[name="${name}"], select[name="${name}"]`
+        );
+        errs.forEach(error => {
+          $(field.parentElement).append(`<span class="text-danger">${error}</div>`);
+        });
       });
-    });
+    }
   }
 };
 

@@ -127,7 +127,7 @@ const metadataForm = (i, types, { media, is3d }, mediaType, extraFields) => {
   //   name,
   //   type,
   // } = media;
-  let name;
+  let name = "";
   if (media.name) name = media.name;
   else if (media.media_content) name = media.media_content.title;
   else if (media.media) name = media.title;
