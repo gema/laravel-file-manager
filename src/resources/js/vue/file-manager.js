@@ -770,7 +770,7 @@ const onEditSelectedMedia = ({
     mediaId,
     medias,
   } = detail;
-  const [media] = medias.filter(m => String(m.id) === mediaId);
+  const [media] = medias.filter(m => String(m.id) === String(mediaId));
   const modal = document.querySelector('#edit-media-modal');
 
   initEditMediaModal(media.id, modal, media);
@@ -813,7 +813,12 @@ const setEditableValues = (media, modal) => {
   );
   metadataFields.forEach(field => {
     const fieldName = field.name.split(' ');
-    const mediaExtraFields = media.extra_fields ? media.extra_fields : media.media_content.extra_fields;
+    let mediaExtraFields;
+    if (media.extra_fields) {
+      mediaExtraFields = media.extra_fields;
+    } else if (media.media_content && media.media_content.extra_fields) {
+      mediaExtraFields = media.media_content.extra_fields;
+    }
     if (fieldName.includes('extra-field') && mediaExtraFields && mediaExtraFields[fieldName[0]]) {
       if (field.type === 'checkbox') {
         field.checked = true;
