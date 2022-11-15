@@ -127,11 +127,11 @@ const metadataForm = (i, types, { media, is3d }, mediaType, extraFields) => {
   //   name,
   //   type,
   // } = media;
-  let name = "";
+  let name = '';
   if (media.name) name = media.name;
   else if (media.media_content) name = media.media_content.title;
   else if (media.media) name = media.title;
-  const type = media.type ? media.type : media.type_id;
+  let type = media.type ? media.type : media.type_id;
   if (is3d) type = 'model';
   const typesListTemplate = typesList(types, type, mediaType);
   const extraFieldsTemplate = extraFieldsTest(extraFields);
@@ -161,15 +161,16 @@ const typesList = (types, type, mediaType) => {
   </div>`;
 };
 
-const extraFieldsTest = (extraFields) => {
+const extraFieldsTest = extraFields => {
   let list = '';
-  extraFields.forEach(field => {
-    list += `<div class="form-group">
-                <label>${field.name}</label>
-                <input name="${field.slug} extra-field" type="${field.type}" placeholder="${field.placeholder}" class="form-control"/>
-              </div>`;
-  });
-
+  if (extraFields) {
+    extraFields.forEach(field => {
+      list += `<div class="form-group">
+                  <label>${field.name}</label>
+                  <input name="${field.slug} extra-field" type="${field.type}" placeholder="${field.placeholder}" class="form-control"/>
+                </div>`;
+    });
+  }
   return list;
 };
 

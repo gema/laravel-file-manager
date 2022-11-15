@@ -150,12 +150,6 @@ export default {
     };
   },
   mounted() {
-    FileManager.default.init({
-      name: this.name,
-      mediaType: this.mediaType,
-      min: this.min || 0,
-      max: this.max || 10,
-    });
     $(window)
       .off(`change_${this.name}`)
       .on(`change_${this.name}`, this.onMediasSelected);
@@ -260,6 +254,15 @@ export default {
     },
     async onEditModalShown() {
       await this.getExtensions()
+      FileManager.default.init({
+        name: this.name,
+        mediaType: this.mediaType,
+        extraFields: this.extraFields,
+        min: this.min || 0,
+        max: this.max || 10,
+        mediaId: this.editedMediaId,
+        medias: this.selectedMedias,
+      });
       customEvent(`edit_media_${this.name}`, {
         mediaId: this.editedMediaId,
         medias: this.selectedMedias,

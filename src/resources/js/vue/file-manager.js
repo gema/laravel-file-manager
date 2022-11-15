@@ -26,6 +26,8 @@ let extraFields;
 
 const init = options => {
   globalOptions = options;
+  mediaType = options.mediaType;
+  extraFields = options.extraFields;
   loadGlobals(onGlobalsLoaded);
   window.addEventListener(`get_extensions_${globalOptions.name}`, e => {
     // allowedMedias = e.detail.extensions
@@ -75,6 +77,7 @@ const setGlobals = ({
     globalTagsListContainer = globalContainer.querySelector('.tags-container ul');
   } else {
     initSelectedMediaEdition();
+    customEvent(`edit_media_${globalOptions.name}`, { mediaId: globalOptions.mediaId, medias: globalOptions.medias });
   }
 };
 
@@ -113,7 +116,7 @@ const initMediaField = ({
   // initTags();
   initRefresh();
   initUpload();
-  //   initSelectedMediaEdition();
+  // initSelectedMediaEdition();
 };
 
 // Render Media List
@@ -811,8 +814,8 @@ const setEditableValues = (media, modal) => {
   metadataFields.forEach(field => {
     const fieldName = field.name.split(' ');
     const mediaExtraFields = media.extra_fields ? media.extra_fields : media.media_content.extra_fields;
-    if (fieldName.includes('extra-field')) {
-      if (field.type === 'checkbox' && mediaExtraFields[fieldName[0]]) {
+    if (fieldName.includes('extra-field') && mediaExtraFields && mediaExtraFields[fieldName[0]]) {
+      if (field.type === 'checkbox') {
         field.checked = true;
       } else {
         field.value = mediaExtraFields[fieldName[0]];
@@ -827,10 +830,10 @@ const onEditionSave = (modal, media) => {
     `#metadata-form-${media.id} .form-control`
   );
   metadataFields.forEach(field => {
-    if(field.type === 'checkbox') {
-      metaData[field.name] = field.checked
+    if (field.type === 'checkbox') {
+      metaData[field.name] = field.checked;
     } else {
-      metaData[field.name] = field.value
+      metaData[field.name] = field.value;
     }
   });
   //   const description = modal.querySelector('textarea[name="description"]') ? modal.querySelector('textarea[name="description"]').value : 'Empty';
