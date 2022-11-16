@@ -1,5 +1,8 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-use-before-define */
-const { truncate } = require('./utils');
+const {
+  truncate,
+} = require('./utils');
 
 const mediaItem = media => `
 <div
@@ -50,14 +53,18 @@ const uploadModalTitle = length => `
   Uploading <span class="medias-count">${length}</span> medias
 `;
 
-const uploadPreview = (file, i, types, mediaType) => {
-  const { media } = file;
-
-  const ext =  media.name.split('.').pop();
+const uploadPreview = (file, i, types, mediaType, extraFields) => {
+  const {
+    media,
+  } = file;
+  const ext = media.name.split('.').pop();
   const ext3D = ['dae', 'abc', 'usd', 'usdc', 'usda', 'ply', 'stl', 'fbx', 'glb', 'gltf', 'obj', 'x3d'];
   const is3d = ext3D.includes(ext);
   const mediaPreviewTemplate = mediaPreview(media, i, is3d);
-  const metadataFormTemplate = metadataForm(i, types, {media, is3d}, mediaType);
+  const metadataFormTemplate = metadataForm(i, types, {
+    media,
+    is3d,
+  }, mediaType, extraFields);
   visitdataForm(i);
 
   let mediaSize = media.size;
@@ -109,25 +116,32 @@ const uploadPreview = (file, i, types, mediaType) => {
   `;
 };
 
-const visitdataForm = (i) => {
-  return `
+const visitdataForm = i => `
     <div id="select2-container-${i}" class="form-group">
       
     </div>
   `;
-}
 
-const metadataForm = (i, types, {media, is3d}, mediaType) => {
-  let { name, type } = media;
+const metadataForm = (i, types, { media, is3d }, mediaType, extraFields) => {
+  // let {
+  //   name,
+  //   type,
+  // } = media;
+  let name = '';
+  if (media.name) name = media.name;
+  else if (media.media_content) name = media.media_content.title;
+  else if (media.media) name = media.title;
+  let type = media.type ? media.type : media.type_id;
   if (is3d) type = 'model';
   const typesListTemplate = typesList(types, type, mediaType);
-
+  const extraFieldsTemplate = extraFieldsTest(extraFields);
   return `
     <form id="metadata-form-${i}">
       <div class="form-group">
         <label>Title</label>
         <input name="title" type="text" class="form-control" value="${name.split('.').shift()}">
       </div>
+      ${extraFieldsTemplate}
       ${typesListTemplate}
     </form>`;
 };
@@ -138,7 +152,6 @@ const typesList = (types, type, mediaType) => {
     list += `<option ${type.id === mediaType ? 'selected' : ''} value="${mediaType}">${type.name}</option>`;
   });
 
-
   return `
   <div class="form-group d-none">
     <label>Media Type</label>
@@ -148,16 +161,30 @@ const typesList = (types, type, mediaType) => {
   </div>`;
 };
 
+const extraFieldsTest = extraFields => {
+  let list = '';
+  if (extraFields) {
+    extraFields.forEach(field => {
+      list += `<div class="form-group">
+                  <label>${field.name}</label>
+                  <input name="${field.slug} extra-field" type="${field.type}" placeholder="${field.placeholder}" class="form-control"/>
+                </div>`;
+    });
+  }
+  return list;
+};
+
 const mediaPreview = (media, i, is3d) => {
-  const { type } = media;
+  const {
+    type,
+  } = media;
   const typesWithoutPreview = ['video/avi'];
 
   let template = '';
 
   if (is3d) {
     template = model3dTemplate();
-  }
-  else if (typesWithoutPreview.includes(type)) {
+  } else if (typesWithoutPreview.includes(type)) {
     template = noPreview(type);
   } else if (/^image/.test(type)) {
     template = imagePreview(media, i);
@@ -237,7 +264,11 @@ const uploadFeedback = (msg, textClass) => `
   ${msg}
 </p>`;
 
-const selectedMedia = ({media_content, name, id}) => {
+const selectedMedia = ({
+  media_content,
+  name,
+  id,
+}) => {
   const description = media_content
     ? media_content.description
     : __('noDescription');
@@ -261,7 +292,7 @@ const selectedMedia = ({media_content, name, id}) => {
     </div>
   </a>
 `;
-}
+};
 module.exports = {
   templates: {
     mediaItem,
