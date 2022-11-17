@@ -136,11 +136,11 @@ export default {
       deep: true,
       handler(val) {
         if (val?.length) {
-          this.selectedMedias = val
+          this.selectedMedias = val;
           this.fetchAsignedMedias();
         }
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -224,17 +224,18 @@ export default {
 
     onMediaUpdated({ detail }) {
       const { media } = detail;
-      if(this.selectedMedias) {
+      if (this.selectedMedias.length) {
         this.selectedMedias = this.selectedMedias.map((m) => {
           if (m.id === media.id) {
-            this.$emit('updateMedia', media)
+            this.$emit("updateMedia", media);
             return media;
           }
           return m;
         });
         toast("Media updated with success");
+      } else {
+        this.$emit("updateMediaMultiple");
       }
-      this.$emit('updateMediaMultiple')
       this.$refs["edit-media-modal"].hide();
     },
 
@@ -261,8 +262,8 @@ export default {
     },
     async handleEditMedia(e) {
       this.$refs["edit-media-modal"].show();
-      const obj = JSON.parse(e.detail)
-      await this.getExtensions()
+      const obj = JSON.parse(e.detail);
+      await this.getExtensions();
       FileManager.default.init({
         name: this.name,
         mediaType: this.mediaType,

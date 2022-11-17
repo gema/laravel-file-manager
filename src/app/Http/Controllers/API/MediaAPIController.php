@@ -190,7 +190,7 @@ class MediaAPIController
             return json_response(null, 422, 200, $validation->errors());
         }
 
-        $mediaContent = MediaContent::where('media_id', $request->route('id'));
+        $mediaContent = MediaContent::where('media_id', $request->route('id'))->first();
         $media = Media::find($mediaContent->media_id);
         // dd($media, $mediaContent);
         if (!$media || !$mediaContent) {
