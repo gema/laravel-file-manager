@@ -224,9 +224,10 @@ export default {
 
     onMediaUpdated({ detail }) {
       const { media } = detail;
-      if (this.selectedMedias.length) {
+      if (this.selectedMedias) {
         this.selectedMedias = this.selectedMedias.map((m) => {
-          if (m.id === media.id) {
+          const id = media.id ? media.id : media.media.id;
+          if (m.id === id) {
             this.$emit("updateMedia", media);
             return media;
           }
@@ -234,7 +235,8 @@ export default {
         });
         toast("Media updated with success");
       } else {
-        this.$emit("updateMediaMultiple");
+        this.$emit("updateMedia", media);
+        toast("Media updated with success");
       }
       this.$refs["edit-media-modal"].hide();
     },

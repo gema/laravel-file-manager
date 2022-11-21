@@ -77,7 +77,10 @@ const setGlobals = ({
     globalTagsListContainer = globalContainer.querySelector('.tags-container ul');
   } else {
     initSelectedMediaEdition();
-    customEvent(`edit_media_${globalOptions.name}`, { mediaId: globalOptions.mediaId, medias: globalOptions.medias });
+    customEvent(`edit_media_${globalOptions.name}`, {
+      mediaId: globalOptions.mediaId,
+      medias: globalOptions.medias
+    });
   }
 };
 
@@ -188,8 +191,8 @@ let isLoading = false;
 const initScroll = lastPage => {
   let page = 1;
   $(globalMediaListContainer).on('scroll', () => {
-    if (globalMediaListContainer.offsetHeight + globalMediaListContainer.scrollTop
-            >= globalMediaListContainer.scrollHeight - 1) {
+    if (globalMediaListContainer.offsetHeight + globalMediaListContainer.scrollTop >=
+      globalMediaListContainer.scrollHeight - 1) {
       if (!isLoading && page + 1 <= lastPage) {
         page += 1;
         isLoading = true;
@@ -269,8 +272,8 @@ const initTagsPagination = (container, lastPage) => {
   $(container).off('scroll');
   $(container).on('scroll', () => {
     if (
-      container.offsetHeight + container.scrollTop
-            >= container.scrollHeight - 1
+      container.offsetHeight + container.scrollTop >=
+      container.scrollHeight - 1
     ) {
       if (!isTagsLoading && page + 1 <= lastPage) {
         page += 1;
@@ -366,9 +369,9 @@ const onSaveAsignTag = () => {
 
 const asignTagRequest = body => {
   fetch('/api/media/tag', {
-    method: 'POST',
-    body,
-  })
+      method: 'POST',
+      body,
+    })
     .then(r => r.json())
     .then(response => {
       if (response.data) {
@@ -410,9 +413,9 @@ const onSaveUnsignTag = () => {
 
 const unsignTagRequest = body => {
   fetch('/api/media/tag/unsign', {
-    method: 'POST',
-    body,
-  })
+      method: 'POST',
+      body,
+    })
     .then(r => r.json())
     .then(response => {
       if (response.data) {
@@ -802,9 +805,9 @@ const setEditableValues = (media, modal) => {
     'textarea[name="description"]'
   );
   if (descriptionField) {
-    descriptionField.value = media.media_content
-      ? media.media_content.description
-      : '';
+    descriptionField.value = media.media_content ?
+      media.media_content.description :
+      '';
   }
 
   // const extraFields = modal.querySelector('input[name="title"]')
@@ -863,9 +866,9 @@ const onEditionSave = (modal, media) => {
   const obj = {};
 
   fetch(`/api/media/${media.id}/edit`, {
-    method: 'POST',
-    body: setExtraFields(metaData),
-  })
+      method: 'POST',
+      body: setExtraFields(metaData),
+    })
     .then(r => r.json())
     .then(onEditionResponse);
 };
@@ -880,7 +883,7 @@ const onEditionResponse = ({
 
   if (!errors && data.updated) {
     customEvent(`updated_media_${globalOptions.name}`, {
-      media: data.media,
+      media: data,
     });
   } else {
     const modal = document.querySelector('#edit-media-modal');

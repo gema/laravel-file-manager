@@ -122,7 +122,10 @@ const visitdataForm = i => `
     </div>
   `;
 
-const metadataForm = (i, types, { media, is3d }, mediaType, extraFields) => {
+const metadataForm = (i, types, {
+  media,
+  is3d
+}, mediaType, extraFields) => {
   // let {
   //   name,
   //   type,
@@ -269,9 +272,9 @@ const selectedMedia = ({
   name,
   id,
 }) => {
-  const description = media_content
-    ? media_content.description
-    : __('noDescription');
+  const description = media_content ?
+    media_content.description :
+    __('noDescription');
 
   return `
   <a
