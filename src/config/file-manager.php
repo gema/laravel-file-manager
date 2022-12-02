@@ -71,4 +71,6 @@ return [
         'gltf' => 'gltf',
         'svg' => 'svg',
     ],
+
+    'rows' => 20, // Number of medias returned per page
 ];

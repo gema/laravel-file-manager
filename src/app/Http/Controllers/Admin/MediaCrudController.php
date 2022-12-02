@@ -2,9 +2,9 @@
 
 namespace GemaDigital\FileManager\app\Http\Controllers\Admin;
 
-use Symfony\Component\HttpFoundation\Request;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class MediaVersionCrudController
@@ -19,7 +19,7 @@ class MediaCrudController extends CrudController
     {
         return $this->fetch([
             'model' => 'GemaDigital\FileManager\app\Models\Media',
-            'paginate' => 15,
+            'paginate' => config('file-manager.rows'),
             'query' => function ($model) {
                 $model = $model->with('mediaContent');
 
@@ -65,8 +65,8 @@ class MediaCrudController extends CrudController
         $parentId = false;
         $parentNamespace = false;
         $show = admin() ?: call_user_func(config('file-manager.parents_field'));
-        
-        if(!$show && !admin()){
+
+        if (!$show && !admin()) {
             $parentQuery = call_user_func(config('file-manager.parents_query'));
             $parentId = $parentQuery->first()->id;
             $parentNamespace = get_class($parentQuery->getModel());
@@ -80,8 +80,8 @@ class MediaCrudController extends CrudController
                 'show' => $show,
                 'id' => $parentId,
                 'model' => $parentNamespace,
-                'global' => $global
-            ]
+                'global' => $global,
+            ],
         ]);
     }
 
