@@ -80,6 +80,7 @@ trait MediaTrait
             foreach (self::$mediable as $column) {
                 if ($entry[$column] !== null) {
                     $decoded = json_decode($entry[$column]);
+
                     if (is_object($decoded) && count($decoded->medias) > 0) {
                         $medias = $decoded->medias;
                         $mediaField = MediaField::create([
@@ -100,13 +101,14 @@ trait MediaTrait
                         }
 
                         $entry[$column] = $mediaField->id;
+
                         $entry->saveQuietly();
                     }
                 }
             }
-
             DB::commit();
         } catch (\Exception $e) {
+            dd($e->getMessage());
             \Log::info($e);
             DB::rollback();
         }
@@ -118,42 +120,62 @@ trait MediaTrait
         try {
             $original = $entry->getOriginal();
             foreach (self::$mediable as $column) {
-                // Delete media field associations
-                $mediaField = DB::table('media_fields')->where('id', $original[$column])->first();
-                \DB::table('media_field_has_media')->where('media_field_id', $original[$column])->delete();
 
-                $decoded = json_decode($entry[$column]);
-                if (is_object($decoded)) {
-                    $medias = $decoded->medias;
+                $mediaField = null;
+                if ($original[$column]) {
+                    // Delete media field associations
+                    $mediaField = DB::table('media_fields')->where('id', $original[$column])->first();
+                    \DB::table('media_field_has_media')->where('media_field_id', $original[$column])->delete();
+                } else {
+                    $mediaIds = json_decode($entry->{$column});
+                    if ($mediaIds) {
+                        $mediaField = MediaField::create([
+                            'entity_type' => self::class,
+                            'entity_id' => $entry->id,
+                        ]);
 
-                    // Delete media combinations
-                    foreach ($medias as $media) {
-                        if (is_object($media) && isset($media->combined_medias)) {
-                            DB::table('media_has_combinations')->where('media_id', $media->id)->delete();
-                        }
-                    }
+                        $data = self::buildData($mediaIds->medias, $mediaField);
 
-                    // Create new media field associations and media combinations
-                    $data = self::buildData($medias, $mediaField);
-
-                    DB::table('media_field_has_media')->insert($data['medias']);
-
-                    if (!empty($data['combinations'])) {
-                        MediaCombination::upsert(
-                            $data['combinations'],
-                            ['media_id', 'combinated_media_id'],
-                            ['updated_at']
-                        );
+                        DB::table('media_field_has_media')->insert($data['medias']);
                     }
                 }
 
-                $entry->refresh();
-                $entry[$column] = $mediaField->id;
-                $entry->saveQuietly();
+                if ($mediaField) {
+                    $decoded = json_decode($entry[$column]);
+                    if (is_object($decoded)) {
+                        $medias = $decoded->medias;
+
+                        // Delete media combinations
+                        foreach ($medias as $media) {
+                            if (is_object($media) && isset($media->combined_medias)) {
+                                DB::table('media_has_combinations')->where('media_id', $media->id)->delete();
+                            }
+                        }
+
+                        // Create new media field associations and media combinations
+                        $data = self::buildData($medias, $mediaField);
+
+                        DB::table('media_field_has_media')->insert($data['medias']);
+
+                        if (!empty($data['combinations'])) {
+                            MediaCombination::upsert(
+                                $data['combinations'],
+                                ['media_id', 'combinated_media_id'],
+                                ['updated_at']
+                            );
+                        }
+                    }
+
+                    $entry->refresh();
+                    $entry[$column] = $mediaField->id;
+                    $entry->saveQuietly();
+                }
+
             }
 
             DB::commit();
         } catch (\Exception $e) {
+            dd($e->getMessage());
             \Log::info($e);
             DB::rollback();
         }
