@@ -122,11 +122,20 @@ trait MediaTrait
             foreach (self::$mediable as $column) {
 
                 $mediaField = null;
-                if ($original[$column]) {
-                    // Delete media field associations
-                    $mediaField = DB::table('media_fields')->where('id', $original[$column])->first();
-                    \DB::table('media_field_has_media')->where('media_field_id', $original[$column])->delete();
+                if ($original[$column] !== 'null' && $original[$column] !== null) {
+                    if ($entry->{$column} !== 'null' && $entry->{$column} !== null) {
+                        // Delete media field associations
+                        DB::table('media_field_has_media')->where('media_field_id', $original[$column])->delete();
+                        $mediaField = DB::table('media_fields')->where('id', $original[$column])->first();
+                    } else {
+                        // Delete media field associations and the media field itself
+                        DB::table('media_field_has_media')->where('media_field_id', $original[$column])->delete();
+                        DB::table('media_fields')->where('id', $original[$column])->delete();
+                        $mediaField = null;
+                    }
+
                 } else {
+                    // Add new media to entity
                     $mediaIds = json_decode($entry->{$column});
                     if ($mediaIds) {
                         $mediaField = MediaField::create([
@@ -167,12 +176,11 @@ trait MediaTrait
                     }
 
                     $entry->refresh();
-                    $entry[$column] = $mediaField->id;
+                    $entry[$column] = isset($mediaField->id) ? $mediaField->id : null;
                     $entry->saveQuietly();
                 }
 
             }
-
             DB::commit();
         } catch (\Exception $e) {
             dd($e->getMessage());
