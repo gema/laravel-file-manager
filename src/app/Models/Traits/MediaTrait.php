@@ -122,7 +122,7 @@ trait MediaTrait
             foreach (self::$mediable as $column) {
 
                 $mediaField = null;
-                if ($original[$column] !== 'null' && $original[$column] !== null) {
+                if ($original[$column] !== 'null' && $original[$column] !== null && (int) $original[$column]) {
                     if ($entry->{$column} !== 'null' && $entry->{$column} !== null) {
                         // Delete media field associations
                         DB::table('media_field_has_media')->where('media_field_id', $original[$column])->delete();
