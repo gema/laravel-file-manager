@@ -32,7 +32,7 @@ trait MediaTrait
             }
 
             return $mediaContents->sortBy('position')->values();
-        } catch (\Exception $e) {
+        } catch (\Exception$e) {
             \Log::info($e);
             return $mediaFieldId;
         }
@@ -96,7 +96,6 @@ trait MediaTrait
                             MediaCombination::upsert(
                                 $data['combinations'],
                                 ['media_id', 'combinated_media_id'],
-                                ['updated_at']
                             );
                         }
 
@@ -107,7 +106,7 @@ trait MediaTrait
                 }
             }
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (\Exception$e) {
             dd($e->getMessage());
             \Log::info($e);
             DB::rollback();
@@ -146,7 +145,6 @@ trait MediaTrait
                         MediaCombination::upsert(
                             $data['combinations'],
                             ['media_id', 'combinated_media_id'],
-                            ['updated_at']
                         );
                     }
                 }
@@ -156,7 +154,7 @@ trait MediaTrait
 
             }
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (\Exception$e) {
             dd($e->getMessage());
             \Log::info($e);
             DB::rollback();
