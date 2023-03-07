@@ -79,7 +79,7 @@ const setGlobals = ({
     initSelectedMediaEdition();
     customEvent(`edit_media_${globalOptions.name}`, {
       mediaId: globalOptions.mediaId,
-      medias: globalOptions.medias
+      medias: globalOptions.medias,
     });
   }
 };
@@ -369,9 +369,9 @@ const onSaveAsignTag = () => {
 
 const asignTagRequest = body => {
   fetch('/api/media/tag', {
-      method: 'POST',
-      body,
-    })
+    method: 'POST',
+    body,
+  })
     .then(r => r.json())
     .then(response => {
       if (response.data) {
@@ -413,9 +413,9 @@ const onSaveUnsignTag = () => {
 
 const unsignTagRequest = body => {
   fetch('/api/media/tag/unsign', {
-      method: 'POST',
-      body,
-    })
+    method: 'POST',
+    body,
+  })
     .then(r => r.json())
     .then(response => {
       if (response.data) {
@@ -480,7 +480,8 @@ const initUploadModal = (files = globalUploadList) => {
   if (i >= 0) extensions = globalMediaTypes[i].extensions;
   if (extensions) {
     files = files.filter(file => {
-      if (!extensions.includes(file.media.type.split('/')[1])) {
+      const [, extension] = file.media.name.split('.');
+      if (!extensions.includes(extension)) {
         toast('Some of the medias do not have the correct extension', 'error');
         return false;
       }
@@ -866,9 +867,9 @@ const onEditionSave = (modal, media) => {
   const obj = {};
 
   fetch(`/api/media/${media.id}/edit`, {
-      method: 'POST',
-      body: setExtraFields(metaData),
-    })
+    method: 'POST',
+    body: setExtraFields(metaData),
+  })
     .then(r => r.json())
     .then(onEditionResponse);
 };
