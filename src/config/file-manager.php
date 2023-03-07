@@ -70,6 +70,7 @@ return [
         'glb' => 'glb',
         'gltf' => 'gltf',
         'svg' => 'svg',
+        'mpeg' => 'mpeg',
     ],
 
     'rows' => 20, // Number of medias returned per page
