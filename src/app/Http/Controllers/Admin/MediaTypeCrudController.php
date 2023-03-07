@@ -85,7 +85,7 @@ class MediaTypeCrudController extends CrudController
             'name' => 'extensions',
             'label' => 'Allowed extensions',
             'options' => Config::get('file-manager.allowed_extensions'),
-            'allows_null' => false,
+            'allows_null' => true,
             'allows_multiple' => true,
         ]);
 
