@@ -448,7 +448,7 @@ const initSelectedMediasEdition = (prefix, medias, type) => {
           formData.append(key, value);
         });
 
-        fetch(`/api/media/${media.media_content.media_id}/edit`, {
+        fetch(`/api/media/${media.media_content.id}/edit`, {
           method: 'POST',
           body: formData,
         })
