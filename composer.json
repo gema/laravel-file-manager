@@ -7,6 +7,11 @@
             "name": "António Almeida",
             "email": "promatik@gmail.com",
             "homepage": "https://promatik.pt"
+        },
+        {
+            "name": "Mário Santos",
+            "email": "mariogilgsantos@gmail.com",
+            "homepage": "https://www.linkedin.com/in/m%C3%A1rio-santos-dev/"
         }
     ],
     "homepage": "https://github.com/gema/laravel-file-manager",
@@ -16,7 +21,7 @@
     ],
     "require": {
         "php": "^7.4|^8.0|^8.1",
-        "illuminate/support": "~7|~8|~9"
+        "illuminate/support": "~7|~8|~9|~10"
     },
     "require-dev": {
         "phpunit/phpunit": "~9.0",
