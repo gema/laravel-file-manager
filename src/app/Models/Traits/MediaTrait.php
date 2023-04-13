@@ -96,7 +96,6 @@ trait MediaTrait
                             MediaCombination::upsert(
                                 $data['combinations'],
                                 ['media_id', 'combinated_media_id'],
-                                ['conflict_action' => 'do nothing']
                             );
                         }
 
