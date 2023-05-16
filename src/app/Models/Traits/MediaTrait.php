@@ -51,7 +51,7 @@ trait MediaTrait
                     'position' => $i,
                 ]);
 
-                if (count($media->combined_medias)) {
+                if (property_exists($media, 'combined_medias')) {
                     foreach ($media->combined_medias as $combinedMediaId) {
                         array_push($combinationData, [
                             'media_id' => $media->id,
@@ -117,7 +117,7 @@ trait MediaTrait
     {
         DB::beginTransaction();
         try {
-            $original = $entry->getOriginal();
+            // $original = $entry->getOriginal();
             foreach (self::$mediable as $column) {
                 // Delete media field associations
                 // $mediaField = DB::table('media_fields')->where('id', $original[$column])->first();
@@ -134,7 +134,7 @@ trait MediaTrait
                     $medias = $decoded->medias;
                     // Delete media combinations
                     foreach ($medias as $media) {
-                        if (is_object($media) && isset($media->combined_medias)) {
+                        if (is_object($media) && property_exists($media, 'combined_medias')) {
                             DB::table('media_has_combinations')->where('media_id', $media->id)->delete();
                         }
                     }
