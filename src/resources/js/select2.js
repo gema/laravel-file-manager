@@ -108,9 +108,10 @@ const initGroupedFields = (container = document) => {
                     text: namespace.split("\\").pop(),
                     children: Object.values(response.data).map((entry) => ({
                       id: entry.id,
-                      text: Array.isArray(entry.name)
-                        ? entry.name[0].data[Object.keys(entry.name[0].data)[0]]
-                        : getPossibleTranslation(JSON.stringify(entry.name)),
+                      // text: Array.isArray(entry.name)
+                      //   ? entry.name[0].data[Object.keys(entry.name[0].data)[0]]
+                      //   : getPossibleTranslation(JSON.stringify(entry.name)),
+                      text: entry.name,
                       namespace,
                     })),
                   });
@@ -118,18 +119,20 @@ const initGroupedFields = (container = document) => {
               });
               more = finished.length < parentsNumber;
             } else {
-              Object.entries(data).forEach(([namespace, response]) => {
-                Object.values(response.data).forEach((entry) => {
-                  results.push({
-                    id: entry.id,
-                    text: Array.isArray(entry.name)
-                      ? entry.name[0].data[Object.keys(entry.name[0].data)[0]]
-                      : getPossibleTranslation(JSON.stringify(entry.name)),
-                    namespace,
-                  });
-                });
-                more = response.current_page < response.last_page;
-              });
+              Object.entries(data).forEach(
+                ([namespace, response]) => {
+                    Object.values(response).forEach((entry) => {
+                        results.push({
+                            id: entry.id,
+                            text: entry.name,
+                            namespace,
+                        });
+                    });
+                    more =
+                        response.current_page <
+                        response.last_page;
+                }
+            );
             }
 
             return {
