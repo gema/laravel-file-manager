@@ -106,7 +106,7 @@ class MediaCrudController extends CrudController
         $data = [];
         foreach (config('file-manager.parents') as $class) {
             $object = new $class();
-            $result = $object->paginate(10);
+            $result = $object->get();
             $arr = [];
             foreach ($result as $entry) {
                 $entry->name = $entry->name;
